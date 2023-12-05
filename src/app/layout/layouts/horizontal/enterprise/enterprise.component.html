@@ -3,7 +3,8 @@
 
 <!-- Navigation -->
 <ng-container *ngIf="isScreenSmall">
-    <fuse-vertical-navigation
+    <nav #stickyMenu>
+        <fuse-vertical-navigation 
         class="dark bg-green-800 print:hidden"
         [mode]="'over'"
         [name]="'mainNavigation'"
@@ -21,6 +22,8 @@
             </div>
         </ng-container>
     </fuse-vertical-navigation>
+    </nav>
+    
 </ng-container>
 
 <!-- Wrapper -->
@@ -70,15 +73,6 @@
         </div>
         <!-- Bottom bar -->
         <ng-container *ngIf="!isScreenSmall">
-            <!-- <div class="flex flex-auto justify-center px-4 md:px-8 bg-card dark:bg-gray-700">
-                <div class="relative flex items-center w-full max-w-360 h-16">
-                    <fuse-horizontal-navigation
-                        class="-mx-4"
-                        [name]="'mainNavigation'"
-                        [navigation]="navigation.horizontal"></fuse-horizontal-navigation>
-                </div>
-            </div> -->
-
             <nav  #stickyMenu class="w-full top-0 drop-shadow" [class.fixed]="fixedMenu">
                 <div class="flex flex-auto justify-center px-4 md:px-8 bg-card dark:bg-gray-700 ">
                     <div class="relative flex items-center w-full max-w-360 h-16">
