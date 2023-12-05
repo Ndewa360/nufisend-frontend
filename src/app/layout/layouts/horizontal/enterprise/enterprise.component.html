@@ -4,7 +4,7 @@
 <!-- Navigation -->
 <ng-container *ngIf="isScreenSmall">
     <fuse-vertical-navigation
-        class="dark bg-gray-900 print:hidden"
+        class="dark bg-green-800 print:hidden"
         [mode]="'over'"
         [name]="'mainNavigation'"
         [navigation]="navigation.default"
@@ -14,9 +14,10 @@
             <!-- Logo assets/images/logo/logo-text-on-dark.svg-->
             <div class="flex items-center h-20 pt-6 px-8">
                 <img
-                    class="w-24"
+                    class="w-8"
                     src="assets/images/logo/ySapp_logo.png"
                     alt="Logo image">
+                    <span class="ml-2 text-base font-bold">Y-SAPP</span>
             </div>
         </ng-container>
     </fuse-vertical-navigation>
@@ -38,6 +39,7 @@
                             class="w-18"
                             src="assets/images/logo/ySapp_logo.png"
                             alt="Logo image">
+                        <span class="ml-2 text-base font-bold">Y-SAPP</span>                            
                     </div>
                 </ng-container>
                 <!-- Navigation toggle button -->
