@@ -2,6 +2,7 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExtraOptions, PreloadAllModules, Router, RouterModule } from '@angular/router';
+import { NgxsModule } from '@ngxs/store'
 import { FuseModule } from '@fuse';
 import { FuseConfigModule } from '@fuse/services/config';
 import { FuseMockApiModule } from '@fuse/lib/mock-api';
@@ -13,6 +14,7 @@ import { AppComponent } from 'app/app.component';
 import { appRoutes } from 'app/app.routing';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { initializeKeycloak } from './core/auth/keycloak-init';
+import { environment } from 'environments/environment';
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -38,7 +40,14 @@ const routerConfig: ExtraOptions = {
 
         // Layout module of your application
         LayoutModule,
-        KeycloakAngularModule
+
+        //Keycloak module for auth
+        KeycloakAngularModule,
+
+        NgxsModule.forRoot([], {
+        developmentMode: !environment.production
+        })
+  
     ],
     bootstrap   : [
         AppComponent

@@ -38,5 +38,9 @@ export class UserService
     {
         return this._user.asObservable();
     }
+    goToUserProfile()
+    {
+        return this.authService.redirectToProfile()
+    }
 
 }
