@@ -1,67 +1,42 @@
 import { Injectable } from '@angular/core';
-import { CanMatch, Route, Router, UrlSegment, UrlTree } from '@angular/router';
-import { Observable, of, switchMap } from 'rxjs';
-import { AuthService } from 'app/core/auth/auth.service';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router, CanMatch } from '@angular/router';
+import { KeycloakAuthGuard, KeycloakService } from 'keycloak-angular';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
-export class AuthGuard implements CanMatch
-{
-    /**
-     * Constructor
-     */
-    constructor(
-        private _authService: AuthService,
-        private _router: Router
-    )
-    {
+export class AuthGuard extends KeycloakAuthGuard {
+  
+  constructor(
+    protected readonly router: Router,
+    protected readonly keycloak: KeycloakService
+  ) {
+    super(router, keycloak);
+  }
+  
+  async isAccessAllowed(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+    
+    if (!this.authenticated) {
+      await this.keycloak.login({
+        redirectUri: window.location.origin + state.url,
+      });
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
+    return this.authenticated;
 
-    /**
-     * Can match
-     *
-     * @param route
-     * @param segments
-     */
-    canMatch(route: Route, segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree
-    {
-        return this._check(segments);
-    }
+    // // Get the roles required from the route.
+    // const requiredRoles = route.data.roles;
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Private methods
-    // -----------------------------------------------------------------------------------------------------
+    // // Allow the user to proceed if no additional roles are required to access the route.
+    // if (!Array.isArray(requiredRoles) || requiredRoles.length === 0) {
+    //   return true;
+    // }
 
-    /**
-     * Check the authenticated status
-     *
-     * @param segments
-     * @private
-     */
-    private _check(segments: UrlSegment[]): Observable<boolean | UrlTree>
-    {
-        // Check the authentication status
-        return this._authService.check().pipe(
-            switchMap((authenticated) => {
+    // // Allow the user to proceed if all the required roles are present.
+    // return requiredRoles.every((role) => this.roles.includes(role));
+  }
 
-                // If the user is not authenticated...
-                if ( !authenticated )
-                {
-                    // Redirect to the sign-in page with a redirectUrl param
-                    const redirectURL = `/${segments.join('/')}`;
-                    const urlTree = this._router.parseUrl(`sign-in?redirectURL=${redirectURL}`);
-
-                    return of(urlTree);
-                }
-
-                // Allow the access
-                return of(true);
-            })
-        );
-    }
+  
 }

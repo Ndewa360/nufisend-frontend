@@ -1,10 +1,12 @@
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { ReplaySubject, Subject, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
 import { NavigationService } from 'app/core/navigation/navigation.service';
+import { KeycloakProfile } from 'keycloak-js';
+import { UserService } from 'app/core/user/user.service';
 
 @Component({
     selector     : 'enterprise-layout',
@@ -15,6 +17,7 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
 {
     fixedMenu: boolean = false;
     menuPosition:any;
+    user: KeycloakProfile=null;
     @ViewChild('stickyMenu') menuElement: ElementRef;
     isScreenSmall: boolean;
     navigation: Navigation;
@@ -28,7 +31,9 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
         private _router: Router,
         private _navigationService: NavigationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _fuseNavigationService: FuseNavigationService
+        private _fuseNavigationService: FuseNavigationService,
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _userService:UserService
     )
     {
     }
@@ -69,6 +74,16 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
                 // Check if the screen is small
                 this.isScreenSmall = !matchingAliases.includes('md');
             });
+
+        // Subscribe to user changes
+        this._userService.user$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((user: KeycloakProfile) => {
+            this.user = user;
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
     }
 
     ngAfterViewInit(){

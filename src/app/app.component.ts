@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from './core/auth/auth.service';
 
 @Component({
     selector   : 'app-root',
@@ -10,7 +11,8 @@ export class AppComponent
     /**
      * Constructor
      */
-    constructor()
+    constructor( private authService:AuthService)
     {
+        authService.checkAuthStatus()
     }
 }

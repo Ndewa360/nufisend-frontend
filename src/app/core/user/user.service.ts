@@ -1,20 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, ReplaySubject, tap } from 'rxjs';
-import { User } from 'app/core/user/user.types';
+import { AuthService } from '../auth/auth.service';
+import { KeycloakProfile } from 'keycloak-js';
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserService
 {
-    private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
+    private _user: ReplaySubject<KeycloakProfile> = new ReplaySubject<KeycloakProfile>(1);
 
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient)
+    constructor(private _httpClient: HttpClient,private authService:AuthService)
     {
+        this.authService.currentUser.subscribe((value)=>this.user=value)
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -26,44 +28,15 @@ export class UserService
      *
      * @param value
      */
-    set user(value: User)
+    set user(value: KeycloakProfile)
     {
         // Store the value
         this._user.next(value);
     }
 
-    get user$(): Observable<User>
+    get user$(): Observable<KeycloakProfile>
     {
         return this._user.asObservable();
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Get the current logged in user data
-     */
-    get(): Observable<User>
-    {
-        return this._httpClient.get<User>('api/common/user').pipe(
-            tap((user) => {
-                this._user.next(user);
-            })
-        );
-    }
-
-    /**
-     * Update the user
-     *
-     * @param user
-     */
-    update(user: User): Observable<any>
-    {
-        return this._httpClient.patch<User>('api/common/user', {user}).pipe(
-            map((response) => {
-                this._user.next(response);
-            })
-        );
-    }
 }

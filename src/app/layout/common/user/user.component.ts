@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy
 import { Router } from '@angular/router';
 import { BooleanInput } from '@angular/cdk/coercion';
 import { Subject, takeUntil } from 'rxjs';
-import { User } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
+import { KeycloakProfile } from 'keycloak-js';
 
 @Component({
     selector       : 'user',
@@ -19,7 +19,7 @@ export class UserComponent implements OnInit, OnDestroy
     /* eslint-enable @typescript-eslint/naming-convention */
 
     @Input() showAvatar: boolean = true;
-    user: User;
+    user: KeycloakProfile=null;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -46,7 +46,7 @@ export class UserComponent implements OnInit, OnDestroy
         // Subscribe to user changes
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((user: User) => {
+            .subscribe((user: KeycloakProfile) => {
                 this.user = user;
 
                 // Mark for check
@@ -80,12 +80,6 @@ export class UserComponent implements OnInit, OnDestroy
         {
             return;
         }
-
-        // Update the user
-        this._userService.update({
-            ...this.user,
-            status
-        }).subscribe();
     }
 
     /**

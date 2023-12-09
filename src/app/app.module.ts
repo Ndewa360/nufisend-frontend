@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ExtraOptions, PreloadAllModules, RouterModule } from '@angular/router';
+import { ExtraOptions, PreloadAllModules, Router, RouterModule } from '@angular/router';
 import { FuseModule } from '@fuse';
 import { FuseConfigModule } from '@fuse/services/config';
 import { FuseMockApiModule } from '@fuse/lib/mock-api';
@@ -11,6 +11,8 @@ import { mockApiServices } from 'app/mock-api';
 import { LayoutModule } from 'app/layout/layout.module';
 import { AppComponent } from 'app/app.component';
 import { appRoutes } from 'app/app.routing';
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+import { initializeKeycloak } from './core/auth/keycloak-init';
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -35,10 +37,19 @@ const routerConfig: ExtraOptions = {
         CoreModule,
 
         // Layout module of your application
-        LayoutModule
+        LayoutModule,
+        KeycloakAngularModule
     ],
     bootstrap   : [
         AppComponent
+    ],
+    providers: [
+        {
+            provide:APP_INITIALIZER,
+            useFactory:initializeKeycloak,
+            multi:true,
+            deps:[KeycloakService,Router]
+          }
     ]
 })
 export class AppModule
