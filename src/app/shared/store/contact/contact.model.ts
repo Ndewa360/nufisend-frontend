@@ -1,4 +1,5 @@
 export interface ContactModel {
+    _id?:string;
     fullName?:string;
     emails?:{email?:string,label?:string}[];
     phoneNumbers?:{country?:string,phoneNumber?:string,label?:string}[];    
@@ -12,5 +13,6 @@ export interface ContactModel {
     company?:string;
     birthday?:Date;
     avatar?:string;
+    background?:string;
 
 }

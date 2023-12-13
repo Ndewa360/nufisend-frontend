@@ -8,6 +8,13 @@ export namespace ContactAction
         constructor(public contact:ContactModel){}
     }
 
+    //Create
+    export class UpdateContact
+    {
+        static readonly type = '[Contact] Update Contact';
+        constructor(public contact:ContactModel, public id:string){}
+    }
+
     //Fetch All contact
     export class FetchAllContact
     {

@@ -8,7 +8,6 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormArray } fr
 import { MatDrawerToggleResult } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { Contact } from 'app/layout/common/quick-chat/quick-chat.types';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { ContactAction, ContactModel } from 'app/shared/store';
 import { Actions, Store, ofActionCompleted, ofActionSuccessful } from '@ngxs/store';
@@ -218,6 +217,9 @@ export class AddComponent implements OnInit, OnDestroy {
             actions: {
                 confirm: {
                     label: 'Annuler'
+                },
+                'cancel':{
+                  label: 'Revenir'
                 }
             }
         });

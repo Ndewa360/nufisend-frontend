@@ -1,4 +1,4 @@
-import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { Action, Selector, State, StateContext, createSelector } from "@ngxs/store";
 import { ContactModel } from "./contact.model";
 import { Injectable } from "@angular/core";
 import { ContactAction } from "./contact.actions";
@@ -38,6 +38,15 @@ export class ContactState{
         return state.contacts
     }
 
+    static selectStateByContactId(contactId:string)
+    {
+        return createSelector([ContactState],(state)=>{
+            let data=state.contacts.find((contact)=>contact._id==contactId)
+            if(data) return data
+            return null;
+        })        
+    }
+
     @Action(ContactAction.AddContact)
     addContact(ctx:StateContext<ContactStateModel>, {contact}:ContactAction.AddContact)
     {
@@ -57,9 +66,38 @@ export class ContactState{
             ),
             catchError((error) => {
                 this._toastrService.error(error?.error?.message, 'Erreur');
-                ctx.setState({
-                    ...state,
-                    // error: error?.error?.message,
+                ctx.patchState({
+                    loadingContacts: false
+                })
+                return throwError(error);
+                
+            })
+        )
+    }
+
+    @Action(ContactAction.UpdateContact)
+    updateContact(ctx:StateContext<ContactStateModel>, {contact,id}:ContactAction.UpdateContact)
+    {
+        const state = ctx.getState();
+        ctx.patchState({
+            loadingContacts: true
+        })
+
+        return this._contactsService.updateContact(contact,id).pipe(
+            tap(
+                (result)=>{
+                    
+                    let contactIndex = state.contacts.findIndex((c)=>c._id==id),contacts = state.contacts;
+                    contact[contactIndex]=result.data
+                    ctx.patchState({
+                        loadingContacts:false,
+                        contacts
+                    })
+                }
+            ),
+            catchError((error) => {
+                this._toastrService.error(error?.error?.message, 'Erreur');
+                ctx.patchState({
                     loadingContacts: false
                 })
                 return throwError(error);

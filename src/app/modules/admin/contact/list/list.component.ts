@@ -67,17 +67,8 @@ export class ListComponent implements OnInit, OnDestroy{
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Get the contact
-        // this._contactsService.contact$
-        //     .pipe(takeUntil(this._unsubscribeAll))
-        //     .subscribe((contact: ContactModel) => {
-
-        //         // Update the selected contact
-        //         this.selectedContact = contact;
-
-        //         // Mark for check
-        //         this._changeDetectorRef.markForCheck();
-        //     });
+        
+        
 
         // Get the countries
         // this._contactsService.countries$
@@ -116,12 +107,30 @@ export class ListComponent implements OnInit, OnDestroy{
         });
 
         // Subscribe to media changes
-        this._fuseMediaWatcherService.onMediaQueryChange$('(min-width: 1440px)')
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((state) => {
+        // this._fuseMediaWatcherService.onMediaQueryChange$('(min-width: 1440px)')
+        //     .pipe(takeUntil(this._unsubscribeAll))
+        //     .subscribe((state) => {
 
-                // Calculate the drawer mode
-                this.drawerMode = state.matches ? 'side' : 'over';
+        //         // Calculate the drawer mode
+        //         this.drawerMode = state.matches ? 'side' : 'over';
+
+        //         // Mark for check
+        //         this._changeDetectorRef.markForCheck();
+        //     });
+    
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {
+
+                // Set the drawerMode if the given breakpoint is active
+                if ( matchingAliases.includes('lg') )
+                {
+                    this.drawerMode = 'side';
+                }
+                else
+                {
+                    this.drawerMode = 'over';
+                }
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -163,6 +172,15 @@ export class ListComponent implements OnInit, OnDestroy{
         // Go back to the list
         this._router.navigate(['./'], {relativeTo: this._activatedRoute});
 
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+    }
+
+    selectContact(contact)
+    {
+        this.selectedContact= contact
+        // Go back to the list
+        this._router.navigate(['./',contact._id], {relativeTo: this._activatedRoute});
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }

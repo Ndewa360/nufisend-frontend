@@ -30,4 +30,12 @@ export class ContactService
     {
         return this._httpClient.post<ApiResultFormat<ContactModel>>(`${environment.apiUrl}/contacts`, contact)
     }
+
+    /**
+     * Update contact
+     */
+    updateContact(contact:ContactModel,id:string): Observable<ApiResultFormat<ContactModel>>
+    {
+        return this._httpClient.put<ApiResultFormat<ContactModel>>(`${environment.apiUrl}/contacts/${id}`, contact)
+    }
 }
