@@ -7,6 +7,7 @@ import { Navigation } from 'app/core/navigation/navigation.types';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { KeycloakProfile } from 'keycloak-js';
 import { UserService } from 'app/core/user/user.service';
+import { FuseLoadingService } from '@fuse/services/loading';
 
 @Component({
     selector     : 'enterprise-layout',
@@ -33,7 +34,8 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _userService:UserService
+        private _userService:UserService,
+        private _fuseLoadingService:FuseLoadingService
     )
     {
     }

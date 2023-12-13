@@ -15,6 +15,10 @@ import { appRoutes } from 'app/app.routing';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { initializeKeycloak } from './core/auth/keycloak-init';
 import { environment } from 'environments/environment';
+import { ContactState } from './shared/store';
+import { GlobalState } from './shared/store/global';
+import { ToastrModule } from 'ngx-toastr';
+import { FuseLoadingModule } from '@fuse/services/loading';
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -30,10 +34,11 @@ const routerConfig: ExtraOptions = {
         BrowserAnimationsModule,
         RouterModule.forRoot(appRoutes, routerConfig),
 
-        // Fuse, FuseConfig & FuseMockAPI
+        // Fuse, FuseConfig, FuseMockAPI, FuseLoading
         FuseModule,
         FuseConfigModule.forRoot(appConfig),
         FuseMockApiModule.forRoot(mockApiServices),
+        FuseLoadingModule,
 
         // Core module of your application
         CoreModule,
@@ -44,10 +49,13 @@ const routerConfig: ExtraOptions = {
         //Keycloak module for auth
         KeycloakAngularModule,
 
-        NgxsModule.forRoot([], {
+        //Ngxs module
+        NgxsModule.forRoot([ContactState,GlobalState], {
         developmentMode: !environment.production
-        })
-  
+        }),
+
+        //Toatr module init
+        ToastrModule.forRoot(),
     ],
     bootstrap   : [
         AppComponent

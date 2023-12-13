@@ -59,6 +59,21 @@ export const appRoutes: Route[] = [
             
         ]
     },
+    // Annuaire routes
+    {
+        path: 'annuaire',
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        children: [
+            {path: 'contacts', loadChildren:() => import('app/modules/admin/contact/contact.module').then(m =>m.ContactModule) },
+        ]
+    },
 
     // Redirect empty path to '/home'
     {path: '**', pathMatch : 'full', redirectTo: 'home'},

@@ -21,14 +21,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 title: 'Contact',
                 type : 'basic',
                 icon : 'mat_outline:contact_phone',
-                link : '/contacts',
+                link : '/annuaire/contacts',
             },
             {
                 id   : 'contact_group',
                 title: 'Groupe',
                 type : 'basic',
                 icon : 'heroicons_outline:user-group',
-                link : '/groups',
+                link : '/annuaire/groups',
             },
         ]
     },
@@ -36,7 +36,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
         id   : 'organization',
         title: 'Organisation',
         type : 'group',
-        icon : 'heroicons_outline:building-office',
+        icon : 'heroicons_outline:office-building',
         link : '/organisation',
         children: [
             {
@@ -44,14 +44,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 title: 'Utilisateur',
                 type : 'basic',
                 icon : 'heroicons_outline:users',
-                link : '/users',
+                link : '/organisation/users',
             },
             {
                 id   : 'parameter',
                 title: 'Parametre',
                 type : 'basic',
-                icon : 'heroicons_outline:cog-6-tooth',
-                link : '/settings',
+                icon : 'heroicons_outline:cog',
+                link : '/organisation/settings',
             },
         ]
     },
@@ -67,14 +67,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 title: 'Envoi direct',
                 type : 'basic',
                 icon : 'feather:send',
-                link : '/send',
+                link : '/message/send',
             },
             {
                 id   : 'planify',
                 title: 'Planifier',
                 type : 'basic',
                 icon : 'mat_outline:schedule',
-                link : '/schedule',
+                link : '/message/schedule',
             },
             
         ]

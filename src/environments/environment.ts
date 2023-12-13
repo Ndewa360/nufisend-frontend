@@ -7,7 +7,6 @@ export const environment = {
 
   apiUrl: 'http://localhost:3000',
   url: 'http://localhost:3000',
-  urlProd: 'http://localhost:3000',
   urlToSendMessage: 'http://localhost:3000',
   keycloak:{
     secret:"AqetVGJS1jk7s1gcyll0ivvREYRj6R9c",
