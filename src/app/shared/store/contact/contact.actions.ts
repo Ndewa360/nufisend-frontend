@@ -20,4 +20,11 @@ export namespace ContactAction
     {
         static readonly type = '[Contact] Fectch All Contact'
     }
+
+    //Delete contact
+    export class DeleteContact
+    {
+        static readonly type = '[Contact] Delete Contact'
+        constructor(public id:string){}
+    }
 }

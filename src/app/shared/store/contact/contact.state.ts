@@ -62,6 +62,7 @@ export class ContactState{
                         loadingContacts:false,
                         contacts:[...state.contacts,result.data]
                     })
+                    this._toastrService.success("Contact ajouté avec success", 'Contact');
                 }
             ),
             catchError((error) => {
@@ -92,6 +93,38 @@ export class ContactState{
                     ctx.patchState({
                         loadingContacts:false,
                         contacts
+                    })
+                    this._toastrService.success(`Contact ${contact.fullName} modifié avec success`, 'Contact');
+                }
+            ),
+            catchError((error) => {
+                this._toastrService.error(error?.error?.message, 'Erreur');
+                ctx.patchState({
+                    loadingContacts: false
+                })
+                return throwError(error);
+                
+            })
+        )
+    }
+
+    @Action(ContactAction.DeleteContact)
+    deleteContact(ctx:StateContext<ContactStateModel>, {id}:ContactAction.DeleteContact)
+    {
+        const state = ctx.getState();
+        ctx.patchState({
+            loadingContacts: true
+        })
+
+        return this._contactsService.deleteContact(id).pipe(
+            tap(
+                (result)=>{                    
+                    let contactIndex = state.contacts.findIndex((c)=>c._id==id),contacts = [...state.contacts];
+                    this._toastrService.success(`Contact ${contacts[contactIndex].fullName} supprimé avec success`, 'Contact');
+                    contacts.splice(contactIndex,1);
+                    ctx.patchState({
+                        loadingContacts:false,
+                        contacts:[...contacts]
                     })
                 }
             ),

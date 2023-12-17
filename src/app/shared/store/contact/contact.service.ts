@@ -38,4 +38,12 @@ export class ContactService
     {
         return this._httpClient.put<ApiResultFormat<ContactModel>>(`${environment.apiUrl}/contacts/${id}`, contact)
     }
+
+    /**
+     * Delete contact
+     */
+    deleteContact(id:string): Observable<ApiResultFormat<null>>
+    {
+        return this._httpClient.delete<ApiResultFormat<null>>(`${environment.apiUrl}/contacts/${id}`)
+    }
 }

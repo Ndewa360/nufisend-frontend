@@ -3,7 +3,7 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormArray } fr
 import { MatDrawerToggleResult } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { Store, Actions, ofActionSuccessful, ofActionCompleted } from '@ngxs/store';
+import { Store, Actions, ofActionSuccessful, ofActionCompleted, ofActionErrored } from '@ngxs/store';
 import { ContactModel, CountryModel, CountryService, ContactAction, ContactState } from 'app/shared/store';
 import { FormUtils } from 'app/shared/utils/form-utils';
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
@@ -30,6 +30,7 @@ export class DetailComponent {
   countries: CountryModel[]=[];
   private _tagsPanelOverlayRef: OverlayRef;
   private _unsubscribeAll: Subject<any> = new Subject<any>();
+  isLoading=true;
   
 
   /**
@@ -91,23 +92,64 @@ export class DetailComponent {
 
       this._store.select(ContactState.selectStateByContactId(this._activatedRoute.snapshot.paramMap.get('id')))
       .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe(this.updateSelectedContact);
+      .subscribe((value)=>{
+        this.isLoading = false;
+        if(!value) return;
+        this.updateSelectedContact(value);        
+      });
       
-    this._ngxsAction.pipe(ofActionSuccessful(ContactAction.UpdateContact)).subscribe(
+    this._ngxsAction.pipe
+    (
+        takeUntil(this._unsubscribeAll),
+        ofActionSuccessful(ContactAction.UpdateContact)
+    )
+    .subscribe(
       (value:any)=>{
-        console.log("Value ",value)
-        this.updateSelectedContact(value)
-      // Navigate to the parent
         this.toggleEditMode(false)
+        this.updateSelectedContact(value.contact)
       }
     );
-    this._ngxsAction.pipe(ofActionCompleted(ContactAction.UpdateContact)).subscribe(
+
+    this._ngxsAction.pipe
+    (
+        takeUntil(this._unsubscribeAll),
+        ofActionCompleted(ContactAction.UpdateContact)
+    )
+    .subscribe(
       (value) => {
         this.submitted=false
         // Mark for check
         this._changeDetectorRef.markForCheck();
       }
     )
+
+    this._ngxsAction.pipe
+    (
+        takeUntil(this._unsubscribeAll),
+        ofActionSuccessful(ContactAction.DeleteContact)
+    )
+    .subscribe(
+        (value) => {
+            this.isLoading =false
+          // Navigate to the parent
+          this._router.navigate(['../'], {relativeTo: this._activatedRoute});
+
+          // Mark for check
+          this._changeDetectorRef.markForCheck();
+        }
+      )
+
+      this._ngxsAction.pipe
+      (
+        takeUntil(this._unsubscribeAll),
+        ofActionErrored(ContactAction.DeleteContact)
+      ).subscribe(
+        (value) => {
+            this.isLoading =false
+          // Mark for check
+          this._changeDetectorRef.markForCheck();
+        }
+      )
 
     // Toggle the edit mode off
     this.toggleEditMode(false);
@@ -283,13 +325,13 @@ export class DetailComponent {
       // Open the confirmation dialog
       const confirmation = this._fuseConfirmationService.open({
           title  : 'Annuler la création',
-          message: 'Voulez-vous annuler la création du contact? Cette action est irréversible!',
+          message: 'Voulez-vous vraiment supprimer ce contact? Cette action est irréversible!',
           actions: {
               confirm: {
-                  label: 'Annuler'
+                  label: 'Supprimer'
               },
               'cancel':{
-                label: 'Revenir'
+                label: 'Annuler'
               }
           }
       });
@@ -300,11 +342,10 @@ export class DetailComponent {
           // If the confirm button pressed...
           if ( result === 'confirmed' )
           {
-               // Navigate to the parent
-               this._router.navigate(['../'], {relativeTo: this._activatedRoute});
-
-              // Mark for check
-              this._changeDetectorRef.markForCheck();
+            this.isLoading=true;
+            // Mark for check
+            this._changeDetectorRef.markForCheck();         
+            this._store.dispatch(new ContactAction.DeleteContact(this.contact._id)); 
           }
       });
 
