@@ -8,6 +8,8 @@ import { ContactService } from 'app/shared/store/contact/contact.service';
 import { Observable, Subject, takeUntil, switchMap, fromEvent, filter } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
 import { Select, Store } from '@ngxs/store';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-contact-list',
@@ -39,7 +41,9 @@ export class ListComponent implements OnInit, OnDestroy{
         @Inject(DOCUMENT) private _document: any,
         private _store: Store,
         private _router: Router,
-        private _fuseMediaWatcherService: FuseMediaWatcherService
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _fuseConfirmationService: FuseConfirmationService,
+        private _toastrService:ToastrService
     )
     {
     }
@@ -197,6 +201,38 @@ export class ListComponent implements OnInit, OnDestroy{
 
             // Mark for check
             this._changeDetectorRef.markForCheck();
+    }
+
+    /**
+     * Import contact
+     */
+    importContact(): void
+    {
+        // Create the contact
+
+            // Go to the new contact
+            // this._router.navigate(['./import'], {relativeTo: this._activatedRoute});
+
+            // Mark for check
+            // this._changeDetectorRef.markForCheck();
+
+            this._toastrService.warning("Fonctionnalité d'import non encore supporté", 'Contact');
+    }
+
+    /**
+     * Export contact
+     */
+    exportContact(): void
+    {
+        // Create the contact
+
+            // Go to the new contact
+            // this._router.navigate(['./import'], {relativeTo: this._activatedRoute});
+
+            // Mark for check
+            // this._changeDetectorRef.markForCheck();
+
+            this._toastrService.warning("Fonctionnalité d'import non encore supporté", 'Contact');
     }
 
     /**

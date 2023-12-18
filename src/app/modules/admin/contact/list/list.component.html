@@ -63,7 +63,26 @@
                             [color]="'primary'"
                             (click)="createContact()">
                             <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                            <span class="ml-2 mr-1">Add</span>
+                            <span class="ml-2 mr-1">Ajouter</span>
+                        </button>
+
+                        <!-- import contact button -->
+                        <button
+                            class="ml-4 text-yellow-500"
+                            mat-stroked-button
+                            (click)="importContact()">
+                            <mat-icon [svgIcon]="'mat_outline:upload'" class="text-yellow-500"></mat-icon>
+                            <span class="ml-2 mr-1">Importer</span>
+                        </button>
+
+                        <!-- export contact button -->
+                        <button
+                            class="ml-4 text-yellow-500"
+                            mat-stroked-button
+                            (click)="exportContact()"
+                            >
+                            <mat-icon [svgIcon]="'mat_outline:download'" class="text-yellow-500"></mat-icon>
+                            <span class="ml-2 mr-1">Export</span>
                         </button>
                     </div>
                 </div>

@@ -7,13 +7,15 @@ import { SharedModule } from 'app/shared/shared.module';
 import { DetailComponent } from './detail/detail.component';
 import { AddComponent } from './add/add.component';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { ImportComponent } from './import/import.component';
 
 
 @NgModule({
   declarations: [
     ListComponent,
     DetailComponent,
-    AddComponent
+    AddComponent,
+    ImportComponent
   ],
   imports: [
     CommonModule,
