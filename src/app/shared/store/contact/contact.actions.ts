@@ -27,4 +27,11 @@ export namespace ContactAction
         static readonly type = '[Contact] Delete Contact'
         constructor(public id:string){}
     }
+
+    //Sync contact
+    export class SyncContact
+    {
+        static readonly type = '[Contact] Sync Contact'
+        constructor(){}
+    }
 }

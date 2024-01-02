@@ -19,6 +19,9 @@ import { ContactState } from './shared/store';
 import { GlobalState } from './shared/store/global';
 import { ToastrModule } from 'ngx-toastr';
 import { FuseLoadingModule } from '@fuse/services/loading';
+import { UserProfileState } from './shared/store/user-profile';
+import { SocketIoModule } from 'ngx-socket-io';
+import { WebsocketManagerService } from './shared/services/websocket-manager/websocket-manager.service';
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -50,12 +53,15 @@ const routerConfig: ExtraOptions = {
         KeycloakAngularModule,
 
         //Ngxs module
-        NgxsModule.forRoot([ContactState,GlobalState], {
+        NgxsModule.forRoot([ContactState,GlobalState,UserProfileState], {
         developmentMode: !environment.production
         }),
 
         //Toatr module init
         ToastrModule.forRoot(),
+
+        //Socket.IO module
+        SocketIoModule
     ],
     bootstrap   : [
         AppComponent
@@ -66,7 +72,8 @@ const routerConfig: ExtraOptions = {
             useFactory:initializeKeycloak,
             multi:true,
             deps:[KeycloakService,Router]
-          }
+          },
+          WebsocketManagerService
     ]
 })
 export class AppModule

@@ -26,7 +26,11 @@ import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FuseFindByKeyPipeModule } from '@fuse/pipes/find-by-key';
+import { TranslocoModule } from '@ngneat/transloco';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { MatTabsModule } from '@angular/material/tabs';
 
 const moduleList = [
     CommonModule,
@@ -60,6 +64,11 @@ const moduleList = [
     MatRadioModule,
     MatSidenavModule,
     FuseFindByKeyPipeModule,
+    MatButtonToggleModule,
+    MatTabsModule,
+    NgApexchartsModule,
+    TranslocoModule,
+    
 ]
 @NgModule({
     imports: [

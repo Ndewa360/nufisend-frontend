@@ -1,0 +1,136 @@
+<ng-container *ngIf="!isWhatsappContactLoading; else toLoading">
+    <div class="flex flex-col">
+        <!-- Whatsapp Sync -->
+        <ng-container *ngIf="((userProfile$|async).hasSyncWhatsApp); else hasNoSyncWhatsapp">
+    
+                <mat-drawer-container
+                    class="flex-auto h-full bg-card dark:bg-transparent"
+                    (backdropClick)="onBackdropClicked()">
+            
+                    <!-- Drawer -->
+                    <mat-drawer
+                        class="w-full  dark:bg-gray-900"
+                        [mode]="drawerMode"
+                        [opened]="false"
+                        [position]="'end'"
+                        [disableClose]="true"
+                        #matDrawer>
+                        <router-outlet></router-outlet>
+                    </mat-drawer>
+            
+                    <mat-drawer-content class="flex flex-col">
+            
+                        <!-- Main -->
+                        <div class="">
+            
+                            <!-- Header -->
+                            <div class="flex flex-col sm:flex-row md:flex-col flex-auto justify-between py-8 px-6 md:px-8 border-b">
+                                <!-- Main actions -->
+                                <div class="flex items-center mt-4 sm:mt-0 md:mt-4">
+                                    <!-- Search -->
+                                    <div class="flex-auto">
+                                        <mat-form-field
+                                            class="fuse-mat-dense fuse-mat-rounded w-full min-w-50"
+                                            subscriptSizing="dynamic">
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                matPrefix
+                                                [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                                            <input
+                                                matInput
+                                                [formControl]="searchInputControl"
+                                                [autocomplete]="'off'"
+                                                [placeholder]="'Search contacts'">
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Add contact button -->
+                                    <button
+                                        class="ml-4"
+                                        mat-flat-button
+                                        [color]="'primary'"
+                                        (click)="syncContact()">
+                                        <mat-progress-spinner
+                                            *ngIf="submitted;"
+                                            [diameter]="24"
+                                            [mode]="'indeterminate'">
+                                        </mat-progress-spinner>
+                                        <mat-icon *ngIf="!submitted" [svgIcon]="'mat_solid:sync'"></mat-icon>
+                                        <span *ngIf="!submitted" class="ml-2 mr-1">Synchronizer</span>
+                                    </button>
+                                </div>
+                            </div>
+            
+                            <!-- Contacts list -->
+                            <div class="relative">
+                                <ng-container *ngIf="contacts.length>0; else noContacts">
+                                    <ng-container *ngFor="let contact of contacts; let i = index; trackBy: trackByFn">
+                                        <!-- Group -->
+                                        <ng-container *ngIf="i === 0 || contact.name.charAt(0) !== contacts[i - 1].name.charAt(0)">
+                                            <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
+                                                {{contact.name.charAt(0)}}
+                                            </div>
+                                        </ng-container>
+                                        <!-- Contact -->
+                                        <a 
+                                            (click)="selectContact(contact)"
+                                            class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
+                                            [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedContact || selectedContact._id !== contact._id,
+                                                        'bg-primary-50 dark:bg-hover': selectedContact && selectedContact._id === contact._id}"
+                                            >
+                                            <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
+                                                <ng-container *ngIf="contact.avatar">
+                                                    <img
+                                                        class="object-cover w-full h-full"
+                                                        [src]="contact.avatar"
+                                                        alt="Contact avatar"/>
+                                                </ng-container>
+                                                <ng-container *ngIf="!contact.avatar">
+                                                    <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                                        {{contact.name.charAt(0)}}
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                            <div class="min-w-0 ml-4">
+                                                <div class="font-medium leading-5 truncate">{{contact.name}}</div>
+                                                <div class="leading-5 truncate text-secondary">{{contact.pushname}} </div>
+                                            </div>
+                                        </a>
+                                    </ng-container>
+                                </ng-container>
+            
+                                <!-- No contacts -->
+                                <ng-template #noContacts>
+                                    <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+                                        <img class="mb-3 mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 7rem;">
+                                            <p class="mb-0">Aucun contact trouvé</p>
+                                    </div>
+                                </ng-template>
+            
+                            </div>
+            
+                        </div>
+            
+                    </mat-drawer-content>
+            
+                </mat-drawer-container>
+            
+            
+        </ng-container>
+    
+        <ng-template #hasNoSyncWhatsapp>
+            <ng-container>
+                <div class="mb-3">
+                    <mat-icon class="icon-size-24 font-bold tracking-tight leading-none text-yellow-500" svgIcon="mat_solid:warning"></mat-icon>
+                </div>
+                <div class="text-lg font-medium ">Veuillez synchronizer votre Whatsapp pour voir vos contacts</div>
+            </ng-container>
+        </ng-template>
+    </div> 
+</ng-container>
+
+<ng-template #toLoading>
+    <div class="flex flex-col items-center mt-2">
+        <mat-progress-spinner [diameter]="100" [mode]="'indeterminate'"></mat-progress-spinner>
+        <div class="text-lg font-medium ">Veuillez patientez...</div>
+    </div>
+</ng-template>

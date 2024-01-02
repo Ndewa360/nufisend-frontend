@@ -46,4 +46,12 @@ export class ContactService
     {
         return this._httpClient.delete<ApiResultFormat<null>>(`${environment.apiUrl}/contacts/${id}`)
     }
+
+    /**
+     * Sync contact
+     */
+    syncContacts(): Observable<ApiResultFormat<null>>
+    {
+        return this._httpClient.post<ApiResultFormat<null>>(`${environment.apiUrl}/contacts/sync-whatsapp`,{})
+    }
 }

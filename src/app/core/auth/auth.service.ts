@@ -3,7 +3,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { KeycloakService } from 'keycloak-angular';
 import { KeycloakProfile } from 'keycloak-js';
-
+// import { WebsocketManagerService } from 'app/shared/services/websocket-manager/websocket-manager.service';
+// import { Socket } from 'ngx-socket-io';
 
 @Injectable({
     providedIn:'root'
@@ -12,7 +13,9 @@ export class AuthService {
  
   currentUser: BehaviorSubject<KeycloakProfile> = new BehaviorSubject<KeycloakProfile>(null); 
 
-  constructor( private readonly keycloak: KeycloakService) 
+  constructor( private readonly keycloak: KeycloakService
+    // ,private socket: WebsocketManagerService
+    ) 
   {
     this.checkAuthStatus()
   }
@@ -22,7 +25,6 @@ export class AuthService {
     if(this.keycloak.isLoggedIn())
     {
         this.currentUser.next(await this.keycloak.loadUserProfile())
-        console.log("User",await this.keycloak.loadUserProfile())
     }
   }
   public getAuthStatus():boolean

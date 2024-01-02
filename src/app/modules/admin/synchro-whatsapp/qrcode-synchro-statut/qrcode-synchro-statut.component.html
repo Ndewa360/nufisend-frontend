@@ -1,0 +1,52 @@
+<div class="flex flex-col items-center mt-2">
+    <ng-container *ngIf="!(loadingUserProfile$|async); else waitingForLoadingUserProfile">
+        <!-- Whatsapp Sync -->
+        <ng-container *ngIf="((userProfile$|async).hasSyncWhatsApp); else hasNoSyncWhatsapp">
+            <div >
+                <mat-icon class="icon-size-24 font-bold tracking-tight leading-none text-green-500" svgIcon="mat_solid:sync"></mat-icon>
+            </div>
+            <div class="text-lg font-medium text-green-600 dark:text-green-500">Votre Whatsapp est connecté</div>
+            <div class="flex items-baseline justify-center w-full mt-5 text-secondary">
+                <button mat-flat-button [color]="'warn'" (click)="endWhatsappSync()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'mat_solid:sync_disabled'"></mat-icon>
+                    <span class="ml-2">Désynchronization</span>
+                    </button>
+            </div>
+        </ng-container>
+
+        <ng-template #hasNoSyncWhatsapp>
+            <ng-container *ngIf=" isWaitingWhatsappSync; else isNoWaitingWhatsappSync">
+                <div class="mb-3">
+                    <mat-progress-spinner [diameter]="100" [mode]="'indeterminate'"></mat-progress-spinner>
+                </div>
+                <div class="text-lg font-medium ">Génération du QR-Code...</div>
+            </ng-container>
+            <ng-template #isNoWaitingWhatsappSync>
+                <ng-container  *ngIf="hasQrCodeIsGenerated; else noQrCodeGenerated">
+                    <div class="mb-3">
+                        <qrcode [qrdata]="generatedQrCode" [width]="250" [errorCorrectionLevel]="'M'" [colorDark]="'#275C3C'" [margin]="'2'">
+                        </qrcode>
+                    </div>
+                    <div class="text-lg font-medium ">Ouvrez Whatsapp sur votre téléphone et scannez le code</div>
+                </ng-container>
+                <ng-template #noQrCodeGenerated>
+                    <div >
+                        <mat-icon class="icon-size-24 font-bold tracking-tight leading-none text-red-500" svgIcon="mat_solid:sync_problem"></mat-icon>
+                    </div>
+                    <div class="text-lg font-medium text-red-600 dark:text-red-500">Votre Whatsapp est déconnecté</div>
+                    <div class="flex items-baseline justify-center w-full mt-5 text-secondary">
+                        <button mat-flat-button (click)="startWathappSync()" [color]="'primary'">
+                            <mat-icon class="icon-size-5" [svgIcon]="'mat_solid:sync'"></mat-icon>
+                            <span class="ml-2">Demarrer la synchronization</span>
+                            </button>
+                    </div>
+                </ng-template>
+            </ng-template>
+            
+        </ng-template>
+    </ng-container>
+
+    <ng-template #waitingForLoadingUserProfile>
+        <mat-progress-spinner [diameter]="100" [mode]="'indeterminate'"></mat-progress-spinner>
+    </ng-template>
+</div>

@@ -71,8 +71,20 @@ export const appRoutes: Route[] = [
             layout: 'enterprise'
         },
         children: [
-            {path: 'contacts', loadChildren:() => import('app/modules/admin/contact/contact.module').then(m =>m.ContactModule) },
+            {path: 'contacts', loadChildren:() => import('app/modules/admin/contact/contact.module').then(m =>m.ContactModule) },              
         ]
+    },
+    {
+        path: 'sync_whatsapp', 
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/admin/synchro-whatsapp/synchro-whatsapp.module').then(m =>m.SynchroWhatsappModule) 
     },
 
     // Redirect empty path to '/home'
