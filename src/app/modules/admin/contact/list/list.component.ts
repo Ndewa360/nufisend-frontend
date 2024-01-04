@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { ContactAction, ContactModel, ContactState } from 'app/shared/store';
 import { ContactService } from 'app/shared/store/contact/contact.service';
-import { Observable, Subject, takeUntil, switchMap, fromEvent, filter } from 'rxjs';
+import { Observable, Subject, takeUntil, switchMap, fromEvent, filter, tap } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
 import { Select, Store } from '@ngxs/store';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
@@ -22,8 +22,12 @@ export class ListComponent implements OnInit, OnDestroy{
   @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
     @Select(ContactState.selectStateData) contacts$: Observable<ContactModel[]>;
+    @Select(ContactState.selectStateLoading) loading$:Observable<boolean>
+    loadingData:boolean=true;
 
     contactsCount: number = 0;
+    contactsFiltered:ContactModel[]=[]
+    contacts:ContactModel[]=[]
     contactsTableColumns: string[] = ['name', 'email', 'phoneNumber', 'job'];
     countries: [];//Country
     drawerMode: 'side' | 'over';
@@ -59,44 +63,45 @@ export class ListComponent implements OnInit, OnDestroy{
     {
         // Get the contacts
         this._store.dispatch(new ContactAction.FetchAllContact())
-        // this.contacts$ = this._contactsService.contacts$;
+
+
+        this.loading$.subscribe((value)=>this.loadingData=value)
         this.contacts$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((contacts: ContactModel[]) => {
-
+            .subscribe((conts: ContactModel[]) => {
+                
                 // Update the counts
-                this.contactsCount = contacts.length;
-
+                this.contactsCount = conts.length;
+                this.contactsFiltered=[...conts]
+                this.contacts=[...conts]
+                console.log("ok data")
+                this._changeDetectorRef.markForCheck()
                 // Mark for check
-                this._changeDetectorRef.markForCheck();
+                
             });
 
-        
-        
-
-        // Get the countries
-        // this._contactsService.countries$
-        //     .pipe(takeUntil(this._unsubscribeAll))
-        //     .subscribe((countries: Country[]) => {
-
-        //         // Update the countries
-        //         this.countries = countries;
-
-        //         // Mark for check
-        //         this._changeDetectorRef.markForCheck();
-        //     });
 
         // Subscribe to search input field value changes
-        // this.searchInputControl.valueChanges
-        //     .pipe(
-        //         takeUntil(this._unsubscribeAll),
-        //         switchMap(query =>
-
-        //             // Search
-        //             // this._contactsService.searchContacts(query)
-        //         )
-        //     )
-        //     .subscribe();
+        this.searchInputControl.valueChanges
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                tap((query:string) =>
+                    {
+                        if(query.length<2)
+                        {
+                            this.contactsFiltered=[...this.contacts]
+                            return;
+                        }
+                        // Search
+                        this.contactsFiltered=this.contacts.filter
+                            (
+                                (contact)=> `${contact.fullName} ${contact.jobTitle} ${contact.company}`.toLowerCase().includes(query.toLowerCase())
+                            )
+                            this._changeDetectorRef.markForCheck();
+                    }
+                )
+            )
+            .subscribe();
 
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
@@ -152,6 +157,8 @@ export class ListComponent implements OnInit, OnDestroy{
             .subscribe(() => {
                 this.createContact();
             });
+
+            this._changeDetectorRef.markForCheck();
     }
 
     /**

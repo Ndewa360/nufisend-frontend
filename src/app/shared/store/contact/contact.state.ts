@@ -174,7 +174,6 @@ export class ContactState{
             tap(
                 result => {
                     const state = ctx.getState();
-                    console.log("Result data", result)
                     ctx.setState({
                         loadingContacts:false,
                         contacts:result.data

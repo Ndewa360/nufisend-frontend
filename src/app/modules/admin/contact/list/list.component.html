@@ -28,9 +28,9 @@
                         <div class="text-4xl font-extrabold tracking-tight leading-none">Contacts</div>
                         <div class="ml-0.5 font-medium text-secondary">
                             <ng-container *ngIf="contactsCount > 0">
-                                {{contactsCount}}
+                                {{contactsFiltered.length}}
                             </ng-container>
-                            {{contactsCount | i18nPlural: {
+                            {{contactsFiltered.length | i18nPlural: {
                             '=0'   : 'Aucun contact',
                             '=1'   : 'contact',
                             'other': 'contacts'
@@ -89,11 +89,11 @@
 
                 <!-- Contacts list -->
                 <div class="relative">
-                    <ng-container *ngIf="contacts$ | async as contacts">
-                        <ng-container *ngIf="contacts.length; else noContacts">
-                            <ng-container *ngFor="let contact of contacts; let i = index; trackBy: trackByFn">
+                    <ng-container *ngIf="loadingData==false; else waitForLoadingData">
+                        <ng-container *ngIf="contactsFiltered.length; else noContacts">
+                            <ng-container *ngFor="let contact of contactsFiltered; let i = index; trackBy: trackByFn">
                                 <!-- Group -->
-                                <ng-container *ngIf="i === 0 || contact.fullName.charAt(0) !== contacts[i - 1].fullName.charAt(0)">
+                                <ng-container *ngIf="i === 0 || contact.fullName.charAt(0) !== contactsFiltered[i - 1].fullName.charAt(0)">
                                     <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
                                         {{contact.fullName.charAt(0)}}
                                     </div>
@@ -125,13 +125,20 @@
                                 </a>
                             </ng-container>
                         </ng-container>
-                    </ng-container>
 
-                    <!-- No contacts -->
-                    <ng-template #noContacts>
-                        <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
-                            <img class="mb-3 mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 7rem;">
-                                <p class="mb-0">Aucun contact trouvé</p>
+                         <!-- No contacts -->
+                        <ng-template #noContacts>
+                            <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+                                <img class="mb-3 mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 7rem;">
+                                    <p class="mb-0">Aucun contact trouvé</p>
+                            </div>
+                        </ng-template>
+                    </ng-container>                   
+
+                    <ng-template #waitForLoadingData>
+                        <div class="flex flex-col items-center mt-2">
+                            <mat-progress-spinner [diameter]="100" [mode]="'indeterminate'"></mat-progress-spinner>
+                            <div class="text-lg font-medium "></div>
                         </div>
                     </ng-template>
 

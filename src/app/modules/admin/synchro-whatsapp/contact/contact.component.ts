@@ -11,7 +11,7 @@ import { ContactState, ContactModel, ContactAction, WhatsappContact } from 'app/
 import { ContactService } from 'app/shared/store/contact/contact.service';
 import { UserProfileState, UserProfileModel } from 'app/shared/store/user-profile';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, filter, fromEvent, takeUntil } from 'rxjs';
+import { Observable, Subject, filter, fromEvent, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-whatsapp-contact',
@@ -27,8 +27,10 @@ export class ContactComponent {
   @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
     contacts: WhatsappContact[];
+    contactsFiltered:WhatsappContact[]=[]
     submitted:boolean = false;
 
+    
     contactsTableColumns: string[] = ['name', 'email', 'phoneNumber', 'job'];
     drawerMode: 'side' | 'over';
     searchInputControl: UntypedFormControl = new UntypedFormControl();
@@ -68,8 +70,8 @@ export class ContactComponent {
         this.whatsappDataService.whatsappContactList.subscribe((data)=> {
           if(data.length==0) return; 
             this.contacts=[...data];
-          console.log("Data ",data) 
-          this.isWhatsappContactLoading=false
+            this.contactsFiltered=[...data]
+            this.isWhatsappContactLoading=false
            // Mark for check
            this._changeDetectorRef.markForCheck();
         })
@@ -100,6 +102,28 @@ export class ContactComponent {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+            // Subscribe to search input field value changes
+        this.searchInputControl.valueChanges
+        .pipe(
+            takeUntil(this._unsubscribeAll),
+            tap((query:string) =>
+                {
+                    if(query.length<2)
+                    {
+                        this.contactsFiltered=[...this.contacts]
+                        return;
+                    }
+                    // Search
+                    this.contactsFiltered=this.contacts.filter
+                        (
+                            (contact)=> `${contact.name} ${contact.number}`.toLowerCase().includes(query.toLowerCase())
+                        )
+                        this._changeDetectorRef.markForCheck();
+                }
+            )
+        )
+        .subscribe();
     }
 
     /**
