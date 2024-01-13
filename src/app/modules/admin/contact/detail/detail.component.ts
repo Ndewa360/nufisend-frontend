@@ -324,7 +324,7 @@ export class DetailComponent {
   {
       // Open the confirmation dialog
       const confirmation = this._fuseConfirmationService.open({
-          title  : 'Annuler la création',
+          title  : 'Annuler la modification',
           message: 'Voulez-vous vraiment supprimer ce contact? Cette action est irréversible!',
           actions: {
               confirm: {

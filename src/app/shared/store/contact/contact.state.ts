@@ -170,6 +170,9 @@ export class ContactState{
     @Action(ContactAction.FetchAllContact)
     fetchAllContats(ctx:StateContext<ContactStateModel>)
     {
+        ctx.patchState({
+            loadingContacts: true
+        })
         return this._contactsService.getContacts().pipe(
             tap(
                 result => {
@@ -179,7 +182,14 @@ export class ContactState{
                         contacts:result.data
                     })
                 }
-            )
+            ),
+            catchError((error) => {
+                ctx.patchState({
+                    loadingContacts: false
+                })
+                return throwError(error);
+                
+            })
         )
     }
 }

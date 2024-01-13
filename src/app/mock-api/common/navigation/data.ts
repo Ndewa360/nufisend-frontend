@@ -76,6 +76,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon : 'mat_outline:schedule',
                 link : '/message/schedule',
             },
+            {
+                id   : 'template_message',
+                title: 'Template de message',
+                type : 'basic',
+                icon : 'feather:file-text',
+                link : '/message-template',
+            },
             
         ]
     },

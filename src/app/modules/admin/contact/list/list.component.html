@@ -27,14 +27,19 @@
                     <div>
                         <div class="text-4xl font-extrabold tracking-tight leading-none">Contacts</div>
                         <div class="ml-0.5 font-medium text-secondary">
-                            <ng-container *ngIf="contactsCount > 0">
-                                {{contactsFiltered.length}}
+                            <ng-container *ngIf="!(loading$ |async); else waitForLoadingDataMessage">
+                                <ng-container *ngIf="contactsCount > 0">
+                                    {{contactsFiltered.length}}
+                                </ng-container>
+                                {{contactsFiltered.length | i18nPlural: {
+                                '=0'   : 'Aucun contact',
+                                '=1'   : 'contact',
+                                'other': 'contacts'
+                            } }}
                             </ng-container>
-                            {{contactsFiltered.length | i18nPlural: {
-                            '=0'   : 'Aucun contact',
-                            '=1'   : 'contact',
-                            'other': 'contacts'
-                        } }}
+                            <ng-template #waitForLoadingDataMessage>
+                                <span class="italic">Chargement en cours...</span>
+                            </ng-template>
                         </div>
                     </div>
 
@@ -89,7 +94,7 @@
 
                 <!-- Contacts list -->
                 <div class="relative">
-                    <ng-container *ngIf="loadingData==false; else waitForLoadingData">
+                    <ng-container *ngIf="!(loading$ | async); else waitForLoadingData">
                         <ng-container *ngIf="contactsFiltered.length; else noContacts">
                             <ng-container *ngFor="let contact of contactsFiltered; let i = index; trackBy: trackByFn">
                                 <!-- Group -->

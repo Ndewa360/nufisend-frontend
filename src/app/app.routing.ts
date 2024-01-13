@@ -74,6 +74,8 @@ export const appRoutes: Route[] = [
             {path: 'contacts', loadChildren:() => import('app/modules/admin/contact/contact.module').then(m =>m.ContactModule) },              
         ]
     },
+
+    //Whatsapp sync
     {
         path: 'sync_whatsapp', 
         canActivate: [AuthGuard],
@@ -85,6 +87,18 @@ export const appRoutes: Route[] = [
             layout: 'enterprise'
         },
         loadChildren:() => import('app/modules/admin/synchro-whatsapp/synchro-whatsapp.module').then(m =>m.SynchroWhatsappModule) 
+    },
+    {
+        path: 'message-template', 
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/admin/message-template/message-template.module').then(m =>m.MessageTemplateModule) 
     },
 
     // Redirect empty path to '/home'

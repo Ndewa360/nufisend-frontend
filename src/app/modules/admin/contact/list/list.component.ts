@@ -65,7 +65,6 @@ export class ListComponent implements OnInit, OnDestroy{
         this._store.dispatch(new ContactAction.FetchAllContact())
 
 
-        this.loading$.subscribe((value)=>this.loadingData=value)
         this.contacts$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((conts: ContactModel[]) => {
@@ -74,7 +73,6 @@ export class ListComponent implements OnInit, OnDestroy{
                 this.contactsCount = conts.length;
                 this.contactsFiltered=[...conts]
                 this.contacts=[...conts]
-                console.log("ok data")
                 this._changeDetectorRef.markForCheck()
                 // Mark for check
                 

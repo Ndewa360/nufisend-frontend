@@ -1,0 +1,125 @@
+<div class="flex flex-auto">
+
+    <form
+        class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto"
+        [formGroup]="messageTemplateModelForm">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between -mt-3 -ml-4">
+
+            <!-- Mark as ... button -->
+            <div
+                class="pr-4 pl-3.5"
+                >
+
+                <!-- Mark as incomplete -->
+                <ng-container >
+                    <div class="flex items-center justify-center">
+                        <mat-icon
+                            class="text-primary"
+                            [svgIcon]="'feather:file-text'"></mat-icon>
+                        <span class="ml-2 font-semibold">Nouveau Template</span>
+                    </div>
+                </ng-container>
+            </div>
+
+            <div class="flex items-center">                
+                <!-- Close button -->
+                <a
+                    mat-icon-button
+                    [routerLink]="['../']">
+                    <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                </a>
+            </div>
+
+        </div>
+
+        <mat-divider class="mt-6 mb-8"></mat-divider>
+
+        <!-- Title -->
+        <div>
+            <mat-form-field
+                class="w-full"
+                [subscriptSizing]="'dynamic'">
+                <mat-label>Titre</mat-label>
+                <textarea
+                    matInput
+                    [formControlName]="'title'"
+                    [spellcheck]="false"
+                    cdkTextareaAutosize
+                    #titleField></textarea>
+            </mat-form-field>
+        </div>
+
+        <!-- Notes -->
+        <div class="mt-8">
+            <mat-form-field
+                class="w-full"
+                [subscriptSizing]="'dynamic'">
+                <mat-label>Description</mat-label>
+                <textarea
+                    matInput
+                    [formControlName]="'description'"
+                    [spellcheck]="false"
+                    cdkTextareaAutosize></textarea>
+            </mat-form-field>
+        </div>
+
+        <!-- Body -->
+        <quill-editor
+            class="mt-8"
+            [formControlName]="'content'"
+            [bounds]="'self'"
+            [modules]="quillModules">
+            
+            <!-- <div quill-editor-toolbar>
+                <span class="ql-formats">
+                  <button class="ql-bold" [title]="'Bold'"></button>
+                </span>
+                <select class="custom-parameters" [title]="'Custom Parameters'">
+                    <option selected></option>
+                    <option value="user_name">user_name</option>
+                    <option value="request_number"></option>
+                </select>
+            </div> -->
+        </quill-editor>
+
+        <!-- Actions -->
+     <div class="flex items-center mt-10 -mx-6 sm:-mx-12 py-4 pr-4 pl-1 sm:pr-12 sm:pl-7 border-t bg-gray-50 dark:bg-transparent">
+        <!-- Delete -->
+        <button
+            mat-button
+            class="ml-auto"
+            [color]="'warn'"
+            [matTooltip]="'Annuler'"
+            (click)="close()">
+            Annuler
+        </button>
+        <!-- Cancel -->
+        <!-- <button
+            class="ml-auto"
+            mat-button
+            [matTooltip]="'Cancel'"
+            (click)="toggleEditMode(false)">
+            Cancel
+        </button> -->
+        <!-- Save -->
+        <button
+            class="ml-2"
+            mat-flat-button
+            [color]="'primary'"
+            [disabled]="messageTemplateModelForm.invalid || submitted"
+            [matTooltip]="'Enregistrer'"
+            (click)="addMessageTemplateModel()">
+            <mat-progress-spinner
+                *ngIf="submitted"
+                [diameter]="24"
+                [mode]="'indeterminate'">
+            </mat-progress-spinner>
+            <span *ngIf="!submitted">Enregistrer</span>
+        </button>
+    </div>
+
+    </form>
+
+    </div>

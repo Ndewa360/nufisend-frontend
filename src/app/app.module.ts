@@ -15,7 +15,7 @@ import { appRoutes } from 'app/app.routing';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { initializeKeycloak } from './core/auth/keycloak-init';
 import { environment } from 'environments/environment';
-import { ContactState } from './shared/store';
+import { ContactState, MessageTemplateState, MessageTemplateStateModel } from './shared/store';
 import { GlobalState } from './shared/store/global';
 import { ToastrModule } from 'ngx-toastr';
 import { FuseLoadingModule } from '@fuse/services/loading';
@@ -53,7 +53,7 @@ const routerConfig: ExtraOptions = {
         KeycloakAngularModule,
 
         //Ngxs module
-        NgxsModule.forRoot([ContactState,GlobalState,UserProfileState], {
+        NgxsModule.forRoot([ContactState,GlobalState,UserProfileState,MessageTemplateState], {
         developmentMode: !environment.production
         }),
 
