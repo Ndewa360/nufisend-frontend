@@ -170,13 +170,15 @@ export class ContactState{
     @Action(ContactAction.FetchAllContact)
     fetchAllContats(ctx:StateContext<ContactStateModel>)
     {
+        const state = ctx.getState();
+        if(state.contacts.length>0) return of(true);
+
         ctx.patchState({
             loadingContacts: true
         })
         return this._contactsService.getContacts().pipe(
             tap(
                 result => {
-                    const state = ctx.getState();
                     ctx.setState({
                         loadingContacts:false,
                         contacts:result.data

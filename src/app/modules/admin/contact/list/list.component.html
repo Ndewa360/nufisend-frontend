@@ -123,10 +123,20 @@
                                             </div>
                                         </ng-container>
                                     </div>
-                                    <div class="min-w-0 ml-4">
+                                    <div class="w-10/12  min-w-0 ml-4">
                                         <div class="font-medium leading-5 truncate">{{contact.fullName}}</div>
                                         <div class="leading-5 truncate text-secondary">{{contact.jobTitle}} {{contact.company?" - "+contact.company:""}}</div>
                                     </div>
+                                    <div class=" w-6 h-6 mr-3 cursor-pointer float-right">
+                                        <!--  -->
+                                        <mat-icon
+                                        [disabled]="!hasWhatsAppConnected"
+                                            (click)="openModelForMessageTo($event,contact)"
+                                            mat-button
+                                            class="icon-size-6 text-emerald-600 dark:text-emerald-400"
+                                            [svgIcon]="'mat_outline:chat'"
+                                            [matTooltip]="'Envoyé un message à '+contact.fullName"></mat-icon>
+                                    </div> 
                                 </a>
                             </ng-container>
                         </ng-container>

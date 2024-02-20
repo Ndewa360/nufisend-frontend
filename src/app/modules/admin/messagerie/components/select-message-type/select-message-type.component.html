@@ -1,0 +1,45 @@
+<div class="w-full mb-3">
+    <!-- Form -->
+    <form [formGroup]="messagesTypeForm">
+        <div class="grid sm:grid-cols-3 gap-6 w-full mt-8">
+            <!-- Plan -->
+            <div class="sm:col-span-3">
+                <fuse-alert
+                    [appearance]="'outline'"
+                    [type]="'info'">
+                    Le type de message affectera la planification suivante. Un message a envoi directe enveras directement le message à la fin de la planification!
+                </fuse-alert>
+            </div>
+            <mat-radio-group
+                class="invisible absolute w-0 h-0 pointer-events-none"
+                [formControlName]="'messageType'"
+                #messageTypeRadioGroup="matRadioGroup">
+                <ng-container *ngFor="let messageType of messagesType; trackBy: trackByFn">
+                    <mat-radio-button [value]="messageType.value"></mat-radio-button>
+                </ng-container>
+            </mat-radio-group>
+            <ng-container *ngFor="let messageType of messagesType; trackBy: trackByFn">
+                <div
+                    class="relative flex flex-col items-start justify-start p-6 rounded-md shadow cursor-pointer bg-card"
+                    [ngClass]="{'ring ring-inset ring-primary': messageTypeRadioGroup.value === messageType.value}"
+                    (click)="messageTypeRadioGroup.value = messageType.value;selectMessageType(messageType.value)">
+                    <ng-container *ngIf="messageTypeRadioGroup.value === messageType.value">
+                        <mat-icon
+                            class="absolute top-0 right-0 mt-3 mr-3 icon-size-7 text-primary"
+                            [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
+                    </ng-container>
+                    <div class="font-semibold">
+                        <mat-icon class="absolute top-0 ml-1 left-0 mt-3 mr-3 icon-size-7"
+                            [svgIcon]="messageType.icon"></mat-icon>
+                            <span class="ml-2">{{messageType.label}}</span></div>
+                    <div class="mt-1 whitespace-normal text-secondary">{{messageType.details}}</div>
+                    <div class="flex-auto"></div>
+                    <!-- <div class="mt-8 text-lg">
+                        <span>{{messageType.price | currency:'USD':'symbol':'1.0'}}</span>
+                        <span class="text-secondary"> / month</span>
+                    </div> -->
+                </div>
+            </ng-container>
+        </div>
+    </form>
+</div>

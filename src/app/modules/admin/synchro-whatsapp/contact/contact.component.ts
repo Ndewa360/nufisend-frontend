@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectorRef, Component, Inject, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MatDrawer } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,35 +7,41 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Actions, Select, Store, ofActionCompleted, ofActionSuccessful } from '@ngxs/store';
 import { WhatsappDataService } from 'app/shared/services/whatsapp/whatsapp-data.service';
-import { ContactState, ContactModel, ContactAction, WhatsappContact } from 'app/shared/store';
+import { ContactState, ContactModel, ContactAction, WhatsappContactModel, WhatsappContactState } from 'app/shared/store';
 import { ContactService } from 'app/shared/store/contact/contact.service';
 import { UserProfileState, UserProfileModel } from 'app/shared/store/user-profile';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, filter, fromEvent, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, combineLatest, combineLatestAll, mergeAll, mergeMap, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-whatsapp-contact',
   templateUrl: './contact.component.html',
-  styleUrls: ['./contact.component.scss']
+  styleUrls: ['./contact.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class ContactComponent {
   @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>
   @Select(UserProfileState.selectStateLoading) loadingUserProfile$:Observable<boolean>
-  
+  @Select(WhatsappContactState.selectStateLoading) loadingContactStart$:Observable<boolean>;
+  @Select(WhatsappContactState.selectStateData) contactList$:Observable<WhatsappContactModel[]>;
+  @Select(WhatsappContactState.selectStatePercent) loadingPercent$:Observable<number>;
   isWhatsappContactLoading=true
+  percent=0;
 
   @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
-    contacts: WhatsappContact[];
-    contactsFiltered:WhatsappContact[]=[]
+    contacts: WhatsappContactModel[];
+    contactsFiltered:WhatsappContactModel[]=[]
     submitted:boolean = false;
 
     
     contactsTableColumns: string[] = ['name', 'email', 'phoneNumber', 'job'];
     drawerMode: 'side' | 'over';
     searchInputControl: UntypedFormControl = new UntypedFormControl();
-    selectedContact: WhatsappContact;
+    selectedContact: WhatsappContactModel;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+
 
     /**
      * Constructor
@@ -67,23 +73,38 @@ export class ContactComponent {
     ngOnInit(): void
     {
         // this.contacts$ = this._contactsService.contacts$;
-        this.whatsappDataService.whatsappContactList.subscribe((data)=> {
+        this.loadingContactStart$.pipe(takeUntil(this._unsubscribeAll)).subscribe((loading)=>{
+            this.isWhatsappContactLoading=loading;
+            // Mark for check
+           this._changeDetectorRef.markForCheck();
+        })
+
+        this.loadingPercent$.pipe(takeUntil(this._unsubscribeAll)).subscribe((percent)=>{
+            this.percent=percent;
+            // Mark for check
+           this._changeDetectorRef.markForCheck();
+        })
+
+        this.contactList$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((data)=> {
           if(data.length==0) return; 
             this.contacts=[...data];
             this.contactsFiltered=[...data]
-            this.isWhatsappContactLoading=false
            // Mark for check
            this._changeDetectorRef.markForCheck();
         })
-      
           
-          this._ngxsAction.pipe(ofActionCompleted(ContactAction.SyncContact)).subscribe(
+        this._ngxsAction.pipe(
+        takeUntil(this._unsubscribeAll),
+        ofActionCompleted(ContactAction.SyncContact))
+        .subscribe(
             (value) => {
-              this.submitted=false
-              // Mark for check
-              this._changeDetectorRef.markForCheck();
+            this.submitted=false
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
             }
-          )
+        )
        
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))

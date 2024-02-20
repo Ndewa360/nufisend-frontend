@@ -130,7 +130,13 @@
 
 <ng-template #toLoading>
     <div class="flex flex-col items-center mt-2">
-        <mat-progress-spinner [diameter]="100" [mode]="'indeterminate'"></mat-progress-spinner>
-        <div class="text-lg font-medium ">Veuillez patientez...</div>
+        <ng-container *ngIf="percent==0; else hasNoPercentToShow">
+            <mat-progress-bar  [mode]="'indeterminate'"></mat-progress-bar>
+            <div class="text-lg font-medium ">Veuillez patientez...</div>
+        </ng-container>
+        <ng-template #hasNoPercentToShow>
+            <mat-progress-bar  [mode]="'determinate'" [value]="percent"></mat-progress-bar>
+            <div class="text-lg font-medium ">chargement de vos contacts ({{percent}}%)</div>
+        </ng-template>
     </div>
 </ng-template>

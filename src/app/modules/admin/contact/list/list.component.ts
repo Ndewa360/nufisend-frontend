@@ -3,13 +3,15 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestro
 import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { ContactAction, ContactModel, ContactState } from 'app/shared/store';
+import { ContactAction, ContactModel, ContactState, GlobalState } from 'app/shared/store';
 import { ContactService } from 'app/shared/store/contact/contact.service';
 import { Observable, Subject, takeUntil, switchMap, fromEvent, filter, tap } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
 import { Select, Store } from '@ngxs/store';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ToastrService } from 'ngx-toastr';
+import { NewMessageForSingleContactComponent } from '../../messagerie/components/new-message-for-single-contact/new-message-for-single-contact.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-contact-list',
@@ -21,6 +23,8 @@ import { ToastrService } from 'ngx-toastr';
 export class ListComponent implements OnInit, OnDestroy{
   @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
+    @Select(GlobalState.selectStateConnectedWhatsApp) hasWhatsAppConnected$:Observable<boolean>;
+    
     @Select(ContactState.selectStateData) contacts$: Observable<ContactModel[]>;
     @Select(ContactState.selectStateLoading) loading$:Observable<boolean>
     loadingData:boolean=true;
@@ -33,6 +37,7 @@ export class ListComponent implements OnInit, OnDestroy{
     drawerMode: 'side' | 'over';
     searchInputControl: UntypedFormControl = new UntypedFormControl();
     selectedContact: ContactModel;
+    hasWhatsAppConnected:boolean=false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -47,7 +52,8 @@ export class ListComponent implements OnInit, OnDestroy{
         private _router: Router,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseConfirmationService: FuseConfirmationService,
-        private _toastrService:ToastrService
+        private _toastrService:ToastrService,
+        private _matDialog: MatDialog, 
     )
     {
     }
@@ -64,6 +70,8 @@ export class ListComponent implements OnInit, OnDestroy{
         // Get the contacts
         this._store.dispatch(new ContactAction.FetchAllContact())
 
+        this.hasWhatsAppConnected$
+            .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>this.hasWhatsAppConnected=value)
 
         this.contacts$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -168,6 +176,20 @@ export class ListComponent implements OnInit, OnDestroy{
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
     }
+    openModelForMessageTo(event,contact)
+    {
+        event.stopPropagation();
+        const dialogRef = this._matDialog.open(NewMessageForSingleContactComponent,
+            {
+                data: {contact}
+            }
+            // {
+            //   height: '100%',
+            //   minWidth: '100%',
+            // }
+            );
+
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
@@ -248,6 +270,6 @@ export class ListComponent implements OnInit, OnDestroy{
      */
     trackByFn(index: number, item: any): any
     {
-        return item.id || index;
+        return item._id || index;
     }
 }

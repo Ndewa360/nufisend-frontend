@@ -100,6 +100,18 @@ export const appRoutes: Route[] = [
         },
         loadChildren:() => import('app/modules/admin/message-template/message-template.module').then(m =>m.MessageTemplateModule) 
     },
+    {
+        path: 'messagerie', 
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/admin/messagerie/messagerie.module').then(m =>m.MessagerieModule) 
+    },
 
     // Redirect empty path to '/home'
     {path: '**', pathMatch : 'full', redirectTo: 'home'},

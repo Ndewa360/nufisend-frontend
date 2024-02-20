@@ -15,13 +15,13 @@ import { appRoutes } from 'app/app.routing';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { initializeKeycloak } from './core/auth/keycloak-init';
 import { environment } from 'environments/environment';
-import { ContactState, MessageTemplateState, MessageTemplateStateModel } from './shared/store';
-import { GlobalState } from './shared/store/global';
+import { ContactState, MessageState, MessageTemplateState, GlobalState, MessageTemplateStateModel, WhatsappContactState, WhatsappQrCodeState } from './shared/store';
 import { ToastrModule } from 'ngx-toastr';
 import { FuseLoadingModule } from '@fuse/services/loading';
 import { UserProfileState } from './shared/store/user-profile';
 import { SocketIoModule } from 'ngx-socket-io';
 import { WebsocketManagerService } from './shared/services/websocket-manager/websocket-manager.service';
+import { GroupState } from './shared/store/group';
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -53,7 +53,7 @@ const routerConfig: ExtraOptions = {
         KeycloakAngularModule,
 
         //Ngxs module
-        NgxsModule.forRoot([ContactState,GlobalState,UserProfileState,MessageTemplateState], {
+        NgxsModule.forRoot([ContactState,GlobalState,UserProfileState,MessageTemplateState, WhatsappContactState,MessageState, GroupState,WhatsappQrCodeState], {
         developmentMode: !environment.production
         }),
 
@@ -61,7 +61,10 @@ const routerConfig: ExtraOptions = {
         ToastrModule.forRoot(),
 
         //Socket.IO module
-        SocketIoModule
+        SocketIoModule.forRoot({
+            url:environment.apiUrl,
+            options:{}
+        })
     ],
     bootstrap   : [
         AppComponent
@@ -73,7 +76,6 @@ const routerConfig: ExtraOptions = {
             multi:true,
             deps:[KeycloakService,Router]
           },
-          WebsocketManagerService
     ]
 })
 export class AppModule

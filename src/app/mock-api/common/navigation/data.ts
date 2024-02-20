@@ -57,24 +57,17 @@ export const defaultNavigation: FuseNavigationItem[] = [
     },
     {
         id   : 'message',
-        title: 'Messagerie',
+        title: 'Message',
         type : 'group',
         icon : 'mat_outline:message',
-        link : '/message',
+        link : '/messagerie',
         children: [
             {
                 id   : 'direct_send',
-                title: 'Envoi direct',
+                title: 'Messagerie',
                 type : 'basic',
                 icon : 'feather:send',
-                link : '/message/send',
-            },
-            {
-                id   : 'planify',
-                title: 'Planifier',
-                type : 'basic',
-                icon : 'mat_outline:schedule',
-                link : '/message/schedule',
+                link : '/messagerie',
             },
             {
                 id   : 'template_message',

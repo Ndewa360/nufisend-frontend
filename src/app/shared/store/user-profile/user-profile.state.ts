@@ -93,6 +93,7 @@ export class UserProfileState{
     fetchUserProfile(ctx:StateContext<UserProfileStateModel>,{email}:UserProfileAction.FetchUserProfile)
     {
         const state = ctx.getState();
+        console.log("State ",state)
         if(state.userProfile) return of(true);
 
         ctx.patchState({

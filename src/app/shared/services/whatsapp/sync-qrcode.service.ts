@@ -3,33 +3,47 @@ import { Store } from '@ngxs/store';
 import { UserProfileAction } from 'app/shared/store/user-profile';
 import { BehaviorSubject, map } from 'rxjs';
 import { WebsocketManagerService } from '../websocket-manager/websocket-manager.service';
+import { WhatsappQrCodeAction } from 'app/shared/store';
+import { Socket } from 'ngx-socket-io';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SyncQrcodeService {
 
-  qrCode:BehaviorSubject<string>=new BehaviorSubject<string>(null);
-  constructor(private socket: WebsocketManagerService,private store:Store) {
+  constructor(private socket: Socket,private store:Store) {
     this.handleSuccessfullySync();
     this.handleSuccessfullyUnSync();
+    // this.subscribeToQrCode()
   }
 
 
   subscribeToQrCode()
   {
-    this.socket.on('qrcode', data=>this.qrCode.next(data));
+    this.socket.on('qrcode', data=>{
+      console.log("OnQrCode ",data)
+      this.store.dispatch([
+        new WhatsappQrCodeAction.SetLoadingQrCode(false),
+        new WhatsappQrCodeAction.SetWhatsAppQrCode(data)
+      ])
+    });
   }
 
   unSubscribeToQrCode(userEmail)
   {
-    this.store.dispatch(new UserProfileAction.updateLoadingUserProfileState(true))
+    this.store.dispatch(
+      [
+        new WhatsappQrCodeAction.SetLoadingQrCode(true),
+        new WhatsappQrCodeAction.SetWhatsAppQrCode(null),
+        new UserProfileAction.updateLoadingUserProfileState(true)
+      ]
+    )
     this.socket.emit("disconnexion",{email:userEmail})
   }
 
   handleSuccessfullySync()
   {
-    this.socket.on('connected', ()=>{
+    this.socket.on('sync-connected', ()=>{
       this.store.dispatch(new UserProfileAction.UpdateUserWhatsappSyncProfile(true))
     });
   }
@@ -41,7 +55,6 @@ export class SyncQrcodeService {
     this.socket.on('disconnected', (value)=>{
       this.store.dispatch(new UserProfileAction.UpdateUserWhatsappSyncProfile(false))
       this.store.dispatch(new UserProfileAction.updateLoadingUserProfileState(false))
-      console.log("disconnected")
     });
   }
 

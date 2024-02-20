@@ -1,34 +1,34 @@
 import { Injectable } from '@angular/core';
-import { UserService } from 'app/core/user/user.service';
+import { Store } from '@ngxs/store';
+// import { UserService } from 'app/core/user/user.service';
+import { UserProfileState } from 'app/shared/store/user-profile';
 import { environment } from 'environments/environment';
 import { Socket } from 'ngx-socket-io';
-import { combineLatest } from 'rxjs';
+import { Subject, combineLatest } from 'rxjs';
+import { SyncQrcodeService } from '../whatsapp/sync-qrcode.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WebsocketManagerService extends Socket {
+export class WebsocketManagerService{
 
   userInfos = null;
+  webSocketConnectedEvent:Subject<boolean>=new Subject();
   constructor(
-    private userService:UserService
+    private store:Store,
+    private socket:Socket,
+    private syncQrCodeService:SyncQrcodeService
   ) {
-    super({ url: environment.apiUrl, options: {} });
-
-    combineLatest([this.fromEvent('connexion'),this.userService.user$]).subscribe(([_,value])=>{
-      if(value) this.emit('connexion', {email: value.email});
-    })
-   
-    
-
-    // this.on('disconnect', reason => { 
-    //   if(reason === 'io server disconnect') {
-    //     //you should renew token or do another important things before reconnecting
-    //     console.log("reconnectionn WSQ")
-    //     this.emit('connexion', {email: this.userInfos.email});
-    //   }
-    // });
-
-
   }
+
+  customConnexion(value)
+    {
+      
+      this.socket.on('connexion', ()=>{
+          this.socket.emit('connexion', {email: value.email});
+          this.webSocketConnectedEvent.next(true);        
+          // this.socket.on("qrcode",(data)=>console.log("Data QrCode Test",data))
+          this.syncQrCodeService.subscribeToQrCode()
+      })
+    }
 }

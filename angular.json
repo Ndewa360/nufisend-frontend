@@ -55,10 +55,14 @@
                             "src/styles/vendors.scss",
                             "src/@fuse/styles/main.scss",
                             "node_modules/ngx-toastr/toastr.css",
+                            "node_modules/dropzone/dist/min/dropzone.min.css",
                             "src/styles/styles.scss",
                             "src/styles/tailwind.scss"
                         ],
-                        "scripts": []
+                        "scripts": [
+                            "node_modules/dropzone/dist/min/dropzone.min.js"
+
+                        ]
                     },
                     "configurations": {
                         "production": {

@@ -90,24 +90,6 @@
                     </mat-form-field>
                 </div>
 
-
-                <!-- Title -->
-                <div class="mt-8">
-                    <mat-form-field
-                        class="w-full"
-                        [subscriptSizing]="'dynamic'">
-                        <mat-label>Titre d'emploi</mat-label>
-                        <mat-icon
-                            matPrefix
-                            class="hidden sm:flex icon-size-5"
-                            [svgIcon]="'heroicons_solid:briefcase'"></mat-icon>
-                        <input
-                            matInput
-                            [formControlName]="'jobTitle'"
-                            placeholder="Titre d'emploi">
-                    </mat-form-field>
-                </div>
-
                 <!-- Company -->
                 <div class="mt-8">
                     <mat-form-field
@@ -122,6 +104,23 @@
                             matInput
                             [formControlName]="'company'"
                             [placeholder]="'Entreprise'">
+                    </mat-form-field>
+                </div>
+
+                <!-- Title -->
+                <div class="mt-8">
+                    <mat-form-field
+                        class="w-full"
+                        [subscriptSizing]="'dynamic'">
+                        <mat-label>Profession</mat-label>
+                        <mat-icon
+                            matPrefix
+                            class="hidden sm:flex icon-size-5"
+                            [svgIcon]="'heroicons_solid:briefcase'"></mat-icon>
+                        <input
+                            matInput
+                            [formControlName]="'jobTitle'"
+                            placeholder="Profession">
                     </mat-form-field>
                 </div>
 

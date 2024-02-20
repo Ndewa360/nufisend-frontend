@@ -142,6 +142,8 @@ export class MessageTemplateState{
     fetchAllTemplates(ctx:StateContext<MessageTemplateStateModel>)
     {
         const state = ctx.getState();
+        if(state.messageTemplates.length>0) return of(true);;
+
         ctx.patchState({
             loadingMessageTemplates: true
         })

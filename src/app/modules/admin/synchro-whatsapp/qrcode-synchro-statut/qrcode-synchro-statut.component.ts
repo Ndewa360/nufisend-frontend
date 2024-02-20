@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component,OnInit, ViewEncapsulation } from '@angular/core';
 import { Select } from '@ngxs/store';
 import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
+import { WhatsappQrCodeState } from 'app/shared/store';
 import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profile';
 import { Observable } from 'rxjs';
 
@@ -22,14 +23,16 @@ export class QrcodeSynchroStatutComponent implements OnInit {
   
   @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>
   @Select(UserProfileState.selectStateLoading) loadingUserProfile$:Observable<boolean>
+  @Select(WhatsappQrCodeState.selectStateQrCode) whatsappQrCode$:Observable<string>
+  @Select(WhatsappQrCodeState.selectStateLoading) whatsappHasLoadQrCode$: Observable<boolean>
   
   generatedQrCode:string=""
-  isWaitingWhatsappSync = false;
+  isWaitingWhatsappSync:boolean = false;
   hasQrCodeIsGenerated = false;
   waitingForUnsync = false;
 
   ngOnInit(): void {
-    this.syncQrCodeService.qrCode.subscribe((data)=>{
+    this.whatsappQrCode$.subscribe((data)=>{
       if(!data) return;
       this.isWaitingWhatsappSync=false;
       this.hasQrCodeIsGenerated=true;
@@ -40,12 +43,14 @@ export class QrcodeSynchroStatutComponent implements OnInit {
     this.userProfile$.subscribe((value)=> {
       this.userProfile= value
     })
+
+    this.whatsappHasLoadQrCode$.subscribe((loading)=>this.isWaitingWhatsappSync=loading);
   }
 
   startWathappSync()
   {
     this.isWaitingWhatsappSync=true;
-    this.syncQrCodeService.subscribeToQrCode();
+    // this.syncQrCodeService.subscribeToQrCode();
   }
 
   endWhatsappSync()

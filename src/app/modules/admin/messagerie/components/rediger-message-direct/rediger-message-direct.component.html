@@ -1,0 +1,86 @@
+<div class="flex flex-col  -m-6">
+    <!-- Compose form *ngIf="!(loadingMessageTemplate$ | async); else toLoading"-->
+    <form 
+        class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto"
+        [formGroup]="composeForm">
+
+        <div class="sm:col-span-3 mb-6">
+            <fuse-alert
+                [appearance]="'outline'"
+                [type]="'info'">
+                Vous pouvez sélectionner un template afin de rédiger le message sous la forme proposé par le template. Dans ce cas, le contenu du message n'est plus obligatoire!
+            </fuse-alert>
+        </div>
+        
+        <div class="sm:col-span-3 mb-6">
+            <mat-label class="font-medium mb-2">Choisir des fichiers</mat-label>
+            <app-file-upload (uploadFileEvent)="setFiles($event)"></app-file-upload>
+        </div>
+
+        <!-- Subject -->
+        <mat-form-field >
+            <mat-label>Choisi un template</mat-label>
+            <input matInput [formControlName]="'subject'" #matForm #autocompleteTrigger="matAutocompleteTrigger" [matAutocomplete]="auto" [placeholder]="'Selectionnez un message template'">
+            <!-- <input matInput [formControlName]="'subject'"> -->
+        </mat-form-field>
+
+        <mat-autocomplete #auto="matAutocomplete">
+            <fuse-loading-bar *ngIf="(loadingMessageTemplate$ | async)"></fuse-loading-bar>
+            <mat-option (click)="selectMessageTemplate(msgTmp)" class="w-full" *ngFor="let msgTmp of messageTemplateFiltered; let i = index; trackBy: trackByFn" [value]="msgTmp.title">
+                <!-- Contact " -->
+                <div  class="flex items-center px-6 py-4 md:px-8 cursor-pointer border-b w-full"
+                    [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !(selectedMessageTemplate && selectedMessageTemplate._id==msgTmp._id),
+                                'bg-primary-50 dark:bg-hover': selectedMessageTemplate && selectedMessageTemplate._id==msgTmp._id}"
+                    >
+                    <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
+                        <ng-container>
+                            <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                {{msgTmp.title.charAt(0)}}
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="min-w-0 ml-4">
+                        <div class="font-medium leading-5 truncate">{{msgTmp.title}}</div>
+                    </div>
+                    <!--  -->
+                    <div class="w-6 h-6 mr-3 cursor-pointer float-right" *ngIf="selectedMessageTemplate && selectedMessageTemplate._id==msgTmp._id" (click)="removeMessageTemplate(msgTmp)">
+                        <mat-icon
+                        mat-button
+                            class="icon-size-6 text-red-600 dark:text-red-400"
+                            [svgIcon]="'heroicons_outline:trash'"
+                            [title]="'Rétirer le contact'"></mat-icon>
+                    </div> 
+
+                </div>
+            </mat-option>
+            
+
+            <mat-option *ngIf="(loadingMessageTemplate$ | async)" [value]="''">
+                <div class="m-2">
+                   Chargement en cours...                                
+                </div>
+            </mat-option>
+
+            <mat-option *ngIf="!(loadingMessageTemplate$ | async) && messageTemplateFiltered.length==0" [value]="''">
+                <div class="p-3 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+                    <img class="mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 4rem;">
+                        <p class="mb-0">Aucun contact trouvé</p>
+                </div>
+            </mat-option>
+        </mat-autocomplete>  
+        <!-- Body -->
+        <quill-editor
+            class="mt-2"
+            [formControlName]="'body'"
+            (onContentChanged)="loseFocus()"
+            [bounds]="'self'"
+            [modules]="quillModules"></quill-editor>
+
+    </form>
+    <!-- <ng-template #toLoading>
+        <div class="flex flex-col items-center mt-12">
+            <mat-progress-bar  [mode]="'indeterminate'"></mat-progress-bar>
+            <div class="text-lg font-medium ">Chargement des templates de messages...</div>            
+        </div>
+    </ng-template> -->
+</div>

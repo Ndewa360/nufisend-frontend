@@ -1,0 +1,68 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div class="bg-card">
+        <div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
+            <div class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-8 sm:my-12">
+                <!-- Avatar and name -->
+                <div class="flex flex-auto items-center min-w-0">
+                    <div class="flex-0 w-30 h-30 rounded-full overflow-hidden">
+                        <img
+                            class="w-full h-full object-cover"
+                            src="assets/images/ui/img/Messagerie-instantanee.webp">
+                    </div>
+                    <div class="flex flex-col min-w-0 ml-4">
+                        <ng-container *transloco="let t">
+                            <div class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate">Messagerie</div>
+                        </ng-container>
+                        <div class="flex items-center">
+                            <mat-icon
+                                class="icon-size-5"
+                                [svgIcon]="'heroicons_solid:information-circle'"></mat-icon>
+                            <div class="ml-1.5 leading-6 truncate text-secondary">Envoyer directement ou planifier vos messages pour une date ulterieur </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Actions -->
+                <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
+
+                    <!--  -->
+                    <button (click)="newMessage()" [disabled]="!hasWhatsAppConnected"  [matTooltip]="hasWhatsAppConnected?'':'Synchronizer votre Whatsapp pour envoyer un message'" mat-flat-button [color]="'primary'">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:mail'"></mat-icon>
+                        <span class="ml-2">Nouveau message</span>
+                    </button>
+
+                </div>
+            </div>
+            
+            <!-- Project selector -->
+            <div
+                class="relative flex self-start pt-2 pb-1 pl-5 pr-4 cursor-pointer overflow-hidden rounded-t-xl border border-b-0 bg-default"
+                matRipple>
+                <div class="flex items-center">
+                    <div class="overflow-hidden">
+                        <div class="font-medium leading-6 truncate">Messagerie Whatsapp</div>
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex-auto border-t -mt-px pt-4 sm:pt-6">
+        <div class="w-full max-w-screen-xl mx-auto p-4">
+
+             <!-- Card #1 -->
+             <fuse-card class="flex flex-col max-w-80 w-full filter-article">
+                
+                <div class="m-8">
+                    <div class="text-2xl font-semibold leading-tight">WhatsApp</div>
+                    <div class="mt-4">De la simplicité dans l'utilisation </div>
+                </div>
+            </fuse-card>
+
+        </div>
+    </div>
+</div>

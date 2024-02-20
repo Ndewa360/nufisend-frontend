@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { ApexOptions } from 'apexcharts';
 import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
 import { WhatsappDataService } from 'app/shared/services/whatsapp/whatsapp-data.service';
+import { WhatsappContactState, WhatsappContactModel } from 'app/shared/store';
 import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profile';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
@@ -16,6 +17,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>
+  @Select(WhatsappContactState.selectStateData) contactList$:Observable<WhatsappContactModel[]>;
 
     chartGithubIssues: ApexOptions = {};
     chartTaskDistribution: ApexOptions = {};
@@ -32,9 +34,9 @@ export class HomeComponent implements OnInit, OnDestroy {
      * Constructor
      */
     constructor(
-        private _router: Router,
-        private whatsappDataService:WhatsappDataService,
+        private _router: Router,        
         private syncQrCodeService:SyncQrcodeService,
+        private store:Store
     )
     {
     }
@@ -49,7 +51,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     ngOnInit(): void
     {
         // Get the data
-        this.whatsappDataService.whatsappContactList.subscribe((data)=> {
+        this.contactList$.pipe(takeUntil(this._unsubscribeAll)).subscribe((data)=> {
             this.contactsNbre= data.length;
         })
 

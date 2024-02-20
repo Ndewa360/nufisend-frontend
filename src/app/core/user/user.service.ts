@@ -5,6 +5,7 @@ import { AuthService } from '../auth/auth.service';
 import { KeycloakProfile } from 'keycloak-js';
 import { Store } from '@ngxs/store';
 import { UserProfileAction } from 'app/shared/store/user-profile';
+import { WebsocketManagerService } from 'app/shared/services/websocket-manager/websocket-manager.service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,11 +17,14 @@ export class UserService
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient,private authService:AuthService,private _store:Store)
+    constructor(private _httpClient: HttpClient,private authService:AuthService,private _store:Store,private _socketWhatsappService:WebsocketManagerService)
     {
         this.authService.currentUser.subscribe((value)=>{
             this.user=value;
-            if(value) this._store.dispatch(new UserProfileAction.FetchUserProfile(value.email))
+            if(value) {
+                this._store.dispatch(new UserProfileAction.FetchUserProfile(value.email));
+                this._socketWhatsappService.customConnexion(value);
+            }
         })
     }
 

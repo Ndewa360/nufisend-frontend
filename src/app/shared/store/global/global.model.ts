@@ -1,4 +1,5 @@
 export interface GlobalModel {
     isLoading:boolean,
-    notifications:string[]
+    notifications:string[],
+    isConnectedToWhatsapp:boolean
 }

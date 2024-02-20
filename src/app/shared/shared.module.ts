@@ -31,6 +31,24 @@ import { FuseFindByKeyPipeModule } from '@fuse/pipes/find-by-key';
 import { TranslocoModule } from '@ngneat/transloco';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatTabsModule } from '@angular/material/tabs';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
+import { WhatsappAskSyncToatrComponent } from './components/whatsapp-ask-sync-toatr/whatsapp-ask-sync-toatr.component'; 
+import { SyncQrcodeService } from './services/whatsapp/sync-qrcode.service';
+import { WebsocketManagerService } from './services/websocket-manager/websocket-manager.service';
+
+// import { DropzoneModule } from 'ngx-dropzone-wrapper';
+// import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
+// import { DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
+
+// const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
+//  // Change this to your upload POST address:
+//   url: '/api/upload',
+//   maxFilesize: 50,
+//   acceptedFiles: 'image/*'
+// };
+
 
 const moduleList = [
     CommonModule,
@@ -68,15 +86,30 @@ const moduleList = [
     MatTabsModule,
     NgApexchartsModule,
     TranslocoModule,
-    
+    MatAutocompleteModule,
+    // DropzoneModule
 ]
 @NgModule({
     imports: [
         ...moduleList
     ],
     exports: [
-        ...moduleList
-    ]
+        ...moduleList,
+        FileUploadComponent,
+      WhatsappAskSyncToatrComponent,
+
+    ],
+    declarations: [
+      FileUploadComponent,
+      WhatsappAskSyncToatrComponent
+    ],
+    providers: [
+        // {
+        //   provide: DROPZONE_CONFIG,
+        //   useValue: DEFAULT_DROPZONE_CONFIG
+        // }
+        // WebsocketManagerService,
+      ]
 })
 export class SharedModule
 {

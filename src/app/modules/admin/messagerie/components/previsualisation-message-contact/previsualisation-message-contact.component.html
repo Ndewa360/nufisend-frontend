@@ -1,0 +1,223 @@
+<div class="flex flex-col md:min-w-160 -m-6">
+    <!-- Header -->
+    <!-- md:max-h-screen  -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary shadow-lg">
+        <div class="text-lg font-medium">Prévisualisation de message</div>
+        <button
+            mat-icon-button
+            (click)="saveAndClose()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+
+    <!-- Compose form -->
+    <!-- md:h-full   -->
+    <div class="flex flex-col flex-auto ">
+        <mat-drawer-container class="flex-auto" [hasBackdrop]="false">
+            <mat-drawer-content class="flex ">           
+                <!-- Chats list -->        
+                <div class="relative flex flex-auto flex-col w-full min-w-0 lg:min-w-100 lg:max-w-100 bg-card dark:bg-transparent">
+                        
+                    <!-- Header -->
+                    <div class="flex flex-col flex-0 py-4 px-8 border-b bg-gray-50 dark:bg-transparent">                
+                        <!-- Search -->
+                        <div class="mt-4">
+                            <mat-form-field class="fuse-mat-rounded fuse-mat-dense w-full" [subscriptSizing]="'dynamic'">
+                                <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                                <input matInput [autocomplete]="'off'" [placeholder]="'Search or start new chat'" (input)="filterContacts(searchField.value)" #searchField>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="min-h-72 max-h-80">
+                        <!-- Chats -->  
+                        <div class="flex-auto overflow-y-auto h-full">
+                            <ng-container *ngIf="filteredContacts.length > 0; else noContacts">
+                                <ng-container *ngFor="let contact of filteredContacts; trackBy: trackByFn">
+                                    <a class="z-20 flex items-center py-5 px-8 cursor-pointer border-b"
+                                        [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedContact || selectedContact._id !== contact._id,
+                                                    'bg-primary-50 dark:bg-hover': selectedContact && selectedContact._id === contact._id}"
+                                        (click)="selectContact(contact)">
+                                        <div class="relative flex flex-0 items-center justify-center w-10 h-10">
+                                            <ng-container *ngIf="contact.avatar">
+                                                <img
+                                                    class="w-full h-full rounded-full object-cover"
+                                                    [src]="contact.avatar"
+                                                    alt="Contact avatar"/>
+                                            </ng-container>
+                                            <ng-container *ngIf="!contact.avatar">
+                                                <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                                    {{contact.fullName.charAt(0)}}
+                                                </div>
+                                            </ng-container>
+                                        </div>
+                                        <div class="min-w-0 ml-4">
+                                            <div class="font-medium leading-5 truncate">{{contact.fullName}}</div>
+                                        </div>
+                                    </a>
+                                </ng-container>
+                            </ng-container>
+                            <ng-template #noContacts>
+                                <div class="flex flex-auto flex-col items-center justify-center h-full">
+                                    <mat-icon
+                                        class="icon-size-24"
+                                        [svgIcon]="'heroicons_outline:chat'"></mat-icon>
+                                    <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Pas de contact sélectionné</div>
+                                </div>
+                            </ng-template>
+                        </div>  
+                    </div>                                      
+                </div>  
+
+                <ng-template #noMessageToShow>
+                    <div class="flex-auto border-l" [ngClass]="{'z-20 absolute inset-0 lg:static lg:inset-auto flex': selectedChat && selectedChat.id,
+                                    'hidden lg:flex': !selectedChat || !selectedChat.id}">
+                        <ng-container>
+                            <div class="flex flex-col flex-auto overflow-y-auto lg:overflow-hidden bg-card dark:bg-default">
+                                <!-- Select chat or start new -->
+                                <div class="flex flex-col flex-auto items-center justify-center bg-gray-100 dark:bg-transparent">
+                                    <mat-icon
+                                        class="icon-size-24"
+                                        [svgIcon]="'heroicons_outline:chat'"></mat-icon>
+                                    <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Select a conversation or start a new chat</div>
+                                </div>
+                            
+                            </div>
+                        </ng-container>
+                    </div>
+                </ng-template>
+
+                <ng-container >
+                    <div class="flex-auto border-l" [ngClass]="{'z-20 absolute inset-0 lg:static lg:inset-auto flex': selectedContact && selectedContact._id,
+                                    'hidden lg:flex': !selectedContact || !selectedContact._id}">
+                        <!-- Conversation -->
+                        
+                        <div class="flex flex-col w-full">
+
+                            <!-- View mode -->
+                            <ng-container *ngIf="selectedContact">
+                                <div class="flex flex-col flex-auto overflow-y-auto bg-card dark:bg-default">
+
+                                    <ng-container >                                
+                                        <mat-drawer-container class="flex-auto h-full" [hasBackdrop]="false">
+                                                                
+                                            <!-- Drawer content -->
+                                            <mat-drawer-content class="flex flex-col overflow-hidden">
+                                
+                                                <!-- Header -->
+                                                <div class="flex flex-0 items-center h-18 px-4 md:px-6 border-b bg-gray-50 dark:bg-transparent">
+                                                                
+                                                    <!-- Contact info -->
+                                                    <div class="flex items-center ml-2 lg:ml-0 mr-2 cursor-pointer" >
+                                                        <div class="relative flex flex-0 items-center justify-center w-10 h-10">
+                                                            <ng-container *ngIf="selectedContact.avatar">
+                                                                <img
+                                                                    class="w-full h-full rounded-full object-cover"
+                                                                    [src]="selectedContact.avatar"
+                                                                    alt="Contact avatar"/>
+                                                            </ng-container>
+                                                            <ng-container *ngIf="!selectedContact.avatar">
+                                                                <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                                                    {{selectedContact.fullName.charAt(0)}}
+                                                                </div>
+                                                            </ng-container>
+                                                        </div>
+                                                        <div class="ml-4 text-lg font-medium leading-5 truncate">{{selectedContact.fullName}}</div>
+                                                    </div>    
+                                                </div>
+                                
+                                                <!-- Conversation -->
+                                                <div class="flex overflow-y-auto flex-col-reverse h-full">
+                                                    <div class="flex flex-col flex-auto shrink p-6 bg-card dark:bg-transparent">
+                                                        <ng-container>
+                                                            <div class="flex flex-col items-end  mt-0.5 ">
+                                                                <!-- Bubble -->
+                                                                <div class="relative max-w-3/4 px-3 py-2 rounded-lg bg-green-700 text-lime-50">
+                                                                    <!-- Speech bubble tail -->
+                                                                    <ng-container >
+                                                                        <div class="absolute bottom-0 w-3 text-green-700 -right-1 -mr-px mb-px ">
+                                                                            <ng-container *ngTemplateOutlet="speechBubbleExtension"></ng-container>
+                                                                        </div>
+                                                                    </ng-container>
+                                                                    <!-- Message -->
+                                                                    <div class="min-w-4 leading-5" [innerHTML]="getCustomMessage()">
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Time -->
+                                                                <ng-container>
+                                                                    <div class="my-0.5 text-sm font-medium text-secondary mr-3">
+                                                                        {{dateToSend | date:'HH:mm'}}
+                                                                    </div>
+                                                                </ng-container>
+                                                            </div>
+                                                        </ng-container>
+                                                    </div>
+                                                </div>
+                                
+                                            </mat-drawer-content>
+                                
+                                        </mat-drawer-container>
+                                
+                                    </ng-container>
+                                
+                                    <!-- Select chat or start new template -->
+                                    <ng-template #selectChatOrStartNew>
+                                        <div class="flex flex-col flex-auto items-center justify-center bg-gray-100 dark:bg-transparent">
+                                            <mat-icon
+                                                class="icon-size-24"
+                                                [svgIcon]="'heroicons_outline:chat'"></mat-icon>
+                                            <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Select a conversation or start a new chat</div>
+                                        </div>
+                                    </ng-template>
+                                
+                                    <!-- Speech bubble tail SVG -->
+                                    <!-- @formatter:off -->
+                                    <ng-template #speechBubbleExtension>
+                                        <svg width="100%" height="100%" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <path d="M1.01522827,0.516204834 C-8.83532715,54.3062744 61.7609863,70.5215302 64.8009949,64.3061218 C68.8074951,54.8859711 30.1663208,52.9997559 37.5036011,0.516204834 L1.01522827,0.516204834 Z" fill="currentColor" fill-rule="nonzero"></path>
+                                            </g>
+                                        </svg>
+                                    </ng-template>
+                                    <!-- @formatter:on -->
+                                
+                                </div>
+                                
+                            </ng-container>
+                        
+                        </div>
+                        
+
+                    </div>
+                </ng-container>
+
+                <!-- Speech bubble tail SVG -->
+                <!-- @formatter:off -->
+                <ng-template #speechBubbleExtension>
+                    <svg width="100%" height="100%" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <path d="M1.01522827,0.516204834 C-8.83532715,54.3062744 61.7609863,70.5215302 64.8009949,64.3061218 C68.8074951,54.8859711 30.1663208,52.9997559 37.5036011,0.516204834 L1.01522827,0.516204834 Z" fill="currentColor" fill-rule="nonzero"></path>
+                        </g>
+                    </svg>
+                </ng-template>
+                <!-- @formatter:on -->
+
+
+            </mat-drawer-content>
+            
+        </mat-drawer-container>        
+
+        <div class="bg-gray-50 dark:bg-transparent">
+            <div class="flex justify-end m-4 ">
+                <button class="px-8 mr-2" mat-flat-button [color]="'accent'" (click)="saveAndClose()" type="button">
+                    C'est Ok!
+                </button>
+            </div>
+        </div>        
+    </div>
+
+</div>
