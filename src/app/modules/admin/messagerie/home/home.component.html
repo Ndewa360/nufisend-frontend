@@ -26,8 +26,8 @@
                 <!-- Actions -->
                 <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
 
-                    <!--  -->
-                    <button (click)="newMessage()" [disabled]="!hasWhatsAppConnected"  [matTooltip]="hasWhatsAppConnected?'':'Synchronizer votre Whatsapp pour envoyer un message'" mat-flat-button [color]="'primary'">
+                    <!-- [disabled]="!hasWhatsAppConnected"  -->
+                    <button (click)="newMessage()"   [matTooltip]="hasWhatsAppConnected?'':'Synchronizer votre Whatsapp pour envoyer un message'" mat-flat-button [color]="'primary'">
                         <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:mail'"></mat-icon>
                         <span class="ml-2">Nouveau message</span>
                     </button>

@@ -22,6 +22,7 @@ export class NewMessageComponent implements OnInit{
   destinationGroups=[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
   messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File}={}
+  planificationObj={hasPlanification:false,planif:{}};
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
 
@@ -104,16 +105,24 @@ export class NewMessageComponent implements OnInit{
         contactsID:this.destinationContacts.map((contact)=>contact._id),
         // groupsID:this.destinationGroups.map((group)=>group)
       }
+
+      if(!this.messageSendToNow && this.planificationObj.hasPlanification) dataToSend.planification=this.planificationObj.planif;
       if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
       else dataToSend.bodyText=this.messageToSend.message;
       if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
       console.log("DataToSend ",dataToSend)
-      this._store.dispatch(new MessageAction.SendMessage(dataToSend));
+      // this._store.dispatch(new MessageAction.SendMessage(dataToSend));
     }
 
     canPrevisualise()
     {
       return (this.messageToSend.messageTemplate || this.messageToSend.message) && this.destinationContacts.length>0
+    }
+
+    setPlanification(planif)
+    {
+      this.planificationObj = planif;
+      console.log("Set Planification ",planif)
     }
 
     privisualiserMessage()

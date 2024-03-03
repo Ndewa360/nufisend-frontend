@@ -1,1 +1,233 @@
-<p>planifier-date-envoi works!</p>
+<form class="flex flex-col mt-4 px-8 pt-10 " [formGroup]="planifForm">
+    <div class="flex flex-col gt-xs:flex-row gt-xs:items-start">
+        <div class="gt-xs:max-w-80 gt-xs:pr-12 mb-3">
+        </div>
+
+        <mat-accordion multi>
+            <mat-expansion-panel hideToggle>
+                <mat-expansion-panel-header  class="flex-auto cursor-pointer" (click)="allDayPageSelect.toggle()" >
+                    <mat-panel-title>
+                        <div class="sm:col-span-4 flex items-center justify-between">
+                            <div >Tous les jours à une heure précise</div>                       
+                        </div>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <span></span>
+                        <mat-slide-toggle class="right-0" [color]="'primary'" disabled [formControlName]="'isAllDayPlage'" (click)="toggleExpand(allDayPageSelect)" #allDayPageSelect></mat-slide-toggle>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+              
+                <div class="flex-auto" >
+                    <div class="flex">
+                        <mat-form-field class="flex-auto">
+                            <mat-label>Selectionner la plage de temps</mat-label>
+                            <mat-date-range-input [rangePicker]="rangePicker">
+                                <input matStartDate formControlName="startAllPlage" placeholder="Date de début">
+                                <input matEndDate formControlName="endAllPlage" placeholder="Date de fin">
+                            </mat-date-range-input>
+                            <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+                            <mat-date-range-picker #rangePicker>
+                                <mat-date-range-picker-actions>
+                                <button mat-button matDateRangePickerCancel>Anuler</button>
+                                <button mat-raised-button color="primary" matDateRangePickerApply>Appliquer</button>
+                                </mat-date-range-picker-actions>
+                            </mat-date-range-picker>
+                            </mat-form-field>
+                    </div>
+
+                    <div class="flex mt-8">
+                        <mat-form-field  class="flex-auto">
+                            <mat-label>Choisir l'heure</mat-label>
+                            <input matInput placeholder="Editable dial" formControlName="timeAllPlage" aria-label="Editable dial" [ngxTimepicker]="editableDial" readonly>
+                            <ngx-material-timepicker #editableDial [theme]="ngxMaterialTimePickerTheme"></ngx-material-timepicker>
+                            <mat-icon class="icon-size-5" mat-button  [svgIcon]="'heroicons_outline:clock'" (click)="editableDial.open()" matSuffix></mat-icon>
+                        </mat-form-field>
+                    </div>
+
+                </div>              
+            </mat-expansion-panel >
+            
+            <mat-expansion-panel  hideToggle>
+                <mat-expansion-panel-header  class="flex-auto cursor-pointer" (click)="recurenceSelect.toggle()" >
+                    <mat-panel-title>
+                        <div class="sm:col-span-4 flex items-center justify-between">
+                            <div >Selon une recurence</div>                       
+                        </div>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <span></span>
+                        <mat-slide-toggle class="right-0" [color]="'primary'" [formControlName]="'isCurrentPlage' " (click)="toggleExpand(recurenceSelect)" #recurenceSelect></mat-slide-toggle>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <div class="flex-auto" >                  
+                    <div class="flex mt-8">
+                        <mat-form-field class="flex-auto">
+                            <mat-label>Chaque </mat-label>
+                            <input matInput type="number" formControlName="numberOfCurrent">
+                            <mat-select [value]="'day'" formControlName="typeOfCurrent"  matSuffix>
+                                <mat-option [value]="'day'">Jour</mat-option>
+                                <mat-option [value]="'week'">Semaine</mat-option>
+                                <mat-option [value]="'month'">Mois</mat-option>
+                                <mat-option [value]="'year'">Année</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex mt-8" *ngIf="planifForm.controls.typeOfCurrent.value=='week'">
+                        <div class="flex-auto mat-mdc-form-field">
+                            <div class="mat-mdc-floating-label font-semibold ">Choisir le jour de la semaine</div>
+                            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" >
+                                <a *ngFor="let day of listOfDay; let i=index" (click)="selectDay(day)"  
+                                    [ngClass]="{'rounded-l-md':i==0,'rounded-r-md':i==6,'z-10 bg-green-800 text-white':day==selectedDayOfWeek}" 
+                                    class="relative inline-flex items-center px-4 py-2 text-sm font-semibold cursor-pointer ring-1 ring-inset ring-gray-300 hover:bg-emerald-900 hover:text-white focus:z-20 focus:outline-offset-0">
+                                    {{day}}
+                                </a>
+                            </nav>
+                          </div>
+                    </div>
+                    <div class="flex mt-8" *ngIf="planifForm.controls.typeOfCurrent.value=='month' || planifForm.controls.typeOfCurrent.value=='year'">
+                        <div class="flex mat-mdc-form-field">
+                            <div class="mat-mdc-floating-label font-semibold ">
+                                <span *ngIf="planifForm.controls.typeOfCurrent.value=='month'">A partir de</span>
+                                <span *ngIf="planifForm.controls.typeOfCurrent.value=='year'">Chaque</span>
+                             </div>
+                            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" >
+                                <a *ngFor="let month of listOfMonth; let i=index" (click)="selectCurrentMonth(month,i)"  
+                                    [ngClass]="{'rounded-l-md':i==0,'rounded-r-md':i==11,'z-10 bg-green-800 text-white':month==selectedMonthOfWeek}" 
+                                    class="relative inline-flex items-center px-4 py-2 text-sm font-semibold cursor-pointer ring-1 ring-inset ring-gray-300 hover:bg-emerald-900 hover:text-white focus:z-20 focus:outline-offset-0">
+                                    {{month}}
+                                </a>
+                            </nav>
+                          </div>                       
+                    </div>      
+                    <div class="flex" *ngIf="planifForm.controls.typeOfCurrent.value=='month' || planifForm.controls.typeOfCurrent.value=='year'">
+                        <mat-card class="demo-inline-calendar-card">
+                            <div (click)="$event.stopPropagation()">
+                            <mat-calendar [selected]="selectedCurrentDate"  [startAt]="startCurrentDateAt" #calendarCurrentDate (selectedChange)="handleCurrentDateSelected($event)" [minDate]="minCurrentDate" [maxDate]="maxCurrentDate" ></mat-calendar>
+                            </div>
+                            </mat-card>
+                    </div>               
+                    <div class="flex mt-8">
+                        <mat-form-field  class="flex-auto">
+                            <mat-label>à</mat-label>
+                            <input matInput placeholder="Editable dial" formControlName="timeCurrentPlage" aria-label="Editable dial" [ngxTimepicker]="choixCurrentHour" readonly>
+                            <ngx-material-timepicker #choixCurrentHour [theme]="ngxMaterialTimePickerTheme"></ngx-material-timepicker>
+                            <mat-icon class="icon-size-5" mat-button  [svgIcon]="'heroicons_outline:clock'" (click)="choixCurrentHour.open()" matSuffix></mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel  hideToggle>
+                <mat-expansion-panel-header  class="flex-auto cursor-pointer" (click)="randomSelect.toggle()" >
+                    <mat-panel-title>
+                        <div class="sm:col-span-4 flex items-center justify-between">
+                            <div >Selectionner aléatoirement</div>                       
+                        </div>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <span></span>
+                        <mat-slide-toggle class="right-0" [color]="'primary'" [formControlName]="'isRandomPlage' " (click)="toggleExpand(randomSelect)" #randomSelect></mat-slide-toggle>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+              
+                <div class="flex">
+                    <div class="md:columns-1/2 sm:w-full">
+                        <mat-card class="demo-inline-calendar-card">
+                            <div (click)="$event.stopPropagation()">
+                            <mat-calendar #calendarRandomDate  [dateClass]="selectedRandomDateFunc" (selectedChange)="updateRandomDateSelected($event,calendarRandomDate)" ></mat-calendar>
+                            </div>
+                          </mat-card>
+                    </div>   
+                    
+                    <div class="md:columns-2/3 sm:w-full">                       
+                        <div class="flex-auto overflow-y-auto">
+                            <ng-container *ngIf="selectedRandomDate.length > 0; else noSelectedRandomDate">
+                                <!-- <ng-container>
+                                    <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
+                                        Contacts ({{selectedContactList.length}})
+                                    </div>
+                                </ng-container>(click)="removeContact(contact)" -->
+                                <ng-container *ngFor="let date of selectedRandomDate; trackBy: trackByFn">                                    
+                                    <a  class="flex items-center px-6 py-4 md:px-8 cursor-pointer border-b" [ngClass]="'hover:bg-gray-100 dark:hover:bg-hover'">
+                                        <div class="w-6 h-6 relative flex flex-0 items-center justify-center w-10 h-10 mt-2">            
+                                            <ng-container >
+                                                <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                                    <mat-icon class="icon-size-2" [svgIcon]="'heroicons_outline:calendar'"></mat-icon>
+                                                </div>
+                                            </ng-container>
+                                        </div>
+                                        <div class="w-8/12 min-w-0 ml-4">
+                                            <div class="font-medium truncate">{{getDate(date) | date}}</div>
+                                        </div>
+                                        <div class=" w-6 h-6 mr-3 cursor-pointer float-right" >
+                                            <mat-icon (click)="removeRandomDateSelected(date,calendarRandomDate)" mat-button class="icon-size-6 text-red-600 dark:text-red-400" [svgIcon]="'heroicons_outline:trash'"
+                                                [matTooltip]="'Rétirer la date'"></mat-icon>
+                                        </div> 
+                                    </a>
+                                </ng-container>
+                            </ng-container>
+
+                             <!-- No contact template -->
+                            <ng-template #noSelectedRandomDate>
+                                <div class="flex flex-auto flex-col items-center justify-center h-full">
+                                    <mat-icon class="icon-size-8" [svgIcon]="'heroicons_outline:calendar'"></mat-icon>
+                                    <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Aucune date séléctionnée</div>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex mt-8">
+                    <mat-form-field  class="flex-auto">
+                        <mat-label>à</mat-label>
+                        <input matInput placeholder="Editable dial" formControlName="timeRandomPlage" aria-label="Editable dial" [ngxTimepicker]="choixRandomHour" readonly>
+                        <ngx-material-timepicker #choixRandomHour [theme]="ngxMaterialTimePickerTheme"></ngx-material-timepicker>
+                        <mat-icon class="icon-size-5" mat-button  [svgIcon]="'heroicons_outline:clock'" (click)="choixRandomHour.open()" matSuffix></mat-icon>
+                    </mat-form-field>
+                </div>
+
+            </mat-expansion-panel>
+          </mat-accordion>
+
+          
+
+
+
+        
+
+        
+        <!-- <div class="flex-auto md:columns-2">
+            <div class="flex ">
+                <mat-form-field class="flex-auto">
+                    <mat-label>Date de début</mat-label>
+                    <input matInput [matDatepicker]="datepicker">
+                    <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+                    <mat-datepicker #datepicker>
+                      <mat-datepicker-actions>
+                        <button mat-button matDatepickerCancel>Annuler</button>
+                        <button mat-raised-button color="primary" matDatepickerApply>Choisr</button>
+                      </mat-datepicker-actions>
+                    </mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="flex ">
+                <mat-form-field class="flex-auto">
+                    <mat-label>Country / Region</mat-label>
+                    <mat-select>
+                        <mat-option value="country-1">Country 1</mat-option>
+                        <mat-option value="country-2">Country 2</mat-option>
+                        <mat-option value="country-3">Country 3</mat-option>
+                    </mat-select>
+                    <mat-icon
+                        class="icon-size-5"
+                        matPrefix
+                        [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
+                </mat-form-field>
+            </div>
+        </div> -->
+    </div>
+</form>
+

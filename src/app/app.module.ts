@@ -22,6 +22,7 @@ import { UserProfileState } from './shared/store/user-profile';
 import { SocketIoModule } from 'ngx-socket-io';
 import { WebsocketManagerService } from './shared/services/websocket-manager/websocket-manager.service';
 import { GroupState } from './shared/store/group';
+// import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -76,6 +77,7 @@ const routerConfig: ExtraOptions = {
             multi:true,
             deps:[KeycloakService,Router]
           },
+        //   provideMomentDateAdapter()
     ]
 })
 export class AppModule

@@ -1,0 +1,32 @@
+mat-panel-description {
+    justify-content: space-between;
+    align-items: center;
+  }
+  .demo-inline-calendar-card {
+    width: 300px;
+  }
+  .mat-mdc-input-element::-webkit-calendar-picker-indicator {
+    display: block;
+  }
+
+
+  .timepicker {
+    z-index: 10000000 !important;
+}
+
+
+.mat-calendar-body-cell.selected .mat-calendar-body-cell-content
+{
+  color:#fff !important;
+
+}
+
+.mat-calendar-body-cell.selected
+{
+  background-color:#166534!important;
+  border-radius: 50%
+}
+.drop-calendar
+{
+  width:30rem
+}

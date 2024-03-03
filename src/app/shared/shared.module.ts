@@ -37,7 +37,10 @@ import { FileUploadComponent } from './components/file-upload/file-upload.compon
 import { WhatsappAskSyncToatrComponent } from './components/whatsapp-ask-sync-toatr/whatsapp-ask-sync-toatr.component'; 
 import { SyncQrcodeService } from './services/whatsapp/sync-qrcode.service';
 import { WebsocketManagerService } from './services/websocket-manager/websocket-manager.service';
-
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import {MatCardModule} from '@angular/material/card';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+// import { CalendarModule } from 'primeng/calendar';
 // import { DropzoneModule } from 'ngx-dropzone-wrapper';
 // import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
 // import { DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
@@ -87,6 +90,10 @@ const moduleList = [
     NgApexchartsModule,
     TranslocoModule,
     MatAutocompleteModule,
+    NgxMaterialTimepickerModule,
+    MatCardModule,
+    MatMomentDateModule
+    // CalendarModule
     // DropzoneModule
 ]
 @NgModule({

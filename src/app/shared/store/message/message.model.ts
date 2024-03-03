@@ -24,6 +24,7 @@ export interface MessageModel
     
     messageTemplateId?:string;
 
+    planification?:Record<string,any>;
     
     bodyText?:string;
     bodyFile?:File;
