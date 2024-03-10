@@ -16,7 +16,7 @@ export class NewMessageForSingleContactComponent {
   messageSendToNow:boolean=false;
   destinationContact:ContactModel=null
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File}={}
+  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File,title?:string}={}
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
 
@@ -73,7 +73,7 @@ export class NewMessageForSingleContactComponent {
     }
 
 
-    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file:File})
+    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file:File,title:string})
     {
       this.messageToSend=message;
     }
@@ -85,6 +85,7 @@ export class NewMessageForSingleContactComponent {
         type:MessageType.TEXT,
         isSentToNow:true,
         contactsID:[this.destinationContact._id],
+        title:this.messageToSend.title
         // groupsID:this.destinationGroups.map((group)=>group)
       }
       if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id

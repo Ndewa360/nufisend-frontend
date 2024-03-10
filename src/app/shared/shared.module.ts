@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Route, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatExpansionModule } from '@angular/material/expansion';
 import {MatDialogModule} from '@angular/material/dialog'; 
@@ -40,6 +40,8 @@ import { WebsocketManagerService } from './services/websocket-manager/websocket-
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import {MatCardModule} from '@angular/material/card';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { CustomQuillEditorComponent } from './components/custom-quill-editor/custom-quill-editor.component';
+import { QuillModule } from 'ngx-quill';
 // import { CalendarModule } from 'primeng/calendar';
 // import { DropzoneModule } from 'ngx-dropzone-wrapper';
 // import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
@@ -98,24 +100,25 @@ const moduleList = [
 ]
 @NgModule({
     imports: [
-        ...moduleList
+        ...moduleList,
+      QuillModule.forRoot(),
+      
     ],
     exports: [
         ...moduleList,
         FileUploadComponent,
       WhatsappAskSyncToatrComponent,
-
+      CustomQuillEditorComponent
+      
     ],
     declarations: [
       FileUploadComponent,
-      WhatsappAskSyncToatrComponent
+      WhatsappAskSyncToatrComponent,
+      CustomQuillEditorComponent
     ],
     providers: [
-        // {
-        //   provide: DROPZONE_CONFIG,
-        //   useValue: DEFAULT_DROPZONE_CONFIG
-        // }
         // WebsocketManagerService,
+       
       ]
 })
 export class SharedModule

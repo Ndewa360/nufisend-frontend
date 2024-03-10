@@ -46,6 +46,7 @@ export class MessageState{
                         sendingMessage:false
                     })
                     this._toastrService.success("Message envoyé avec success", 'WhatsApp Message');
+                    // if(!message.isSentToNow) this.
                 }
             ),
             catchError((error) => {

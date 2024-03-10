@@ -11,7 +11,13 @@
                 Vous pouvez sélectionner un template afin de rédiger le message sous la forme proposé par le template. Dans ce cas, le contenu du message n'est plus obligatoire!
             </fuse-alert>
         </div>
-        
+         <!-- Subject -->
+         <mat-form-field >
+            <mat-label>Titre du message</mat-label>
+            <input matInput [formControlName]="'title'" [placeholder]="'Saissisez un message'">
+            <!-- <input matInput [formControlName]="'subject'"> -->
+        </mat-form-field>
+
         <div class="sm:col-span-3 mb-6">
             <mat-label class="font-medium mb-2">Choisir des fichiers</mat-label>
             <app-file-upload (uploadFileEvent)="setFiles($event)"></app-file-upload>
@@ -39,16 +45,15 @@
                             </div>
                         </ng-container>
                     </div>
-                    <div class="min-w-0 ml-4">
+                    <div class="w-10/12 min-w-0 ml-4">
                         <div class="font-medium leading-5 truncate">{{msgTmp.title}}</div>
                     </div>
                     <!--  -->
-                    <div class="w-6 h-6 mr-3 cursor-pointer float-right" *ngIf="selectedMessageTemplate && selectedMessageTemplate._id==msgTmp._id" (click)="removeMessageTemplate(msgTmp)">
-                        <mat-icon
-                        mat-button
+                    <div class="w-6 h-6 mr-3 cursor-pointer float-right" *ngIf="selectedMessageTemplate && selectedMessageTemplate._id==msgTmp._id" (click)="removeMessageTemplate(msgTmp,$event)">
+                        <mat-icon mat-button                            
                             class="icon-size-6 text-red-600 dark:text-red-400"
                             [svgIcon]="'heroicons_outline:trash'"
-                            [title]="'Rétirer le contact'"></mat-icon>
+                            [matTooltip]="'Rétirer le template'"></mat-icon>
                     </div> 
 
                 </div>
@@ -69,12 +74,8 @@
             </mat-option>
         </mat-autocomplete>  
         <!-- Body -->
-        <quill-editor
-            class="mt-2"
-            [formControlName]="'body'"
-            (onContentChanged)="loseFocus()"
-            [bounds]="'self'"
-            [modules]="quillModules"></quill-editor>
+        <app-custom-quill-editor class="mt-2" [formControlName]="'body'"  (onContentWriteChanged)="loseFocus()"></app-custom-quill-editor>
+        
 
     </form>
     <!-- <ng-template #toLoading>

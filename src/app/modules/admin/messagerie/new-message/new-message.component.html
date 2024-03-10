@@ -17,7 +17,8 @@
     <div class="flex flex-col flex-auto p-x-6 p-y-3 sm:p-8  md:h-full overflow-y-auto">
         <form class="p-4 bg-card shadow rounded "
                 [formGroup]="newMessageForm">
-                <mat-horizontal-stepper [linear]="true" #horizontalStepper>
+                <!--  -->
+                <mat-horizontal-stepper  [linear]="true" #horizontalStepper>
                     <mat-step [formGroupName]="'stepSelectContacts'" [completed]="destinationContacts.length>0 || destinationGroups.length>0"   #horizontalStepperStep1>
                         <ng-template matStepLabel>Destinataires</ng-template>                        
                         <app-select-contacts-groups (contactsAndGroupsSelected)="getDestinationMessageData($event)" class="flex"></app-select-contacts-groups>

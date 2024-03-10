@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, ReplaySubject, Subject, combineLatest, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, Subject, combineLatest, take, takeUntil, tap } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
@@ -8,14 +8,15 @@ import { NavigationService } from 'app/core/navigation/navigation.service';
 import { KeycloakProfile } from 'keycloak-js';
 import { UserService } from 'app/core/user/user.service';
 import { FuseLoadingService } from '@fuse/services/loading';
-import { Actions, Select, ofActionSuccessful } from '@ngxs/store';
+import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { UserProfileState, UserProfileModel, UserProfileAction } from 'app/shared/store/user-profile';
 import { ToastrService } from 'ngx-toastr';
 import { WhatsappAskSyncToatrComponent } from 'app/shared/components/whatsapp-ask-sync-toatr/whatsapp-ask-sync-toatr.component';
 import { WhatsappDataService } from 'app/shared/services/whatsapp/whatsapp-data.service';
 import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
 import { FuseAlertService } from '@fuse/components/alert';
-import { GlobalState } from 'app/shared/store';
+import { ContactAction, GlobalState } from 'app/shared/store';
+import { PlanificationAction } from 'app/shared/store/planifcation';
 
 @Component({
     selector     : 'enterprise-layout',
@@ -48,8 +49,9 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService:UserService,
         private _toastrService:ToastrService,
-        private ngxAction:Actions,
-        private _fuseAlertService: FuseAlertService 
+        private _fuseAlertService: FuseAlertService,
+        private _store:Store,private _ngxsAction:Actions
+
     )
     {
     }
@@ -75,6 +77,16 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        this._ngxsAction.pipe(
+            ofActionSuccessful(UserProfileAction.FetchUserProfile),
+            tap(()=>this._store.dispatch([
+                new ContactAction.FetchAllContact(),
+                new PlanificationAction.FetchAllPlanification()
+                ])
+            ),
+            take(1)
+        ).subscribe(()=>{})
+
         // Subscribe to navigation data
         this._navigationService.navigation$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -101,7 +113,7 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
         });
 
         combineLatest([
-            this.ngxAction.pipe
+            this._ngxsAction.pipe
             (
                 takeUntil(this._unsubscribeAll),
                 ofActionSuccessful(UserProfileAction.FetchUserProfile)

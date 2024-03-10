@@ -16,7 +16,6 @@ export class MessageService
     constructor(private _httpClient: HttpClient)
     {}
 
-
     /**
      * Send Message
      */
@@ -24,10 +23,10 @@ export class MessageService
     {
         let formData = new FormData();
         for ( var key in message ) {
-            formData.append(key, message[key]);
+            if(key=="planification") formData.append(key,JSON.stringify( message[key]));
+            else formData.append(key, message[key]);
         }
         return this._httpClient.post<ApiResultFormat<MessageModel>>(`${environment.apiUrl}/message/post`, formData)
     }
-
     
 }

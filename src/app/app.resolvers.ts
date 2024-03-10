@@ -20,7 +20,7 @@ export class InitialDataResolver implements Resolve<any>
         private _navigationService: NavigationService,
         private _notificationsService: NotificationsService,
         private _quickChatService: QuickChatService,
-        private _shortcutsService: ShortcutsService
+        private _shortcutsService: ShortcutsService,
     )
     {
     }
@@ -43,7 +43,7 @@ export class InitialDataResolver implements Resolve<any>
             this._messagesService.getAll(),
             this._notificationsService.getAll(),
             this._quickChatService.getChats(),
-            this._shortcutsService.getAll()
+            this._shortcutsService.getAll(),            
         ]);
     }
 }

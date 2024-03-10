@@ -17,6 +17,7 @@ import { RedigerMessagePlanifierComponent } from './components/rediger-message-p
 import { QuillModule } from 'ngx-quill';
 import { NewMessageForSingleContactComponent } from './components/new-message-for-single-contact/new-message-for-single-contact.component';
 import { PrevisualisationMessageContactComponent } from './components/previsualisation-message-contact/previsualisation-message-contact.component';
+import { HomePlanningListComponent } from './components/home-planning-list/home-planning-list.component';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { PrevisualisationMessageContactComponent } from './components/previsuali
     RedigerMessageDirectComponent,
     RedigerMessagePlanifierComponent,
     NewMessageForSingleContactComponent,
-    PrevisualisationMessageContactComponent
+    PrevisualisationMessageContactComponent,
+    HomePlanningListComponent
   ],
   imports: [
     CommonModule,
@@ -39,7 +41,6 @@ import { PrevisualisationMessageContactComponent } from './components/previsuali
     FuseCardModule,
     MatStepperModule,
     SharedModule,
-    QuillModule.forRoot(),
   ],
   exports:[
     NewMessageForSingleContactComponent

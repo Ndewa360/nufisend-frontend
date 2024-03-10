@@ -21,7 +21,7 @@ export class NewMessageComponent implements OnInit{
   destinationContacts:ContactModel[] = []
   destinationGroups=[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File}={}
+  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File,title?:string}={}
   planificationObj={hasPlanification:false,planif:{}};
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
@@ -90,7 +90,7 @@ export class NewMessageComponent implements OnInit{
       this._changeDetectorRef.markForCheck();
     }
 
-    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file:File})
+    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file:File,title:string})
     {
       console.log("Message ",message)
       this.messageToSend=message;
@@ -103,6 +103,7 @@ export class NewMessageComponent implements OnInit{
         type:MessageType.TEXT,
         isSentToNow:this.messageSendToNow,
         contactsID:this.destinationContacts.map((contact)=>contact._id),
+        title:this.messageToSend.title
         // groupsID:this.destinationGroups.map((group)=>group)
       }
 
@@ -111,7 +112,7 @@ export class NewMessageComponent implements OnInit{
       else dataToSend.bodyText=this.messageToSend.message;
       if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
       console.log("DataToSend ",dataToSend)
-      // this._store.dispatch(new MessageAction.SendMessage(dataToSend));
+      this._store.dispatch(new MessageAction.SendMessage(dataToSend));
     }
 
     canPrevisualise()
