@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEnca
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
-import { ContactModel, MessageAction, MessageModel, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { ContactModel, ContactState, MessageAction, MessageModel, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
+import { Observable, Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { PrevisualisationMessageContactComponent } from '../components/previsualisation-message-contact/previsualisation-message-contact.component';
 
 @Component({
@@ -60,7 +60,6 @@ export class NewMessageComponent implements OnInit{
     )
     .subscribe(
       (value:any)=>{
-        console.log("Save New Message");
         this.saveAndClose()
       }
     );
@@ -103,8 +102,8 @@ export class NewMessageComponent implements OnInit{
         type:MessageType.TEXT,
         isSentToNow:this.messageSendToNow,
         contactsID:this.destinationContacts.map((contact)=>contact._id),
-        title:this.messageToSend.title
-        // groupsID:this.destinationGroups.map((group)=>group)
+        title:this.messageToSend.title,
+        groupsID:this.destinationGroups.map((group)=>group._id)
       }
 
       if(!this.messageSendToNow && this.planificationObj.hasPlanification) dataToSend.planification=this.planificationObj.planif;
@@ -123,18 +122,22 @@ export class NewMessageComponent implements OnInit{
     setPlanification(planif)
     {
       this.planificationObj = planif;
-      console.log("Set Planification ",planif)
     }
 
-    privisualiserMessage()
+    async privisualiserMessage()
     {
+      let contactGroup = [];
+      if(this.destinationGroups.length>0)
+      {
+        contactGroup = await firstValueFrom(this._store.select(ContactState.selectStateByContactsId(this.destinationGroups.map((group)=>group.contacts).reduce((allContacts,group)=>[...allContacts,...group.contacts]))))
+      }
       // Open the dialog
       const dialogRef = this._matDialog.open(PrevisualisationMessageContactComponent,
         {
           minHeight: '80%',
           minWidth: '80%',
           data: {
-            destinationContact: this.destinationContacts,
+            destinationContact: [...this.destinationContacts,...contactGroup],
             message: this.messageToSend
           }
         }

@@ -34,11 +34,12 @@ export class MessageProcessing
 
     static getVarListWithValues(contact:ContactModel,sender,dateToSend):Record<string,any>
     {
+        let receiverEmail =ContactExtractData.getDefaultMail(contact);
         return {
             senderEmail:sender.email,
             senderFullName:`${sender.firstName} ${sender.lastName}`,
             receiverFullName:`${contact.fullName}`,
-            receiverEmail: ContactExtractData.getDefaultMail(contact),
+            receiverEmail: receiverEmail?receiverEmail:"",
             dateToSend:`${(dateToSend?new Date(dateToSend):new Date()).toLocaleDateString()}`,
             plateform: "Ysapp"
         }

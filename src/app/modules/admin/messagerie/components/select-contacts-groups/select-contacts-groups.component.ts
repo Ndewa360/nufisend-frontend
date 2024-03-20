@@ -2,7 +2,7 @@ import { state, style, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
-import { ContactState, ContactModel, ContactAction, GroupModel, GroupState } from 'app/shared/store';
+import { ContactState, ContactModel, ContactAction, GroupModel, GroupState, GroupAction } from 'app/shared/store';
 import { Observable, Subject, combineLatest, takeUntil, tap } from 'rxjs';
 
 @Component({
@@ -39,10 +39,10 @@ export class SelectContactsGroupsComponent implements OnInit {
     ){}
   ngOnInit(): void {
     // Get the contacts
-    this._store.dispatch(new ContactAction.FetchAllContact())
+    this._store.dispatch([new ContactAction.FetchAllContact(),new GroupAction.FetchAllGroup()])
 
     combineLatest(this.contacts$,this.groups$).subscribe(([contacts,groups])=>{
-      let data = [...contacts.map((cont)=>({isGroup:false,data:cont})),...groups.map((group)=>({isGroup:false,data:group}))]
+      let data = [...contacts.map((cont)=>({isGroup:false,data:cont})),...groups.map((group)=>({isGroup:true,data:group}))]
       this.contactsGroupsFiltered= [...data];
       this.contactsGroups = [...data ]
       this._changeDetectorRef.markForCheck();
