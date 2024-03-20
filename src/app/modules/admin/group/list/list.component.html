@@ -1,1 +1,102 @@
-<p>list works!</p>
+<div class="flex flex-col flex-auto min-w-0" >
+
+    <mat-drawer-container
+        class="flex-auto h-full bg-card dark:bg-transparent"
+        (backdropClick)="onBackdropClicked()">
+
+         <!-- Drawer -->
+         <mat-drawer
+         class="w-full md:w-160 dark:bg-gray-900"
+         [mode]="drawerMode"
+         [opened]="false"
+         [position]="'end'"
+         [disableClose]="true"
+         #matDrawer>
+         <router-outlet></router-outlet>
+     </mat-drawer> 
+
+    <mat-drawer-content class="flex flex-col bg-gray-100">
+        <!-- Header -->
+        <div class="relative flex-0 py-8 px-4 sm:p-16 overflow-hidden bg-gray-800 dark">
+            <!-- Background - @formatter:off -->
+            <!-- Rings -->
+            <svg class="absolute inset-0 pointer-events-none"
+                viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+                <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
+                    <circle r="234" cx="196" cy="23"></circle>
+                    <circle r="234" cx="790" cy="491"></circle>
+                </g>
+            </svg>
+            <!-- @formatter:on -->
+            <div class="z-10 relative flex flex-col items-center">
+                <h2 class="text-xl font-semibold">GROUPES</h2>
+                <div class="mt-1 text-4xl sm:text-7xl font-extrabold tracking-tight leading-tight text-center">
+                    Gérer l'ensemble de vos groupes d'utilisateurs
+                </div>
+                <div class="max-w-2xl mt-6 sm:text-2xl text-center tracking-tight text-secondary">
+                    Vous pouvez creer, supprimer et modifier l'ensemble de vos groupes. Ces groupes sont semblables a des groupes de diffussion. 
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 m-4 md:mt-16">
+            <ng-container *ngFor="let group of (groups$ | async)">
+                <a class=" flex flex-col items-start w-56 p-6 rounded-lg shadow bg-card rounded-lg hover:shadow-xl transition-shadow duration-150 ease-in-out" [routerLink]="[group._id]">
+                    <div class="flex items-center justify-center p-4 rounded-full bg-primary-50 text-primary-700 dark:bg-primary dark:text-on-primary">
+                        <mat-icon class="text-current" [svgIcon]="group.icon?group.icon:'heroicons_outline:user-group'"></mat-icon>
+                    </div>
+                    <!-- Title -->
+                    <div class="mt-5 text-lg font-medium leading-5">{{group.name}}</div>
+                    <!-- Description -->
+                    <div class="mt-0.5 line-clamp-2 text-secondary">{{group.description}}</div>
+                    <!-- Members -->
+                    <ng-container *ngIf="(getGroupMember(group) | async).length">
+                        <div class="w-12 h-1 mt-6 border-t-2"></div>
+                        <div class="flex items-center mt-6 -space-x-1.5">                  
+                            <ng-container *ngFor="let member of (getGroupMember(group) | async).slice(0, 5)" >
+                                <div class="cursor-pointer flex items-center -space-x-1.5">
+                                    <img
+                                        class="flex-0 w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent object-cover"
+                                        *ngIf="member.avatar; else noAvatar;"
+                                        [src]="member.avatar">
+                                    <ng-template #noAvatar >
+                                        <div
+                                            class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent bg-gray-200 text-gray-500"
+                                            *ngIf="!member.avatar">
+                                            <div class="text-md font-semibold">
+                                                {{member.fullName?.charAt(0)}}
+                                            </div>
+                                        </div>
+                                    </ng-template>
+                                </div>
+
+                            </ng-container>                            
+                            <ng-container *ngIf="(getGroupMember(group) | async).length > 5">
+                                <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent bg-gray-200 text-gray-500">
+                                    <div class="text-md font-semibold">
+                                        +{{ (getGroupMember(group) | async).slice(5).length }}
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                        </div>
+                    </ng-container>
+                    <!-- Last activity -->
+                    <div class="flex items-center mt-4 text-md font-md">
+                        <div class="text-secondary">Crée:</div>
+                        <div class="ml-1">{{formatDateAsRelative(group.createdAt)}}</div>
+                    </div>
+                </a>
+            </ng-container>
+            <!-- New board -->
+            <div (click)="createGroup()" matTooltip="Nouveau groupe" class="flex flex-col  items-center justify-center w-56 rounded-lg cursor-pointer border-2 border-gray-300 border-dashed hover:bg-hover h-64 transition-colors duration-150 ease-in-out">
+                <mat-icon
+                    class="icon-size-12 text-hint"
+                    [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+            </div>
+        </div>
+    </mat-drawer-content>
+
+    </mat-drawer-container>
+    
+</div>

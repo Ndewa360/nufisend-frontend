@@ -93,13 +93,13 @@
         <div class="flex flex-col flex-auto w-full sm:max-w-360 sm:shadow-lg sm:rounded-lg sm:overflow-hidden bg-default">
             <!-- *ngIf="true" hack is required here for router-outlet to work correctly.
                  Otherwise, layout changes won't be registered and the view won't be updated! -->
-                 <fuse-alert [type]="'info'" class="mb-4" [showIcon]="false" [appearance]="'border'" [dismissible]="true" [dismissed]="true" [name]="'synchro_whatsapp_loading'">
+                 <fuse-alert [type]="'info'" [ngClass]="{'mb-4':showSynchroWhatsappLoading}" [showIcon]="false" [appearance]="'border'" [dismissible]="true" [dismissed]="true" [name]="'synchro_whatsapp_loading'">
                     <app-whatsapp-ask-sync-toatr></app-whatsapp-ask-sync-toatr>
                 </fuse-alert>
-            <fuse-alert [type]="'warning'" class="mb-4" [showIcon]="true" [appearance]="'border'" [dismissible]="true" [dismissed]="true" [name]="'synchro_whatsapp'">
+            <fuse-alert [type]="'warning'" [ngClass]="{'mb-4':showSynchroWhatsappAlert}" [showIcon]="true" [appearance]="'border'" [dismissible]="true" [dismissed]="true" [name]="'synchro_whatsapp'">
                 <!-- <mat-icon class="icon-size-5" fuseAlertIcon [svgIcon]="'heroicons_solid:lock-open'"></mat-icon> -->
                 <span fuseAlertTitle>Synchonisation Whatsapp</span>
-                Aucun compte WhatsApp synchronzé! Veuillez syncrhonisizer votre Whwatsapp pour pouvoir envoyer les messages
+                Aucun compte WhatsApp synchronzé! Veuillez synchronizer votre Whwatsapp pour pouvoir envoyer les messages
             </fuse-alert>
             <router-outlet *ngIf="true"></router-outlet>
         </div>

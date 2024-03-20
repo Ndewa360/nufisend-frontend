@@ -5,6 +5,8 @@ import { Actions, Store, ofActionSuccessful } from '@ngxs/store';
 import { ContactModel, MessageTemplateModel, MessageAction } from 'app/shared/store';
 import { Subject, takeUntil } from 'rxjs';
 import { NewMessageComponent } from '../../new-message/new-message.component';
+import { MessageProcessing } from 'app/shared/utils';
+import { UserService } from 'app/core/user/user.service';
 
 @Component({
   selector: 'app-previsualisation-message-contact',
@@ -22,11 +24,13 @@ export class PrevisualisationMessageContactComponent {
   submitted:boolean=false;
   message:string="";
   dateToSend:Date = new Date()
+  sender:any=null;
 
   constructor(
     public matDialogRef: MatDialogRef<PrevisualisationMessageContactComponent>,
     private _changeDetectorRef: ChangeDetectorRef,
     private _store:Store,
+    private userService:UserService,
     @Inject(MAT_DIALOG_DATA) data: {destinationContact: ContactModel[],message:{messageTemplate?:MessageTemplateModel,message?:string,file?:File}}
   )
   {
@@ -46,6 +50,7 @@ export class PrevisualisationMessageContactComponent {
    */
   ngOnInit(): void
   {
+    this.userService.user$.subscribe((value)=>this.sender=value);
     // Mark for check
     this._changeDetectorRef.markForCheck();      
   }
@@ -64,6 +69,8 @@ export class PrevisualisationMessageContactComponent {
     selectContact(contact)
     {
       this.selectedContact=contact;
+      this.getCustomMessage()
+      this._changeDetectorRef.markForCheck();      
     }
 
   saveAndClose(): void
@@ -73,10 +80,10 @@ export class PrevisualisationMessageContactComponent {
     // Mark for check
     this._changeDetectorRef.markForCheck();
   }
-
+ 
   getCustomMessage()
   {
-    return this.message;
+    this.message=MessageProcessing.getPersonalizedMessage(this.message,this.selectedContact,this.sender,this.dateToSend)
   }
 
 

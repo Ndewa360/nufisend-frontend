@@ -47,6 +47,14 @@ export class ContactState{
         })        
     }
 
+    static selectStateByContactsId(contactsId:string[])
+    {
+        return createSelector([ContactState],(state)=>{
+            return contactsId.map((contactId)=> state.contacts.find((contact)=>contact._id==contactId)).filter((contact)=> contact!=undefined)
+        })        
+    }
+
+
     @Action(ContactAction.AddContact)
     addContact(ctx:StateContext<ContactStateModel>, {contact}:ContactAction.AddContact)
     {

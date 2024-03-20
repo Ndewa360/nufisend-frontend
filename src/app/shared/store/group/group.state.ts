@@ -88,8 +88,8 @@ export class GroupState{
             tap(
                 (result)=>{
                     
-                    let groupIndex = state.groups.findIndex((c)=>c._id==id),groups = state.groups;
-                    group[groupIndex]=result.data
+                    let groupIndex = state.groups.findIndex((c)=>c._id==id),groups = [...state.groups];
+                    groups[groupIndex]=result.data
                     ctx.patchState({
                         loadingGroups:false,
                         groups
@@ -171,6 +171,7 @@ export class GroupState{
     fetchAllContats(ctx:StateContext<GroupStateModel>)
     {
         const state = ctx.getState();
+        console.log("State ",state)
         if(state.groups.length>0) return of(true);
 
         ctx.patchState({

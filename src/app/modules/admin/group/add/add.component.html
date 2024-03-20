@@ -1,1 +1,111 @@
-<p>add works!</p>
+<div class="flex flex-auto">
+
+    <form
+        class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto"
+        [formGroup]="groupForm">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between -mt-3 -ml-4">
+
+            <!-- Mark as ... button -->
+            <div class="pr-4 pl-3.5" >
+
+                <!-- Mark as incomplete -->
+                <ng-container >
+                    <div class="flex items-center justify-center">
+                        <mat-icon class="text-primary" [svgIcon]="'heroicons_outline:user-group'"></mat-icon>
+                        <span class="ml-2 font-semibold">Nouveau Groupe</span>
+                    </div>
+                </ng-container>
+            </div>
+
+            <div class="flex items-center">                
+                <!-- Close button -->
+                <a mat-icon-button [routerLink]="['../']">
+                    <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                </a>
+            </div>
+
+        </div>
+
+        <mat-divider class="mt-6 mb-8"></mat-divider>
+
+        <!-- Title -->
+        <div>
+            <mat-form-field
+                class="w-full"
+                [subscriptSizing]="'dynamic'">
+                <mat-label>Nom</mat-label>
+                <textarea
+                    matInput
+                    [formControlName]="'name'"
+                    [spellcheck]="false"
+                    cdkTextareaAutosize
+                    #titleField></textarea>
+            </mat-form-field>
+        </div>
+
+        <!-- Notes -->
+        <div class="mt-8">
+            <mat-form-field
+                class="w-full"
+                [subscriptSizing]="'dynamic'">
+                <mat-label>Description</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'"></mat-icon>
+                <textarea
+                    matInput
+                    [placeholder]="'Description'"
+                    [formControlName]="'description'"
+                    [spellcheck]="false"
+                    [rows]="3"
+                    ></textarea>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <div class="w-full">
+                <app-select-contact [isNewGroup]="true" [editMode]="true" (contactsSelected)="selectedContactEvent($event)"></app-select-contact>
+            </div>
+        </div>
+
+       
+
+        <!-- Actions -->
+     <div class="flex items-center mt-10 -mx-6 py-4 pr-4 pl-1 sm:pr-12 sm:pl-7 border-t bg-gray-50 dark:bg-transparent">
+        <!-- Delete -->
+        <button
+            mat-button
+            class="ml-auto"
+            [color]="'warn'"
+            [matTooltip]="'Annuler'"
+            (click)="deleteGroup()">
+            Annuler
+        </button>
+        <!-- Cancel -->
+        <!-- <button
+            class="ml-auto"
+            mat-button
+            [matTooltip]="'Cancel'"
+            (click)="toggleEditMode(false)">
+            Cancel
+        </button> -->
+        <!-- Save -->
+        <button
+            class="ml-2"
+            mat-flat-button
+            [color]="'primary'"
+            [disabled]="groupForm.invalid || submitted"
+            [matTooltip]="'Enregistrer'"
+            (click)="addGroup()">
+            <mat-progress-spinner
+                *ngIf="submitted"
+                [diameter]="24"
+                [mode]="'indeterminate'">
+            </mat-progress-spinner>
+            <span *ngIf="!submitted">Enregistrer</span>
+        </button>
+    </div>
+
+    </form>
+
+    </div>

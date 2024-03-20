@@ -29,26 +29,29 @@
                 <!-- <div [ngClass]="visibilityClasses" class="z-10  max-h-72 overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none  "> -->
                     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
                         <fuse-loading-bar *ngIf="(loading$ | async)"></fuse-loading-bar>
-                        <mat-optgroup *ngIf="!(loading$ | async)" [label]="'Contacts ('+contactsFiltered.length+')'">
-                            <mat-option (click)="selectContact(contact)" *ngFor="let contact of contactsFiltered; let i = index; trackBy: trackByFn" [value]="contact.fullName">
+                        <mat-optgroup *ngIf="!(loading$ | async)" [label]="'Contacts ('+contactsGroupsFiltered.length+')'">
+                            <mat-option (click)="selectContact(contactGroup)" *ngFor="let contactGroup of contactsGroupsFiltered; let i = index; trackBy: trackByFn" [value]="contactGroup.isGroup?contactGroup.data.name:contactGroup.data.fullName">
                                 <!-- Contact " -->
                                 <a  class="z-20 w-full flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
-                                    [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectectContactsGroups.has(contact._id),
-                                                'bg-primary-50 dark:bg-hover': selectectContactsGroups.has(contact._id)}"
+                                    [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectectContactsGroups.has(contactGroup.data._id),
+                                                'bg-primary-50 dark:bg-hover': selectectContactsGroups.has(contactGroup.data._id)}"
                                     >
                                     <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
-                                        <ng-container *ngIf="contact.avatar">
-                                            <img class="object-cover w-full h-full" [src]="contact.avatar" [alt]="contact.fullName.charAt(0)"/>
+                                        <ng-container *ngIf="contactGroup.data.avatar">
+                                            <img class="object-cover w-full h-full" [src]="contactGroup.data.avatar" [alt]="contactGroup.isGroup?contactGroup.data.name.charAt(0):contactGroup.data.fullName.charAt(0)"/>
                                         </ng-container>
-                                        <ng-container *ngIf="!contact.avatar">
+                                        <ng-container *ngIf="!contactGroup.data.avatar">
                                             <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                                                {{contact.fullName.charAt(0)}}
+                                                {{contactGroup.isGroup?contactGroup.data.name.charAt(0):contactGroup.data.fullName.charAt(0)}}
                                             </div>
                                         </ng-container>
                                     </div>
                                     <div class="min-w-0 ml-4">
-                                        <div class="font-medium leading-5 truncate">{{contact.fullName}}</div>
-                                        <div class="leading-5 truncate text-secondary">{{contact.jobTitle}} {{contact.company?" - "+contact.company:""}}</div>
+                                        <div class="font-medium leading-5 truncate">{{contactGroup.isGroup?contactGroup.data.name:contactGroup.data.fullName}}</div>
+                                        <div class="leading-5 truncate text-secondary">
+                                            <ng-container *ngIf="contactGroup.isGroup; else noGroup">Groupe</ng-container>
+                                            <ng-template #noGroup>{{contactGroup.data.jobTitle}} {{contactGroup.data.company?" - "+contactGroup.data.company:""}}</ng-template>
+                                        </div>
                                     </div>
     
                                 </a>
@@ -62,7 +65,7 @@
                             </div>
                         </mat-option>
 
-                        <mat-option *ngIf="!(loading$ | async) && contactsFiltered.length==0" [value]="''">
+                        <mat-option *ngIf="!(loading$ | async) && contactsGroupsFiltered.length==0" [value]="''">
                             <div class="p-3 sm:p-10 border-t text-4xl font-semibold tracking-tight text-center">
                                 <img class="mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 4rem;">
                                     <p class="mb-0">Aucun contact trouvé</p>
@@ -105,7 +108,7 @@
                                         <div class="font-medium leading-5 truncate">{{contact.fullName}}</div>
                                         <div class="leading-5 truncate text-secondary">{{contact.jobTitle}} {{contact.company?" - "+contact.company:""}}</div>
                                     </div>
-                                    <div class=" w-6 h-6 mr-3 cursor-pointer float-right" (click)="removeContact(contact)">
+                                    <div class=" w-6 h-6 mr-3 cursor-pointer float-right" (click)="removeContactGroup({isGroup:false,data:contact})">
                                         <mat-icon
                                         mat-button
                                             class="icon-size-6 text-red-600 dark:text-red-400"
@@ -128,7 +131,7 @@
                         </div>
                     </div>
 
-                    <div class="w-full">
+                    <div class="w-full">                       
                         <div class="flex-auto overflow-y-auto">
                             <ng-container *ngIf="selectedGroupList.length > 0; else noGroups">
                                 <ng-container>
@@ -137,34 +140,48 @@
                                     </div>
                                 </ng-container>
                                 <ng-container *ngFor="let group of selectedGroupList; trackBy: trackByFn">
-                                    <a class="z-20 flex items-center py-5 px-8 cursor-pointer border-b hover:bg-gray-100 dark:hover:bg-hover">
-                                        <div class="relative flex flex-0 items-center justify-center w-10 h-10">            
-                                            <ng-container >
-                                                <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                                                    {{group.name.charAt(0)}}
-                                                </div>
-                                            </ng-container>
-                                        </div>
-                                        <div class="min-w-0 ml-4">
-                                            <div class="font-medium leading-5 truncate">{{group.name}}</div>
-                                            <div class="leading-5 truncate text-secondary">
-                                                
+                                 
+                                    <a 
+                                    class="flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
+                                    [ngClass]="'hover:bg-gray-100 dark:hover:bg-hover'"
+                                    >
+                                    <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
+                                        <ng-container *ngIf="group.avatar">
+                                            <img
+                                                class="object-cover w-full h-full"
+                                                [src]="group.avatar"
+                                                alt="Avatar Contact"/>
+                                        </ng-container>
+                                        <ng-container *ngIf="!group.avatar">
+                                            <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                                {{group.name.charAt(0)}}
                                             </div>
-                                        </div>                                        
-                                    </a>
+                                        </ng-container>
+                                    </div>
+                                    <div class="w-10/12 min-w-0 ml-4">
+                                        <div class="font-medium leading-5 truncate">{{group.name}}</div>
+                                    </div>
+                                    <div class=" w-6 h-6 mr-3 cursor-pointer float-right" (click)="removeContactGroup({isGroup:true,data:group})">
+                                        <mat-icon
+                                        mat-button
+                                            class="icon-size-6 text-red-600 dark:text-red-400"
+                                            [svgIcon]="'heroicons_outline:trash'"
+                                            [matTooltip]="'Rétirer le group'"></mat-icon>
+                                    </div> 
+                                </a>
                                 </ng-container>
                             </ng-container>
-                             <!-- No chats template -->
-                             <ng-template #noGroups>
+
+                             <!-- No group template -->
+                            <ng-template #noGroups>
                                 <div class="flex flex-auto flex-col items-center justify-center h-full">
                                     <mat-icon
                                         class="icon-size-24"
-                                        [svgIcon]="'mat_outline:group'"></mat-icon>
+                                        [svgIcon]="'mat_outline:person'"></mat-icon>
                                     <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Aucun groupe séléctionné</div>
                                 </div>
                             </ng-template>
                         </div>
-                        
                     </div>
                   
                 </div>

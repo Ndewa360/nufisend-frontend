@@ -15,7 +15,7 @@ import { WhatsappAskSyncToatrComponent } from 'app/shared/components/whatsapp-as
 import { WhatsappDataService } from 'app/shared/services/whatsapp/whatsapp-data.service';
 import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
 import { FuseAlertService } from '@fuse/components/alert';
-import { ContactAction, GlobalState } from 'app/shared/store';
+import { ContactAction, GlobalState, GroupAction } from 'app/shared/store';
 import { PlanificationAction } from 'app/shared/store/planifcation';
 
 @Component({
@@ -33,6 +33,8 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
     hasConnectedWhatsApp = false;
     isScreenSmall: boolean;
     navigation: Navigation;
+    showSynchroWhatsappAlert:boolean=false;
+    showSynchroWhatsappLoading:boolean=false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>
     @Select(GlobalState.selectStateConnectedWhatsApp) hasWhatsappConnected$:Observable<boolean>;
@@ -81,7 +83,8 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
             ofActionSuccessful(UserProfileAction.FetchUserProfile),
             tap(()=>this._store.dispatch([
                 new ContactAction.FetchAllContact(),
-                new PlanificationAction.FetchAllPlanification()
+                new PlanificationAction.FetchAllPlanification(),
+                new GroupAction.FetchAllGroup()
                 ])
             ),
             take(1)
@@ -112,6 +115,11 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
             this._changeDetectorRef.markForCheck();
         });
 
+        this._fuseAlertService.onDismiss.subscribe((value)=>{
+            if(value=="synchro_whatsapp") this.showSynchroWhatsappAlert=false
+            if(value=="synchro_whatsapp_loading") this.showSynchroWhatsappLoading=false;
+        })
+
         combineLatest([
             this._ngxsAction.pipe
             (
@@ -123,8 +131,12 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
             if(user && user.hasSyncWhatsApp) 
             {
                 if(!this.userProfile) {                    
-                    if(!this.hasConnectedWhatsApp) this._fuseAlertService.show("synchro_whatsapp_loading")
+                    if(!this.hasConnectedWhatsApp) {
+                        this._fuseAlertService.show("synchro_whatsapp_loading")
+                        this.showSynchroWhatsappLoading=true;
+                    }
                     this._fuseAlertService.dismiss("synchro_whatsapp")
+                    this.showSynchroWhatsappAlert=false
                 }
                 
             }
@@ -133,12 +145,19 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
                 this.userProfile = user;
                 this._fuseAlertService.show("synchro_whatsapp")
                 this._fuseAlertService.dismiss("synchro_whatsapp_loading")
+                this.showSynchroWhatsappAlert=true
+                this.showSynchroWhatsappLoading=false;
+
             }
         })
 
         this.hasWhatsappConnected$.subscribe((value)=> {
-            console.log("Value ",value)
-            if(value) this._fuseAlertService.dismiss('synchro_whatsapp_loading')
+            if(value) {
+                this._fuseAlertService.dismiss('synchro_whatsapp_loading')
+                
+                this.showSynchroWhatsappAlert=false
+                this.showSynchroWhatsappLoading=false;
+            }
           })
     }
 
