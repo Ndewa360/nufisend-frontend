@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEnca
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
-import { ContactModel, ContactState, MessageAction, MessageModel, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
+import { ContactModel, ContactState, GroupModel, MessageAction, MessageModel, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
 import { Observable, Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { PrevisualisationMessageContactComponent } from '../components/previsualisation-message-contact/previsualisation-message-contact.component';
 
@@ -19,7 +19,7 @@ export class NewMessageComponent implements OnInit{
   newMessageForm : UntypedFormGroup;
   messageSendToNow:boolean=false;
   destinationContacts:ContactModel[] = []
-  destinationGroups=[];
+  destinationGroups:GroupModel[]=[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
   messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File,title?:string}={}
   planificationObj={hasPlanification:false,planif:{}};
@@ -84,14 +84,12 @@ export class NewMessageComponent implements OnInit{
     }
     setMessageType(isSentToNow)
     {
-      console.log("Set message type ",isSentToNow)
       this.messageSendToNow=isSentToNow;
       this._changeDetectorRef.markForCheck();
     }
 
     setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file:File,title:string})
     {
-      console.log("Message ",message)
       this.messageToSend=message;
     }
 
@@ -110,7 +108,6 @@ export class NewMessageComponent implements OnInit{
       if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
       else dataToSend.bodyText=this.messageToSend.message;
       if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
-      console.log("DataToSend ",dataToSend)
       this._store.dispatch(new MessageAction.SendMessage(dataToSend));
     }
 
@@ -129,8 +126,16 @@ export class NewMessageComponent implements OnInit{
       let contactGroup = [];
       if(this.destinationGroups.length>0)
       {
-        contactGroup = await firstValueFrom(this._store.select(ContactState.selectStateByContactsId(this.destinationGroups.map((group)=>group.contacts).reduce((allContacts,group)=>[...allContacts,...group.contacts]))))
+        contactGroup = (await Promise.all(this.destinationGroups.map(async (group)=>{
+          let contacts= await firstValueFrom(this._store.select(ContactState.selectStateByContactsId(group.contacts)))
+          return contacts.map((contact)=>({...contact,groupName:group.name}))
+        })))
+        .reduce((allContacts,contacts)=>[...allContacts,...contacts],[])
       }
+      
+      
+
+      console.log("Contact Group",contactGroup)
       // Open the dialog
       const dialogRef = this._matDialog.open(PrevisualisationMessageContactComponent,
         {

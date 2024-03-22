@@ -1,3 +1,6 @@
+import { ContactModel } from "../contact";
+import { GroupModel } from "../group";
+
 export enum MessageType{
     TEXT="text",
     IMAGE = "image",
@@ -16,6 +19,10 @@ export interface MessageModel
 
     
     groupsID?:string[];
+
+    contacts?:ContactModel[];
+
+    groups?:GroupModel[];
 
     
     isSentToNow:boolean;

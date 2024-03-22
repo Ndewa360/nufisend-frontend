@@ -9,7 +9,6 @@
             mat-table
             matSort
             [dataSource]="dataSource"
-            [trackBy]="trackByFn"
             #dataTable>
 
             <!-- Titre -->
@@ -23,11 +22,18 @@
                 <td
                     mat-cell
                     *matCellDef="let plan">
-                    <span class="pr-6 font-medium text-sm text-secondary whitespace-nowrap">
+                    <!-- <span class="pr-6 font-medium text-sm text-secondary whitespace-nowrap">
                         <span class="w-2 h-2 rounded-full"
-                              [ngClass]="{'bg-green-500': plan.isActive == true,
-                                    'bg-amber-500': plan.isActive == false}"></span>
-                        {{plan.title}}
+                              [ngClass]="{'bg-green-500': plan.isActive,
+                                    'bg-amber-500': !plan.isActive}"></span>
+                        {{plan.title}}                        
+                    </span>-->
+                    <span class="flex items-center">
+                        <span
+                            class="w-2 h-2 rounded-full"
+                            [ngClass]="{'bg-green-500': plan.isActive,
+                            'bg-amber-500': !plan.isActive}"></span>
+                        <span class="ml-3 leading-4">{{plan.title}}</span>
                     </span>
                 </td>
             </ng-container>
@@ -62,62 +68,58 @@
                     *matCellDef="let plan">
                     <span class="pr-6 whitespace-nowrap">
                         <!-- Members -->
-                    <ng-container *ngIf="plan.message.contacts?.length">
-                        <!-- <div class="w-12 h-1 mt-6 border-t-2"></div> -->
-                        <mat-menu #contactListMenu="matMenu">
-                            <button mat-menu-item *ngFor="let contact of contactList">
-                                <a  class="z-20 w-full flex items-center px-6 py-4 md:px-8 cursor-pointer border-b">
-                                <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
-                                    <ng-container *ngIf="(contact | async).avatar">
-                                        <img class="object-cover w-full h-full" [src]="(contact | async).avatar" [alt]="(contact | async).fullName.charAt(0)"/>
-                                    </ng-container>
-                                    <ng-container *ngIf="!(contact | async).avatar">
-                                        <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                                            {{(contact | async).fullName.charAt(0)}}
-                                        </div>
-                                    </ng-container>
-                                </div>
-                                <div class="min-w-0 ml-4">
-                                    <div class="font-medium leading-5 truncate">{{(contact | async).fullName}}</div>
-                                    <div class="leading-5 truncate text-secondary">{{(contact | async).jobTitle}} {{(contact | async).company?" - "+(contact | async).company:""}}</div>
-                                </div>
-
-                            </a>
-                            </button>
-                          </mat-menu>
-                        <div class="flex items-center mt-6 -space-x-1.5">
-                            <!--  -->
-                            <ng-container *ngFor="let memberId of plan.message.contacts.slice(0, 3); trackBy: trackByFn" >
-                                <div [matMenuTriggerFor]="contactListMenu" (click)="getListOfContactDetail(plan.message.contacts)" class="cursor-pointer flex items-center -space-x-1.5">
-                                    <img
-                                        class="flex-0 w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent object-cover"
-                                        *ngIf="(getContactDetail(memberId) | async)?.avatar; else noAvatar;"
-                                        [src]="(getContactDetail(memberId) | async)?.avatar">
-                                    <ng-template #noAvatar >
-                                        <div
-                                            class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent bg-gray-200 text-gray-500"
-                                            *ngIf="!(getContactDetail(memberId)?.avatar)">
-                                            <div class="text-md font-semibold">
-                                                {{(getContactDetail(memberId) | async)?.fullName?.charAt(0)}}
+                        <ng-container *ngIf="plan.message.contacts?.length">
+                            <!-- <div class="w-12 h-1 mt-6 border-t-2"></div> -->
+                            <mat-menu #contactListMenu="menu">
+                                <button mat-menu-item *ngFor="let contact of contactList">
+                                    <a  class="z-20 w-full flex items-center px-6 py-4 md:px-8 cursor-pointer border-b">
+                                    <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
+                                        <ng-container *ngIf="contact.avatar">
+                                            <img class="object-cover w-full h-full" [src]="contact.avatar" [alt]="contact.fullName.charAt(0)"/>
+                                        </ng-container>
+                                        <ng-container *ngIf="contact.avatar">
+                                            <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                                {{contact.fullName.charAt(0)}}
                                             </div>
-                                        </div>
-                                    </ng-template>
-                                </div>
-
-                                <!-- <img
-                                    *ngIf="!contact?.avatar"
-                                    [src]="member.avatar"
-                                    alt="Member avatar"> -->
-                            </ng-container>                            
-                            <ng-container *ngIf="plan.message.contacts.length > 5">
-                                <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent bg-gray-200 text-gray-500">
-                                    <div class="text-md font-semibold">
-                                        +{{ plan.message.contacts.slice(5).length }}
+                                        </ng-container>
                                     </div>
-                                </div>
-                            </ng-container>
-                        </div>
-                    </ng-container>
+                                    <div class="min-w-0 ml-4">
+                                        <div class="font-medium leading-5 truncate">{{contact.fullName}}</div>
+                                        <div class="leading-5 truncate text-secondary">{{contact.jobTitle}} {{contact.company?" - "+contact.company:""}}</div>
+                                    </div>
+
+                                </a>
+                                </button>
+                            </mat-menu>
+                            <div class="flex items-center mt-6 -space-x-1.5">
+                                <!--  -->
+                                <ng-container *ngFor="let memberId of plan.message.contacts.slice(0, 3)" >
+                                    <div  (click)="getListOfContactDetail(plan.message.contacts)" class="cursor-pointer flex items-center -space-x-1.5">
+                                        <img
+                                            class="flex-0 w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent object-cover"
+                                            *ngIf="(getContactDetail(memberId) | async)?.avatar; else noAvatar;"
+                                            [src]="(getContactDetail(memberId) | async)?.avatar">
+                                        <ng-template #noAvatar >
+                                            <div
+                                                class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent bg-gray-200 text-gray-500"
+                                                *ngIf="!(getContactDetail(memberId)?.avatar)">
+                                                <div class="text-md font-semibold">
+                                                    {{(getContactDetail(memberId) | async)?.fullName?.charAt(0)}}
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+
+                                </ng-container>                            
+                                <ng-container *ngIf="plan.message.contacts.length > 5">
+                                    <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent bg-gray-200 text-gray-500">
+                                        <div class="text-md font-semibold">
+                                            +{{ plan.message.contacts.slice(5).length }}
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </ng-container>
                     </span>
                 </td>
             </ng-container>
@@ -134,7 +136,59 @@
                     mat-cell
                     *matCellDef="let plan">
                     <span class="pr-6 font-medium whitespace-nowrap">
-                        Groupes
+                        <span class="pr-6 whitespace-nowrap">
+                            <!-- Groups -->
+                            <ng-container *ngIf="plan.message.groups?.length">
+                                <!-- <div class="w-12 h-1 mt-6 border-t-2"></div> -->
+                                <mat-menu #groupListMenu="matMenu">
+                                    <button mat-menu-item *ngFor="let group of groupList">
+                                        <a  class="z-20 w-full flex items-center px-6 py-4 md:px-8 cursor-pointer border-b">
+                                            <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
+                                                <ng-container *ngIf="group.avatar">
+                                                    <img class="object-cover w-full h-full" [src]="group.avatar" [alt]="group.name.charAt(0)"/>
+                                                </ng-container>
+                                                <ng-container *ngIf="group.avatar">
+                                                    <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                                        {{group.name.charAt(0)}}
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                            <div class="min-w-0 ml-4">
+                                                <div class="font-medium leading-5 truncate">{{group.name}}</div>
+                                            </div>
+        
+                                        </a>
+                                    </button>
+                                </mat-menu>
+                                <div class="flex items-center mt-6 -space-x-1.5">
+                                    <!--  -->
+                                    <ng-container *ngFor="let memberId of plan.message.groups.slice(0, 3)" >
+                                        <div (click)="getListOfGroupDetail(plan.message.groups)" class="cursor-pointer flex items-center -space-x-1.5">
+                                            <img
+                                                class="flex-0 w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent object-cover"
+                                                *ngIf="(getGroupDetail(memberId) | async)?.avatar; else noAvatarGroup;"
+                                                [src]="(getGroupDetail(memberId) | async)?.avatar">
+                                            <ng-template #noAvatarGroup >
+                                                <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent bg-gray-200 text-gray-500"
+                                                    *ngIf="!(getGroupDetail(memberId)?.avatar)">
+                                                    <div class="text-md font-semibold">
+                                                        {{(getGroupDetail(memberId) | async)?.name?.charAt(0)}}
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </div>
+
+                                    </ng-container>                            
+                                    <ng-container *ngIf="plan.message.groups.length > 5">
+                                        <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent bg-gray-200 text-gray-500">
+                                            <div class="text-md font-semibold">
+                                                +{{ plan.message.groups.slice(5).length }}
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </span>
                     </span>
                 </td>
             </ng-container>
@@ -150,7 +204,30 @@
                 <td
                     mat-cell
                     *matCellDef="let plan">
-                    action
+                    <button  mat-icon-button [matMenuTriggerFor]="optionPlanification">
+                        <mat-icon
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_solid:dots-vertical'"></mat-icon>
+                    </button>
+                    <mat-menu #optionPlanification="matMenu">
+                        <button mat-menu-item *ngIf="!plan.isActive;else isActivePlan" (click)="enablePlaning(plan)">
+                            <mat-icon
+                            class="icon-size-5 text-green-600 dark:text-green-400"
+                            [svgIcon]="'mat_outline:check'"></mat-icon> Activer
+                        </button>
+                        <ng-template #isActivePlan>
+                            <button mat-menu-item (click)="desablePlaning(plan)">
+                                <mat-icon
+                                class="icon-size-5 text-yellow-600 dark:text-yellow-400"
+                                [svgIcon]="'mat_outline:close'"></mat-icon> Désactiver
+                            </button>
+                        </ng-template>
+                        <button mat-menu-item (click)="deletePlaning(plan)">
+                            <mat-icon
+                            class="icon-size-5 text-red-600 dark:text-red-400"
+                            [svgIcon]="'heroicons_solid:trash'"></mat-icon> supprimer
+                        </button>
+                    </mat-menu>
                 </td>
             </ng-container>
 
@@ -177,5 +254,8 @@
                 mat-footer-row
                 *matFooterRowDef="['dataTableFooter']"></tr>
         </table>
+
+        <mat-progress-bar class="mb-4" *ngIf="submited" [mode]="'indeterminate'"></mat-progress-bar>
+       
     </div>
 </div>

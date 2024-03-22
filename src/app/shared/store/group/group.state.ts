@@ -47,6 +47,13 @@ export class GroupState{
         })        
     }
 
+    static selectStateByGroupsId(groupsId:string[])
+    {
+        return createSelector([GroupState],(state)=>{
+            return groupsId.map((groupId)=> state.groups.find((group)=>group._id==groupId)).filter((group)=> group!=undefined && group!=null)
+        })          
+    }
+
     @Action(GroupAction.AddGroup)
     addGroup(ctx:StateContext<GroupStateModel>, {group}:GroupAction.AddGroup)
     {

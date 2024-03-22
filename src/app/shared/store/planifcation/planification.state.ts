@@ -77,8 +77,8 @@ export class PlanificationState{
             tap(
                 (result)=>{
                     
-                    let planificationIndex = state.planifications.findIndex((c)=>c._id==id),planifications = state.planifications;
-                    planification[planificationIndex]=result.data
+                    let planificationIndex = state.planifications.findIndex((c)=>c._id==id),planifications = [...state.planifications];
+                    planifications[planificationIndex]=result.data
                     ctx.patchState({
                         loadingPlanifications:false,
                         planifications

@@ -57,6 +57,9 @@
                                         </div>
                                         <div class="min-w-0 ml-4">
                                             <div class="font-medium leading-5 truncate">{{contact.fullName}}</div>
+                                            <div *ngIf="contact.groupName" class="leading-5 truncate text-secondary">
+                                                {{contact.groupName}}
+                                            </div>
                                         </div>
                                     </a>
                                 </ng-container>
@@ -73,6 +76,7 @@
                     </div>                                      
                 </div>  
 
+            
                 <ng-template #noMessageToShow>
                     <div class="flex-auto border-l" [ngClass]="{'z-20 absolute inset-0 lg:static lg:inset-auto flex': selectedChat && selectedChat.id,
                                     'hidden lg:flex': !selectedChat || !selectedChat.id}">
@@ -127,6 +131,9 @@
                                                             </ng-container>
                                                         </div>
                                                         <div class="ml-4 text-lg font-medium leading-5 truncate">{{selectedContact.fullName}}</div>
+                                                        <div *ngIf="selectContact.groupName" class="leading-5 truncate text-secondary">
+                                                            {{selectContact.groupName}}
+                                                        </div>
                                                     </div>    
                                                 </div>
                                 

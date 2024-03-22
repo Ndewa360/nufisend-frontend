@@ -4,6 +4,7 @@ import { ToastrService } from "ngx-toastr";
 import { catchError, tap, throwError } from "rxjs";
 import { MessageAction } from "./message.actions";
 import { MessageService } from "./message.service";
+import { PlanificationAction } from "../planifcation";
 
 export class MessageStateModel {
     sendingMessage:boolean
@@ -46,7 +47,8 @@ export class MessageState{
                         sendingMessage:false
                     })
                     this._toastrService.success("Message envoyé avec success", 'WhatsApp Message');
-                    // if(!message.isSentToNow) this.
+                    console.log("Result ",result)
+                    if(!message.isSentToNow) ctx.dispatch(new PlanificationAction.AddPlanification(result.data))
                 }
             ),
             catchError((error) => {

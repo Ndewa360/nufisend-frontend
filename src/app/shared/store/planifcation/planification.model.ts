@@ -16,16 +16,16 @@ export type PlanificationType = {
   }
   
 export interface PlanificationModel {
-    _id:string;
+    _id?:string;
     
-    owner:string;
+    owner?:string;
 
-    message:MessageModel;
+    message?:MessageModel;
 
-    title:string;
+    title?:string;
     
-    planning:PlanificationType[]
+    planning?:PlanificationType[]
 
-    isActive:Boolean;
+    isActive?:Boolean;
 }
 

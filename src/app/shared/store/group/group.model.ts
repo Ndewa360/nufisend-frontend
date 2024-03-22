@@ -12,6 +12,7 @@ export interface GroupModel
     
     contacts?:string[];
 
+    groupName?:string;
     
     profilePicture:string;
 
