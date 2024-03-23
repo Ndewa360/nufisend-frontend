@@ -4,7 +4,7 @@ import { MatDrawerToggleResult } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Store, Actions, ofActionSuccessful, ofActionCompleted, ofActionErrored } from '@ngxs/store';
-import { ContactModel, CountryModel, CountryService, ContactAction, ContactState } from 'app/shared/store';
+import { ContactModel, CountryModel, CountryService, ContactAction, ContactState, GroupModel } from 'app/shared/store';
 import { FormUtils } from 'app/shared/utils/form-utils';
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -22,6 +22,8 @@ export class DetailComponent {
   @ViewChild('tagsPanel') private _tagsPanel: TemplateRef<any>;
   @ViewChild('tagsPanelOrigin') private _tagsPanelOrigin: ElementRef;
   submitted = false
+  selectedGroup:GroupModel[]=[];
+
   editMode: boolean = false;
 
   contact: ContactModel=null;
@@ -77,7 +79,7 @@ export class DetailComponent {
 
       // Create the contact form
       this.contactForm = this._formBuilder.group({
-          // avatar      : [null],
+          avatar      : [null],
           fullName       : ['', [Validators.required]],
           emails         : this._formBuilder.array([]),
           phoneNumbers   : this._formBuilder.array([]),
@@ -194,6 +196,7 @@ export class DetailComponent {
         })
       );
     }
+
     // Add the email form groups to the emails form array
     emailFormGroups.forEach((emailFormGroup) => {
       (this.contactForm.get('emails') as UntypedFormArray).push(emailFormGroup);
@@ -303,6 +306,8 @@ export class DetailComponent {
 
       contact.phoneNumbers = contact.phoneNumbers.filter(phoneNumber => phoneNumber.phoneNumber);
 
+      if(this.selectedGroup.length>0) contact.groups= this.selectedGroup.map((group)=>group._id)
+
       this.submitted=true;
       this._store.dispatch(new ContactAction.UpdateContact(contact,this.contact._id));
       
@@ -375,6 +380,11 @@ export class DetailComponent {
 
       // Upload the avatar
       // this._contactsService.uploadAvatar(this.contact.id, file).subscribe();
+  }
+
+  selectedContactEvent(groupsList)
+  {
+    this.selectedGroup=[...groupsList]
   }
 
   /**

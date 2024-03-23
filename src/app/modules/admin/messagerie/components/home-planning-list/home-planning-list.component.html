@@ -66,18 +66,18 @@
                 <td
                     mat-cell
                     *matCellDef="let plan">
-                    <span class="pr-6 whitespace-nowrap">
+                    <div class="pr-6 whitespace-nowrap">
                         <!-- Members -->
                         <ng-container *ngIf="plan.message.contacts?.length">
                             <!-- <div class="w-12 h-1 mt-6 border-t-2"></div> -->
-                            <mat-menu #contactListMenu="menu">
+                            <mat-menu #contactListMenu="matMenu">
                                 <button mat-menu-item *ngFor="let contact of contactList">
-                                    <a  class="z-20 w-full flex items-center px-6 py-4 md:px-8 cursor-pointer border-b">
+                                    <a  class="z-20 w-full flex items-center px-4 py-4 cursor-pointer border-b">
                                     <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
                                         <ng-container *ngIf="contact.avatar">
                                             <img class="object-cover w-full h-full" [src]="contact.avatar" [alt]="contact.fullName.charAt(0)"/>
                                         </ng-container>
-                                        <ng-container *ngIf="contact.avatar">
+                                        <ng-container *ngIf="!contact.avatar">
                                             <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
                                                 {{contact.fullName.charAt(0)}}
                                             </div>
@@ -91,10 +91,10 @@
                                 </a>
                                 </button>
                             </mat-menu>
-                            <div class="flex items-center mt-6 -space-x-1.5">
+                            <div class="flex items-center -space-x-1.5">
                                 <!--  -->
                                 <ng-container *ngFor="let memberId of plan.message.contacts.slice(0, 3)" >
-                                    <div  (click)="getListOfContactDetail(plan.message.contacts)" class="cursor-pointer flex items-center -space-x-1.5">
+                                    <div [matMenuTriggerFor]="contactListMenu" (click)="getListOfContactDetail(plan.message.contacts)" class="cursor-pointer flex items-center -space-x-1.5">
                                         <img
                                             class="flex-0 w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent object-cover"
                                             *ngIf="(getContactDetail(memberId) | async)?.avatar; else noAvatar;"
@@ -120,7 +120,7 @@
                                 </ng-container>
                             </div>
                         </ng-container>
-                    </span>
+                    </div>
                 </td>
             </ng-container>
 
@@ -132,9 +132,7 @@
                     *matHeaderCellDef>
                     Groupes
                 </th>
-                <td
-                    mat-cell
-                    *matCellDef="let plan">
+                <td mat-cell *matCellDef="let plan">
                     <span class="pr-6 font-medium whitespace-nowrap">
                         <span class="pr-6 whitespace-nowrap">
                             <!-- Groups -->
@@ -142,12 +140,12 @@
                                 <!-- <div class="w-12 h-1 mt-6 border-t-2"></div> -->
                                 <mat-menu #groupListMenu="matMenu">
                                     <button mat-menu-item *ngFor="let group of groupList">
-                                        <a  class="z-20 w-full flex items-center px-6 py-4 md:px-8 cursor-pointer border-b">
+                                        <a  class="z-20 w-full flex items-center cursor-pointer border-b  px-4 py-4">
                                             <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
                                                 <ng-container *ngIf="group.avatar">
                                                     <img class="object-cover w-full h-full" [src]="group.avatar" [alt]="group.name.charAt(0)"/>
                                                 </ng-container>
-                                                <ng-container *ngIf="group.avatar">
+                                                <ng-container *ngIf="!group.avatar">
                                                     <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
                                                         {{group.name.charAt(0)}}
                                                     </div>
@@ -163,7 +161,7 @@
                                 <div class="flex items-center mt-6 -space-x-1.5">
                                     <!--  -->
                                     <ng-container *ngFor="let memberId of plan.message.groups.slice(0, 3)" >
-                                        <div (click)="getListOfGroupDetail(plan.message.groups)" class="cursor-pointer flex items-center -space-x-1.5">
+                                        <div [matMenuTriggerFor]="groupListMenu" (click)="getListOfGroupDetail(plan.message.groups)" class="cursor-pointer flex items-center -space-x-1.5">
                                             <img
                                                 class="flex-0 w-8 h-8 rounded-full ring ring-offset-1 ring-bg-card ring-offset-transparent object-cover"
                                                 *ngIf="(getGroupDetail(memberId) | async)?.avatar; else noAvatarGroup;"

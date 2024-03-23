@@ -95,8 +95,8 @@ export class HomePlanningListComponent implements OnInit,OnDestroy {
 
   async getListOfGroupDetail(groups)
   {
-    this.groupList= await lastValueFrom(this._store.select(GroupState.selectStateByGroupsId(groups)))
-    this.groupListMenu.openMenu();
+    this.groupList= await firstValueFrom(this._store.select(GroupState.selectStateByGroupsId(groups)))
+    // this.groupListMenu.openMenu();
   }
 
   getContactDetail(contactID)
@@ -105,8 +105,8 @@ export class HomePlanningListComponent implements OnInit,OnDestroy {
   }
   async getListOfContactDetail(contacts)
   {
-    this.contactList= await lastValueFrom(this._store.select(ContactState.selectStateByContactsId(contacts)))
-    this.contactListMenu.openMenu();
+    this.contactList= await firstValueFrom(this._store.select(ContactState.selectStateByContactsId(contacts)))
+    // this.contactListMenu.openMenu();
   }
 
   desablePlaning(plan)

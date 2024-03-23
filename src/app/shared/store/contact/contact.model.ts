@@ -14,6 +14,7 @@ export interface ContactModel {
     birthday?:Date;
     avatar?:string;
     background?:string;
+    groups?:string[]
 
 }
 

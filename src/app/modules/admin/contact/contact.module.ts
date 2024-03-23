@@ -9,6 +9,7 @@ import { AddComponent } from './add/add.component';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { ImportComponent } from './import/import.component';
 import { MessagerieModule } from '../messagerie/messagerie.module';
+import { SelectGroupComponent } from './components/select-group/select-group.component';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { MessagerieModule } from '../messagerie/messagerie.module';
     ListComponent,
     DetailComponent,
     AddComponent,
-    ImportComponent
+    ImportComponent,
+    SelectGroupComponent
   ],
   imports: [
     CommonModule,

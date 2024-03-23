@@ -9,7 +9,7 @@ import { MatDrawerToggleResult } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
-import { ContactAction, ContactModel } from 'app/shared/store';
+import { ContactAction, ContactModel, GroupModel } from 'app/shared/store';
 import { Actions, Store, ofActionCompleted, ofActionSuccessful } from '@ngxs/store';
 import { FormUtils } from 'app/shared/utils/form-utils';
 
@@ -33,6 +33,7 @@ export class AddComponent implements OnInit, OnDestroy {
     countries: CountryModel[]=[];
     private _tagsPanelOverlayRef: OverlayRef;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    selectedGroup: GroupModel[];
     
 
     /**
@@ -107,6 +108,7 @@ export class AddComponent implements OnInit, OnDestroy {
           })
         );
         // Add the email form groups to the emails form array
+        console.warn("Email Form Group ",emailFormGroups)
         emailFormGroups.forEach((emailFormGroup) => {
           (this.contactForm.get('emails') as UntypedFormArray).push(emailFormGroup);
         });
@@ -189,20 +191,11 @@ export class AddComponent implements OnInit, OnDestroy {
         contact.emails = contact.emails.filter(email => email.email);
 
         contact.phoneNumbers = contact.phoneNumbers.filter(phoneNumber => phoneNumber.phoneNumber);
+        if(this.selectedGroup.length>0) contact.groups= this.selectedGroup.map((contact)=>contact._id)
 
-        console.log("Contact ",contact)
         this.submitted=true;
         this._store.dispatch(new ContactAction.AddContact(contact));
         
-        
-        // Update the contact on the server
-        // this._contactsService.updateContact(contact.id, contact).subscribe(() => {
-
-        //     // Toggle the edit mode off
-        //     this.toggleEditMode(false);
-        // });
-
-
     }
 
     /**
@@ -386,6 +379,11 @@ export class AddComponent implements OnInit, OnDestroy {
 
     }
 
+    selectedGroupEvent(groupsList)
+  {
+    this.selectedGroup=[...groupsList]
+  }
+  
     /**
      * Get country info by iso code
      *
