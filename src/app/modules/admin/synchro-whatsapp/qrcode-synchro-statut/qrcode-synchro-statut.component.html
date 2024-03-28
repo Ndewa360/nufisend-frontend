@@ -1,7 +1,7 @@
 <div class="flex flex-col items-center mt-2">
     <ng-container *ngIf="!(loadingUserProfile$|async); else waitingForLoadingUserProfile">
         <!-- Whatsapp Sync -->
-        <ng-container *ngIf="((userProfile$|async).hasSyncWhatsApp); else hasNoSyncWhatsapp">
+        <ng-container *ngIf="((userProfile$ | async).hasSyncWhatsApp); else hasNoSyncWhatsapp">
             <div >
                 <mat-icon class="icon-size-24 font-bold tracking-tight leading-none text-green-500" svgIcon="mat_solid:sync"></mat-icon>
             </div>

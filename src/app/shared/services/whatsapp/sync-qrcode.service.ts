@@ -12,16 +12,21 @@ import { Socket } from 'ngx-socket-io';
 export class SyncQrcodeService {
 
   constructor(private socket: Socket,private store:Store) {
-    this.handleSuccessfullySync();
-    this.handleSuccessfullyUnSync();
-    // this.subscribeToQrCode()
+    this.initSubscriptionEvent();    
   }
 
+  initSubscriptionEvent()
+  {
+    this.handleSuccessfullySync();
+    this.handleSuccessfullyUnSync();
+    this.subscribeToQrCode()
+  }
 
   subscribeToQrCode()
   {
+    console.log("Qr Code Start")
     this.socket.on('qrcode', data=>{
-      console.log("OnQrCode ",data)
+    console.log("Qr Code",data)
       this.store.dispatch([
         new WhatsappQrCodeAction.SetLoadingQrCode(false),
         new WhatsappQrCodeAction.SetWhatsAppQrCode(data)
