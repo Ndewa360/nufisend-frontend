@@ -113,7 +113,7 @@ export class NewMessageComponent implements OnInit{
 
     canPrevisualise()
     {
-      return (this.messageToSend.messageTemplate || this.messageToSend.message) && this.destinationContacts.length>0
+      return (this.messageToSend.messageTemplate || this.messageToSend.message) && (this.destinationContacts.length>0 || this.destinationGroups.length>0)
     }
 
     setPlanification(planif)

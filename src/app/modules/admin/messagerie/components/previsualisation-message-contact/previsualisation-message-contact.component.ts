@@ -23,6 +23,7 @@ export class PrevisualisationMessageContactComponent {
   messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File}={}
   submitted:boolean=false;
   message:string="";
+  initMessage:string=""
   dateToSend:Date = new Date()
   sender:any=null;
 
@@ -37,7 +38,7 @@ export class PrevisualisationMessageContactComponent {
     this.destinationContacts = [...data.destinationContact];
     this.filteredContacts = [...data.destinationContact]
     this.messageToSend = data.message;
-    this.message = data.message.message?data.message.message:data.message.messageTemplate.content;
+    this.initMessage = data.message.message?data.message.message:data.message.messageTemplate.content;
     console.log(data.message)
   }
 
@@ -83,7 +84,8 @@ export class PrevisualisationMessageContactComponent {
  
   getCustomMessage()
   {
-    this.message=MessageProcessing.getPersonalizedMessage(this.message,this.selectedContact,this.sender,this.dateToSend)
+
+    this.message=MessageProcessing.getPersonalizedMessage(this.initMessage,this.selectedContact,this.sender,this.dateToSend)
   }
 
 
