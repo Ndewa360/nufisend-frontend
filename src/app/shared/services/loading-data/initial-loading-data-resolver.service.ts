@@ -2,10 +2,10 @@ import { Injectable } from "@angular/core";
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { Actions, Store, ofActionSuccessful } from "@ngxs/store";
 import { UserService } from "app/core/user/user.service";
-import { ContactAction } from "app/shared/store";
+import { ContactAction, GroupAction } from "app/shared/store";
 import { PlanificationAction } from "app/shared/store/planifcation";
 import { UserProfileAction } from "app/shared/store/user-profile";
-import { Observable, catchError, forkJoin, map, of, take, tap } from "rxjs";
+import { Observable, catchError, combineLatest, combineLatestAll, forkJoin, map, of, skipUntil, skipWhile, take, tap } from "rxjs";
 
 @Injectable({
     providedIn:"root"
@@ -30,7 +30,20 @@ export class InitialLoadingDataResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
-        
-        return of(true)
+        return combineLatest(
+            this._store.select((state)=>state.userprofile.userProfile)
+            .pipe(
+                skipWhile((x)=>x==null),
+                tap(()=>this._store.dispatch([
+                            new ContactAction.FetchAllContact(),
+                            new PlanificationAction.FetchAllPlanification(),
+                            new GroupAction.FetchAllGroup()
+                            ])
+                    ),
+            ),
+            this._store.select((state)=>state.contacts.contacts).pipe(skipWhile((x)=>x.length==0)),
+            this._store.select((state)=>state.planifications.planifications).pipe(skipWhile((x)=>x.length==0)),
+            this._store.select((state)=>state.groups.groups).pipe(skipWhile((x)=>x.length==0)),
+        )
     }
 }
