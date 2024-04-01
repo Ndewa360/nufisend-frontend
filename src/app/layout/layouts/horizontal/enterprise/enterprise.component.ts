@@ -15,7 +15,7 @@ import { WhatsappAskSyncToatrComponent } from 'app/shared/components/whatsapp-as
 import { WhatsappDataService } from 'app/shared/services/whatsapp/whatsapp-data.service';
 import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
 import { FuseAlertService } from '@fuse/components/alert';
-import { ContactAction, GlobalState, GroupAction } from 'app/shared/store';
+import { ContactAction, GlobalState, GroupAction, MessageTemplateAction } from 'app/shared/store';
 import { PlanificationAction } from 'app/shared/store/planifcation';
 
 @Component({
@@ -84,7 +84,8 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
             tap(()=>this._store.dispatch([
                 new ContactAction.FetchAllContact(),
                 new PlanificationAction.FetchAllPlanification(),
-                new GroupAction.FetchAllGroup()
+                new GroupAction.FetchAllGroup(),
+                new MessageTemplateAction.FetchAllMessageTemplate()
                 ])
             ),
             take(1)

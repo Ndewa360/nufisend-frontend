@@ -31,6 +31,7 @@
         "@types/node": "^20.10.5",
         "angularx-qrcode": "^15.0.1",
         "apexcharts": "3.36.3",
+        "cron-parser": "^4.9.0",
         "crypto-js": "3.3.0",
         "highlight.js": "11.7.0",
         "keycloak-angular": "^15.0.0",

@@ -23,7 +23,7 @@ import { SocketIoModule } from 'ngx-socket-io';
 import { WebsocketManagerService } from './shared/services/websocket-manager/websocket-manager.service';
 import { GroupState } from './shared/store/group';
 import { PlanificationState } from './shared/store/planifcation';
-// import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+// import {provideMomentDateAdapter} from ./modules/admin/dashboard/components/schedule-list-day/schedule-list-day.component
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -32,7 +32,7 @@ const routerConfig: ExtraOptions = {
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
     ],
     imports     : [
         BrowserModule,

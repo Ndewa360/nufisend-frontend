@@ -1,0 +1,32 @@
+<!-- Schedule -->
+
+<div class="flex flex-col mt-2 divide-y">
+    <ng-container *ngFor="let planing of planingList">
+        <div class="flex flex-row items-center justify-between py-4 px-0.5">
+            <div class="flex flex-col">
+                <div class="font-medium">{{planing.title}}</div>
+                <div class="flex flex-col sm:flex-row sm:items-center -ml-0.5 mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3">
+                    <ng-container *ngFor="let plan of planing.planning">
+                        <div class="flex items-center">
+                            <mat-icon
+                                class="icon-size-5 text-hint"
+                                [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                            <div class="ml-1.5 text-md text-secondary">{{plan.time}}</div>
+                        </div>
+                    </ng-container>
+                    <!-- <ng-container *ngIf="scheduleItem.location">
+                        <div class="flex items-center">
+                            <mat-icon
+                                class="icon-size-5 text-hint"
+                                [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
+                            <div class="ml-1.5 text-md text-secondary">{{scheduleItem.location}}</div>
+                        </div>
+                    </ng-container> -->
+                </div>
+            </div>
+            <button mat-icon-button>
+                <mat-icon [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+            </button>
+        </div>
+    </ng-container>
+</div>

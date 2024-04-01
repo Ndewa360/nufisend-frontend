@@ -57,7 +57,7 @@ export const appRoutes: Route[] = [
             layout: 'enterprise'
         },
         children: [
-            {path: '', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule)},
+            {path: '', loadChildren: () => import('app/modules/admin/dashboard/dashboard.module').then(m => m.DashboardModule)},
             
         ]
     },

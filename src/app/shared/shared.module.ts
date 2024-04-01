@@ -94,7 +94,9 @@ const moduleList = [
     MatAutocompleteModule,
     NgxMaterialTimepickerModule,
     MatCardModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatButtonToggleModule,
+
     // CalendarModule
     // DropzoneModule
 ]
