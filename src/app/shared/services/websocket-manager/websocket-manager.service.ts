@@ -6,6 +6,7 @@ import { environment } from 'environments/environment';
 import { Socket } from 'ngx-socket-io';
 import { Subject, combineLatest } from 'rxjs';
 import { SyncQrcodeService } from '../whatsapp/sync-qrcode.service';
+import { WhatsappDataService } from '../whatsapp/whatsapp-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class WebsocketManagerService{
   constructor(
     private store:Store,
     private socket:Socket,
-    private syncQrCodeService:SyncQrcodeService
+    private syncQrCodeService:SyncQrcodeService,
+    private whatsAppDataService:WhatsappDataService
   ) {
   }
 
@@ -27,8 +29,6 @@ export class WebsocketManagerService{
       this.socket.on('connexion', ()=>{
           this.socket.emit('connexion', {email: value.email});
           this.webSocketConnectedEvent.next(true);        
-          // this.socket.on("qrcode",(data)=>console.log("Data QrCode Test",data))
-          this.syncQrCodeService.subscribeToQrCode()
       })
     }
 }
