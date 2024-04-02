@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { PlanificationModel } from 'app/shared/store/planifcation';
 
 @Component({
@@ -6,11 +6,8 @@ import { PlanificationModel } from 'app/shared/store/planifcation';
   templateUrl: './schedule-list-day.component.html',
   styleUrls: ['./schedule-list-day.component.scss']
 })
-export class ScheduleListDayComponent {
+export class ScheduleListDayComponent{
+
   @Input() planingList:PlanificationModel[]=[]
 
-  getTime()
-  {
-    
-  }
 }

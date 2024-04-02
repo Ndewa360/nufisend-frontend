@@ -4,7 +4,7 @@ import { ExampleComponent } from 'app/modules/admin/example/example.component';
 
 const exampleRoutes: Route[] = [
     {
-        path     : '',
+        path     : '**',
         component: ExampleComponent
     }
 ];

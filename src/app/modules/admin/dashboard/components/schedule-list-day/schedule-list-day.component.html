@@ -14,19 +14,14 @@
                             <div class="ml-1.5 text-md text-secondary">{{plan.time}}</div>
                         </div>
                     </ng-container>
-                    <!-- <ng-container *ngIf="scheduleItem.location">
-                        <div class="flex items-center">
-                            <mat-icon
-                                class="icon-size-5 text-hint"
-                                [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
-                            <div class="ml-1.5 text-md text-secondary">{{scheduleItem.location}}</div>
-                        </div>
-                    </ng-container> -->
                 </div>
             </div>
-            <button mat-icon-button>
-                <mat-icon [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-            </button>
+            <!-- <button mat-icon-button>
+            </button> -->
+            <mat-icon *ngIf="planing.isActive; else iconNoActive" [svgIcon]="'heroicons_outline:check-circle'" class="text-emerald-600 dark:text-emerald-400" ></mat-icon>
+            <ng-template #iconNoActive>
+                <mat-icon [svgIcon]="'heroicons_outline:exclamation-circle'" class="text-amber-600 dark:text-amber-400" ></mat-icon>
+            </ng-template>
         </div>
     </ng-container>
 </div>

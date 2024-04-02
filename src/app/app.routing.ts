@@ -119,6 +119,32 @@ export const appRoutes: Route[] = [
         },
         loadChildren:() => import('app/modules/admin/messagerie/messagerie.module').then(m =>m.MessagerieModule) 
     },
+    {
+        path: 'organisation', 
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+            initialLoadingData: InitialLoadingDataResolver
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/admin/example/example.module').then(m =>m.ExampleModule) 
+    },
+    {
+        path: 'settings', 
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+            initialLoadingData: InitialLoadingDataResolver
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/admin/example/example.module').then(m =>m.ExampleModule) 
+    },
 
     // Redirect empty path to '/home'
     {path: '**', pathMatch : 'full', redirectTo: 'home'},

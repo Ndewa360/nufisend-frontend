@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { Actions, Store, ofActionSuccessful } from "@ngxs/store";
 import { UserService } from "app/core/user/user.service";
-import { ContactAction, GroupAction } from "app/shared/store";
+import { ContactAction, GroupAction, MessageTemplateAction } from "app/shared/store";
 import { PlanificationAction } from "app/shared/store/planifcation";
 import { UserProfileAction } from "app/shared/store/user-profile";
 import { Observable, catchError, combineLatest, combineLatestAll, forkJoin, map, of, skipUntil, skipWhile, take, tap } from "rxjs";
@@ -37,7 +37,8 @@ export class InitialLoadingDataResolver implements Resolve<any>
                 tap(()=>this._store.dispatch([
                             new ContactAction.FetchAllContact(),
                             new PlanificationAction.FetchAllPlanification(),
-                            new GroupAction.FetchAllGroup()
+                            new GroupAction.FetchAllGroup(),
+                            new MessageTemplateAction.FetchAllMessageTemplate()
                             ])
                     ),
             ),

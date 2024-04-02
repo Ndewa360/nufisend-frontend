@@ -27,6 +27,10 @@ export class ScheduleComponent implements OnInit,AfterViewInit{
   currentDataGrid:number[]=[]
   planificationInitData:PlanificationModel[]=[]
   selectedPlanificationsDayData:PlanificationModel[]=[];
+  listOfDay=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"]
+  selectedDayOfWeek="Lundi";
+
+
 
     /**
      * Constructor
@@ -132,7 +136,7 @@ export class ScheduleComponent implements OnInit,AfterViewInit{
           grid       : {
               borderColor: 'var(--fuse-border)'
           },
-          labels     : ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
+          labels     : this.listOfDay,
           legend     : {
               show: false
           },
@@ -228,18 +232,27 @@ export class ScheduleComponent implements OnInit,AfterViewInit{
         this.getPlaningOfDay()
     }
 
-    getPlaningOfDay()
+    getPlaningOfDay(currentIndexDay=0)
     {
-        let currentDate = new Date(this.planificationFirstDateChart.getFullYear(),this.planificationFirstDateChart.getMonth(),this.planificationFirstDateChart.getDate());
-        this.planificationInitData = this.planificationInitData.filter((plan)=>{
+        let currentDate = new Date(this.planificationFirstDateChart.getFullYear(),this.planificationFirstDateChart.getMonth(),this.planificationFirstDateChart.getDate()+currentIndexDay);
+        this.selectedPlanificationsDayData = this.planificationInitData.filter((plan)=>{
             let isToCurrentDate =false;
             CronJobString.transformPlanificationToCronJobArray(plan.planning).forEach((cronPlanString)=>{
-                let intervale = parseExpression(cronPlanString.plan,{currentDate,iterator:true});
-                if(intervale.hasNext()) isToCurrentDate = true;
+                if(!cronPlanString.plan) return;
+                // console.log("Console ",cronPlanString)
+                if(parseExpression(cronPlanString.plan,{currentDate,iterator:true}).hasNext()) isToCurrentDate = true;
             });
             return isToCurrentDate;
         })
+        // console.log("Selected For Date ",this.selectedPlanificationsDayData,this.planificationInitData)
     }
+
+    selectDay(value)
+    {
+        this.selectedDayOfWeek=this.listOfDay[value];
+        this.getPlaningOfDay(value)
+    }
+
 
     getDataFromStartTo(startDate:Date,endDate:Date,data:string[])
     {
@@ -249,6 +262,7 @@ export class ScheduleComponent implements OnInit,AfterViewInit{
         while(intervale.hasNext())
         {
           let dateFound = intervale.next();
+        //   console.log("Console GetData ",dateFound.value);
           dataGrid[dateFound.value.getDay()]++;
         }         
        })
