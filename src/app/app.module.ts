@@ -15,12 +15,11 @@ import { appRoutes } from 'app/app.routing';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { initializeKeycloak } from './core/auth/keycloak-init';
 import { environment } from 'environments/environment';
-import { ContactState, MessageState, MessageTemplateState, GlobalState, MessageTemplateStateModel, WhatsappContactState, WhatsappQrCodeState } from './shared/store';
+import { ContactState, MessageState, MessageTemplateState, GlobalState, WhatsappContactState, WhatsappQrCodeState } from './shared/store';
 import { ToastrModule } from 'ngx-toastr';
 import { FuseLoadingModule } from '@fuse/services/loading';
 import { UserProfileState } from './shared/store/user-profile';
 import { SocketIoModule } from 'ngx-socket-io';
-import { WebsocketManagerService } from './shared/services/websocket-manager/websocket-manager.service';
 import { GroupState } from './shared/store/group';
 import { PlanificationState } from './shared/store/planifcation';
 // import {provideMomentDateAdapter} from ./modules/admin/dashboard/components/schedule-list-day/schedule-list-day.component

@@ -40,7 +40,7 @@ export const appRoutes: Route[] = [
             layout: 'empty'
         },
         children: [
-            {path: '', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},
+            {path: '', loadChildren: () => import('app/modules/landing/landing.module').then(m => m.LandingHomeModule)},
         ]
     },
 

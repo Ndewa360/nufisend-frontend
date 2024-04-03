@@ -30,6 +30,7 @@
         "@ngxs/store": "^3.8.2",
         "@types/node": "^20.10.5",
         "angularx-qrcode": "^15.0.1",
+        "aos": "^2.3.4",
         "apexcharts": "3.36.3",
         "cron-parser": "^4.9.0",
         "crypto-js": "3.3.0",

@@ -1,0 +1,29 @@
+@import url("https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css");
+@import url("https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css");
+
+
+.bg-main-color {
+  background-color: #166534;
+}
+/* Animation des éléments */
+.fade-up {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Style pour le menu fixe */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+input {
+  background:white !important;
+}

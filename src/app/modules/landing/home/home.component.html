@@ -1,31 +1,265 @@
-<div class="flex flex-col items-center justify-center w-full h-full">
-    <div class="w-full max-w-3xl">
-        <div class="max-w-none mx-auto prose prose-sm">
-            <img
-                class="w-20"
-                src="assets/images/logo/logo.svg"
-                alt="Logo image">
-            <h1>Landing Module</h1>
-            <p>
-                This can be the landing or the welcome page of your application. If you have an SSR (Server Side Rendering) setup, or if you don't need to have Search engine
-                visibility and optimizations, you can even use this page as your primary landing page.
-            </p>
-            <p>
-                This is a separate "module", it has its own directory and routing setup and also it's completely separated from the actual application. This is also a simple example of
-                a multiple applications setup that uses the same codebase. You can have different entry points and essentially have different applications within the same codebase.
-            </p>
+<div class="w-full min-w-0 bg-gray-100 font-sans">
+    <app-navbar></app-navbar>
+    <!-- Section principale - Description des fonctionnalités -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-main-color mb-6 text-center">Des fonctionnalités puissantes pour faciliter votre communication</h2>
+            <!-- Description des fonctionnalités -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Fonctionnalité 1 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up">
+                    <div class="text-center mb-4">
+                        <img src="./../../../../assets/images/ui/img/synchro-watshapp.png" alt="Synchronisation des Contacts" class="mx-auto">
+                    </div>
+                    <h3 class="text-xl font-bold text-main-color mb-2">Synchronisation des Contacts</h3>
+                    <p class="text-gray-700">Importez facilement vos contacts depuis WhatsApp dans notre application pour une gestion simplifiée.</p>
+                </div>
+                <!-- Fonctionnalité 2 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center mb-4">
+                        <img src="./../../../../assets/images/ui/img/difusion_group_whatsapp-removebg-preview.png" alt="Création de Groupes de Diffusion" class="mx-auto">
+                    </div>
+                    <h3 class="text-xl font-bold text-main-color mb-2">Création de Groupes de Diffusion</h3>
+                    <p class="text-gray-700">Regroupez vos contacts dans des groupes de diffusion personnalisés pour des communications ciblées.</p>
+                </div>
+                <!-- Fonctionnalité 3 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-center mb-4">
+                        <img src="./../../../../assets/images/ui/img/planing_whatsapp-removebg-preview.png" alt="Messages Automatisés" class="mx-auto w-50">
+                    </div>
+                    <h3 class="text-xl font-bold text-main-color mb-2">Messages Automatisés</h3>
+                    <p class="text-gray-700">Programmez des messages automatisés à des dates précises pour une communication régulière et efficace.</p>
+                </div>
+            </div>
         </div>
-        <div>
-            <a
-                class="mt-8"
-                mat-flat-button
-                [color]="'primary'"
-                [routerLink]="'/dashboard'">
-                <span>Launch the App</span>
-                <mat-icon
-                    class="ml-2 icon-size-5"
-                    [svgIcon]="'heroicons_solid:arrow-narrow-right'"></mat-icon>
-            </a>
+    </section>
+
+    <!-- Section des captures d'écran -->
+    <section class="bg-gray-200 py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-main-color mb-6 text-center">Aperçu de l'Application</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Capture d'écran 1 -->
+                <div class="rounded-lg overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="600">
+                    <img src="screenshot1.png" alt="Capture d'écran 1">
+                    <p class="text-lg mt-2 text-gray-700">Gérez facilement vos contacts et créez des groupes de diffusion personnalisés.</p>
+                </div>
+                <!-- Capture d'écran 2 -->
+                <div class="rounded-lg overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="800">
+                    <img src="screenshot2.png" alt="Capture d'écran 2">
+                    <p class="text-lg mt-2 text-gray-700">Planifiez des messages automatisés pour une communication efficace à tout moment.</p>
+                </div>
+                <!-- Capture d'écran 3 -->
+                <div class="rounded-lg overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="1000">
+                    <img src="screenshot3.png" alt="Capture d'écran 3">
+                    <p class="text-lg mt-2 text-gray-700">Personnalisez vos messages et suivez l'engagement de vos contacts.</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
+
+
+    <section class="bg-main-color text-white py-8">
+        <div class="container mx-auto px-2 pt-4 pb-12 text-gray-800">
+          <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-white">
+            Pricing
+          </h2>
+          <div class="w-full mb-4">
+            <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
+          </div>
+          <div class="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
+            <div class="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
+              <div class="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
+                <div class="p-8 text-3xl font-bold text-center border-b-4">
+                  Gratuit
+                </div>
+                <ul class="w-full text-center text-sm">
+                  <li class="border-b py-4">10 Messages planifiés</li>
+                  <li class="border-b py-4">Importation de contacts</li>
+                  <li class="border-b py-4">Synchronisation WhatsApp</li>
+                </ul>
+              </div>
+              <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
+                <div class="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
+                  0 FCFA
+                  <span class="text-base">pour un utilisateur</span>
+                </div>
+                <div class="flex items-center justify-center">
+                  <button class="mx-auto bg-main-color lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                    Débuter
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 shadow-lg z-10">
+              <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
+                <div class="w-full p-8 text-3xl font-bold text-center">Basic</div>
+                <div class="h-1 w-full gradient my-0 py-0 rounded-t"></div>
+                <ul class="w-full text-center text-base font-bold">
+                  <li class="border-b py-4">+100 Messages planifiés</li>
+                  <li class="border-b py-4">Importation de contacts WhatsApp</li>
+                  <li class="border-b py-4">Synchronisation WhatsApp</li>
+                  <li class="border-b py-4">Groupes de difussions</li>
+                </ul>
+              </div>
+              <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
+                <div class="w-full pt-6 text-4xl font-bold text-center">
+                  500 FCFA
+                  <span class="text-base">/ par mois</span>
+                </div>
+                <div class="flex items-center justify-center">
+                  <button class="mx-auto bg-main-color lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                    Débuter
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
+              <div class="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
+                <div class="p-8 text-3xl font-bold text-center border-b-4">
+                  Pro
+                </div>
+                <ul class="w-full text-center text-sm">
+                  <li class="border-b py-4">Messages planifiés illimités</li>
+                  <li class="border-b py-4">Importation de contacts WhatsApp</li>
+                  <li class="border-b py-4">Intégration annuaire Google</li>
+                  <li class="border-b py-4">Annuaire partagé entre plusieurs comptes</li>
+                  <li class="border-b py-4">Se connecter avec son compte Google</li>
+                </ul>
+              </div>
+              <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
+                <div class="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
+                  2000 FCFA <br>
+                  <span class="text-base">/ par mois / 50 messages planifiés</span>
+                </div>
+                <div class="flex items-center justify-center">
+                  <button class="mx-auto  bg-main-color lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                    Débuter
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <!-- Section Avantages du Marketing Digital -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-main-color mb-6 text-center">Les avantages du Marketing Digital avec notre application</h2>
+            <!-- Description des avantages -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Avantage 1 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up">
+                    <div class="text-center mb-4">
+                        <img src="benefit1.png" alt="Avantage 1" class="mx-auto">
+                    </div>
+                    <h3 class="text-xl font-bold text-main-color mb-2">Augmentation de la visibilité</h3>
+                    <p class="text-gray-700">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla.</p>
+                </div>
+                <!-- Avantage 2 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center mb-4">
+                        <img src="benefit2.png" alt="Avantage 2" class="mx-auto">
+                    </div>
+                    <h3 class="text-xl font-bold text-main-color mb-2">Amélioration de l'engagement</h3>
+                    <p class="text-gray-700">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla.</p>
+                </div>
+                <!-- Avantage 3 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-center mb-4">
+                        <img src="benefit3.png" alt="Avantage 3" class="mx-auto">
+                    </div>
+                    <h3 class="text-xl font-bold text-main-color mb-2">Optimisation des campagnes</h3>
+                    <p class="text-gray-700">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section des clients -->
+    <section class="py-12 bg-main-color text-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-6 text-center">Ce que nos clients disent</h2>
+            <!-- Commentaires des clients -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Commentaire 1 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up">
+                    <p class="text-gray-700">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, lorem at commodo lacinia."</p>
+                    <p class="text-main-color font-bold mt-4">- Client 1</p>
+                </div>
+                <!-- Commentaire 2 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="200">
+                    <p class="text-gray-700">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, lorem at commodo lacinia."</p>
+                    <p class="text-main-color font-bold mt-4">- Client 2</p>
+                </div>
+                <!-- Commentaire 3 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="400">
+                    <p class="text-gray-700">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, lorem at commodo lacinia."</p>
+                    <p class="text-main-color font-bold mt-4">- Client 3</p>
+                </div>
+                <!-- Commentaire 4 -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="600">
+                    <p class="text-gray-700">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, lorem at commodo lacinia."</p>
+                    <p class="text-main-color font-bold mt-4">- Client 4</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section sur l'entreprise Yaba-In -->
+    <section class="py-12 bg-gray-900 text-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-6 text-center">À propos de notre entreprise</h2>            
+            <div class="flex flex-colt-4 ">
+                <div class="text-right w-2/5" data-aos="fade-up">
+                    <img src="./../../../../assets/images/logo/yaba-in.png" alt="Logo de Yaba-In" class="mx-auto  w-50">
+                </div>
+                <div data-aos="fade-up" class="w-3/5 text-2xl" data-aos-delay="200">
+                        <p class="text-gray-400 mb-2">Chez Yaba-In, nous nous engageons à fournir des solutions de communication numérique innovantes et efficaces pour répondre aux besoins de nos clients.</p>
+                        <p class="text-gray-400">Notre mission est d'aider nos clients à tirer le meilleur parti de leur communication digitale, en leur offrant des outils puissants et des services de qualité.</p>
+                </div>
+                
+            </div>
+            <!-- Logo de l'entreprise -->
+            
+        </div>
+    </section>
+
+    <!-- Section Contact -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-6 text-center">Contactez-nous</h2>
+            <div class="flex  mt-8 justify-center">
+                <div class="text-right w-2/5">
+                    <img src="./../../../../assets/images/logo/ySapp_logo.png" alt="Logo de l'application" class="mx-auto w-50">
+                </div>
+               <div class="">
+                <div data-aos="fade-up mb-2">
+                    <h3 class="text-xl font-semibold mb-2">Adresse</h3>
+                    <p class="text-gray-700">Carrefour Prison, Bangangté, Cameroun</p>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="text-xl font-semibold mb-2">Email</h3>
+                    <p class="text-gray-700">contact@yaba-in.com</p>
+                </div>
+               </div>
+            </div>
+            <!-- Logo de l'entreprise -->
+           
+        </div>
+    </section>
+
+    <!-- Section Newsletter -->
+    <section class="py-12 bg-main-color text-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-6 text-center">Abonnez-vous à notre Newsletter</h2>
+            <form class="flex justify-center items-center">
+                <input type="email" placeholder="Votre adresse email" class="py-3 px-4 w-full md:w-2/3 lg:w-1/2 rounded-l-lg focus:outline-none">
+                <button class=" text-main-color py-3 px-6 rounded-r-lg hover:bg-green-900 bg-green-700 transition duration-300">S'abonner</button>
+            </form>
+        </div>
+    </section>
+
+    <app-footer></app-footer>
 </div>
