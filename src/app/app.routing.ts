@@ -44,6 +44,19 @@ export const appRoutes: Route[] = [
         ]
     },
 
+    // Landing routes
+    {
+        path: 'getting-started',
+        component: LayoutComponent,
+        // canActivate: [NoAuthGuard],
+        data: {
+            layout: 'empty'
+        },
+        children: [
+            {path: '', loadChildren: () => import('app/modules/get-started/get-started.module').then(m => m.GetStartedModule)},
+        ]
+    },
+
     // Admin routes
     {
         path: 'dashboard',

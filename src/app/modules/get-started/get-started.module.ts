@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { GetStartedRoutingModule } from './get-started-routing.module';
 import { HomeComponent } from './home/home.component';
+import { SharedModule } from 'app/shared/shared.module';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { HomeComponent } from './home/home.component';
   ],
   imports: [
     CommonModule,
-    GetStartedRoutingModule
+    GetStartedRoutingModule,
+    SharedModule
   ]
 })
 export class GetStartedModule { }
