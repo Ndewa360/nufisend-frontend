@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { KeycloakService } from 'keycloak-angular';
 import { KeycloakProfile } from 'keycloak-js';
+import { environment } from 'environments/environment';
 // import { WebsocketManagerService } from 'app/shared/services/websocket-manager/websocket-manager.service';
 // import { Socket } from 'ngx-socket-io';
 
@@ -47,8 +48,15 @@ export class AuthService {
   }
  
   // Login into your account
-  authLogin() {
-    this.keycloak.login();    
+  authLogin(isFirstLogin=false) {
+    if(isFirstLogin) return this.keycloak.login({redirectUri:`${environment.url}/dashboard`});    
+    return this.keycloak.login();    
+  }
+
+  authRegister(isFirstRegistration=false)
+  {
+    if(isFirstRegistration) return this.keycloak.register({redirectUri:`${environment.url}/dashboard`})
+    return this.keycloak.register()
   }
  
   logOut():Promise<any>

@@ -22,13 +22,13 @@ export const appRoutes: Route[] = [
     
     // Auth routes for authenticated users
     {
-        path: 'sign-out',
+        path: 'auth',
         // canActivate: [NoAuthGuard],
         component: LayoutComponent,
         data: {
             layout: 'empty'
         },
-        loadChildren: () => import('app/modules/auth/sign-out/sign-out.module').then(m => m.AuthSignOutModule),
+        loadChildren: () => import('app/modules/auth/auth.module').then(m => m.AuthModule),
     },
     
     // Landing routes
