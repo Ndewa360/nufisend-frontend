@@ -1,0 +1,116 @@
+<div class="flex flex-col md:min-w-160  -m-6">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary shadow-lg">
+        <div class="text-lg font-medium ">
+            <mat-icon [svgIcon]="'mat_outline:upload'" class="text-yellow-500"></mat-icon>
+           <span class="align-middle">Uploadez vos contacts </span> 
+        </div>
+        <button
+            mat-icon-button
+            (click)="saveAndClose()"
+            [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <!-- Compose form -->
+    <div class="flex flex-col flex-auto p-x-6 p-y-3 sm:p-8  md:h-full overflow-y-auto">
+        <form class="p-4 bg-card shadow"
+                [formGroup]="importContactForm">
+                <!--  -->
+                <mat-horizontal-stepper  [linear]="true" #horizontalStepper>
+                    <!-- [completed]="file" -->
+                    <mat-step    #horizontalStepperStep1>
+                        <ng-template matStepLabel>Choisir un fichier</ng-template>                        
+                        <div class="mt-2">
+                            <div class="sm:col-span-3 mb-6">
+                                <fuse-alert
+                                    [appearance]="'outline'"
+                                    [type]="'info'">
+                                    Veuillez vous rassurer que votre fichier soit sous le format attentus par le template. Pour télécharger le template <span class="bg-primary text-white mr-2 ml-2 hover:underline cursor-pointer" (click)="generateCSVFile()">clique ici</span>
+                                </fuse-alert>
+                            </div>
+                    
+                            <div class="sm:col-span-3 mb-6">
+                                <app-file-upload class="mb-2" acceptedFile="CSV" acceptedFileType=".csv" (uploadFileEvent)="setFiles($event)"></app-file-upload>
+                            </div>
+                        </div>
+                        <div class="flex justify-end">                            
+                            <button class="px-8" mat-flat-button extended [color]="'primary'"  type="button" matStepperNext>
+                                Suivant
+                                <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-right'" [title]="'Suivant'" aria-hidden="true" iconPositionEnd></mat-icon>    
+                            </button>
+                        </div>
+                    </mat-step>
+
+                    <mat-step  #horizontalStepperStep2>
+                        <ng-template matStepLabel>Prévisualisation</ng-template>
+                        <app-previsualize-data-file [file]="file"></app-previsualize-data-file>
+                        
+                        <div class="flex justify-end">
+                            <button
+                                class="px-8 mr-2"
+                                mat-flat-button
+                                [color]="'accent'"
+                                type="button"
+                                matStepperPrevious>
+                                <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-left'" [title]="'Précédent'"></mat-icon>
+                                Précédent
+                            </button>
+                            <button
+                                class="px-8"
+                                mat-flat-button
+                                [color]="'primary'"
+                                type="button"
+                                matStepperNext>
+                                Suivant 
+                                <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-right'" [title]="'Suivant'" iconPositionEnd></mat-icon>
+                            </button>
+                        </div>
+                    </mat-step>
+
+                    <mat-step>
+                        <ng-template matStepLabel>Rediger & Soumettre</ng-template>
+                        <div>3</div>
+                        <!-- <ng-template #redigerMessagePlanifier><app-rediger-message-planifier></app-rediger-message-planifier></ng-template>  -->
+                        <div class="flex mt-8 justify-between">
+                            <div class="">
+                                <button
+                                    mat-button
+                                    [color]="'primary'"
+                                    [matTooltip]="'Prévisualiser le message'">
+                                    Prévisualiser
+                                </button>
+                            </div>
+                            <div class="flex justify-end">
+                                <button
+                                    class="px-8 mr-2"
+                                    mat-flat-button
+                                    [color]="'accent'"
+                                    type="button"
+                                    matStepperPrevious>
+                                    <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-left'" [title]="'Précédent'"></mat-icon>
+                                    Précédent
+                                </button>
+                                <button
+                                    class="px-8"
+                                    mat-flat-button
+                                    [color]="'primary'"
+                                    (click)="importFile()">
+                                    <mat-progress-spinner *ngIf="(submitted | async); else endWordTermine" [diameter]="24" [mode]="'indeterminate'">
+                                    </mat-progress-spinner>
+                                    <ng-template #endWordTermine>Envoyer</ng-template>
+                                </button>
+                            </div>
+                        </div>
+                    </mat-step>
+                </mat-horizontal-stepper>
+            </form>
+
+
+    </div>
+
+</div>

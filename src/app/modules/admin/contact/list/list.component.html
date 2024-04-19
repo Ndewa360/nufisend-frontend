@@ -66,19 +66,19 @@
                             class="ml-4"
                             mat-flat-button
                             [color]="'primary'"
-                            (click)="createContact()">
-                            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                            <span class="ml-2 mr-1">Ajouter</span>
+                            (click)="createContact()"
+                            [matTooltip]="'Ajouter un contact'">
+                            <mat-icon [svgIcon]="'feather:user-plus'"></mat-icon>
                         </button>
 
                         <!-- import contact button -->
-                        <!-- <button
+                        <button
                             class="ml-4 text-yellow-500 hidden md:block"
                             mat-stroked-button
+                            [matTooltip]="'Importer une liste de contacts'"
                             (click)="importContact()">
                             <mat-icon [svgIcon]="'mat_outline:upload'" class="text-yellow-500"></mat-icon>
-                            <span class="ml-2 mr-1">Importer</span>
-                        </button> -->
+                        </button>
 
                         <!-- export contact button -->
                         <!-- <button
