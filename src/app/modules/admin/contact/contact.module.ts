@@ -10,7 +10,9 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { ImportComponent } from './import/import.component';
 import { MessagerieModule } from '../messagerie/messagerie.module';
 import { SelectGroupComponent } from './components/select-group/select-group.component';
-import { UploadComponent } from './components/upload/upload.component';
+import { UploadFileComponent } from './components/upload-file/upload-file.component';
+import { MatStepperModule } from '@angular/material/stepper';
+import { PrevisualizeDataFileComponent } from './components/previsualize-data-file/previsualize-data-file.component';
 
 
 @NgModule({
@@ -20,12 +22,15 @@ import { UploadComponent } from './components/upload/upload.component';
     AddComponent,
     ImportComponent,
     SelectGroupComponent,
-    UploadComponent
+    UploadFileComponent,
+    PrevisualizeDataFileComponent
   ],
   imports: [
     CommonModule,
     ContactRoutingModule,
     MessagerieModule,
+    MatStepperModule,
+
     SharedModule
   ],
   providers   : [

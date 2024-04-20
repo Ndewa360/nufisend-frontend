@@ -12,7 +12,7 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ToastrService } from 'ngx-toastr';
 import { NewMessageForSingleContactComponent } from '../../messagerie/components/new-message-for-single-contact/new-message-for-single-contact.component';
 import { MatDialog } from '@angular/material/dialog';
-import { UploadComponent } from '../components/upload/upload.component';
+import { UploadFileComponent } from '../components/upload-file/upload-file.component';
 
 @Component({
   selector: 'app-contact-list',
@@ -237,12 +237,12 @@ export class ListComponent implements OnInit, OnDestroy{
     importContact(): void
     {
         // Import the contact
-        const dialogRef = this._matDialog.open(UploadComponent,
+        const dialogRef = this._matDialog.open(UploadFileComponent,
             {
               height: '100%',
               minWidth: '100%',
             }
-        );
+            );
     }
 
     /**

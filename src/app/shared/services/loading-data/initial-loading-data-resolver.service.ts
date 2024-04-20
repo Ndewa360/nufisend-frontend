@@ -12,10 +12,10 @@ import { Observable, catchError, combineLatest, combineLatestAll, forkJoin, map,
 })
 export class InitialLoadingDataResolver implements Resolve<any>
 {
+    
     /**
      * Constructor
      */
-    
     constructor(private _store:Store,private _ngxsAction:Actions,private userProfileService:UserService){}
 
     // -----------------------------------------------------------------------------------------------------

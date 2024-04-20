@@ -13,7 +13,8 @@ export class FileUploadComponent implements OnInit,AfterViewInit {
   @ViewChild("dropzone") dropzoneHtml:ElementRef;
   @ViewChild("inputDropzone") inputDropzone:ElementRef;
   @Input() isMultiple:boolean=false;
-  @Input() acceptedFile = "image/*,video/*,audio/*,.pdf,.doc,.docx,.pptx,.xls,.xlsx"
+  @Input() acceptedFile = "PDF, WORD, PPTX or PNG (MAX. 800x400px)"
+  @Input() acceptedFileType ="image/*,video/*,audio/*,.pdf,.doc,.docx,.pptx,.xls,.xlsx"
   
   
   @Output() uploadFileEvent:EventEmitter<File[]>=new EventEmitter<File[]>();
