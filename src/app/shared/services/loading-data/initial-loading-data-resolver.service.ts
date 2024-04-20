@@ -42,9 +42,10 @@ export class InitialLoadingDataResolver implements Resolve<any>
                             ])
                     ),
             ),
-            this._store.select((state)=>state.contacts.contacts).pipe(skipWhile((x)=>x.length==0)),
-            this._store.select((state)=>state.planifications.planifications).pipe(skipWhile((x)=>x.length==0)),
-            this._store.select((state)=>state.groups.groups).pipe(skipWhile((x)=>x.length==0)),
+            this._store.select((state)=>state.contacts.initLoadingState).pipe(skipWhile((initLoadingState)=>initLoadingState!="LOADED")),
+            this._store.select((state)=>state.planifications.initLoadingState).pipe(skipWhile((initLoadingState)=>initLoadingState!="LOADED")),
+            this._store.select((state)=>state.groups.initLoadingState).pipe(skipWhile((initLoadingState)=>initLoadingState!="LOADED")),
+            this._store.select((state)=>state.messageTemplates.initLoadingState).pipe(skipWhile((initLoadingState)=>initLoadingState!="LOADED")),
         )
     }
 }

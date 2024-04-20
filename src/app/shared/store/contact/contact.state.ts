@@ -8,7 +8,9 @@ import { catchError, of, tap, throwError } from "rxjs";
 
 export class ContactStateModel {
     contacts:ContactModel[]
-    loadingContacts:boolean
+    loadingContacts:boolean;
+    initLoadingState:'NO_LOADED'|'LOADING'|'LOADED';
+
 }
 
 
@@ -16,6 +18,7 @@ export class ContactStateModel {
     name: "contacts",
     defaults:{
         loadingContacts:false,
+        initLoadingState:'NO_LOADED',
         contacts:[]
     }
 })
@@ -183,20 +186,23 @@ export class ContactState{
         if(state.contacts.length>0) return of(true);
 
         ctx.patchState({
-            loadingContacts: true
+            loadingContacts: true,
+            initLoadingState:"LOADING"
         })
         return this._contactsService.getContacts().pipe(
             tap(
                 result => {
                     ctx.setState({
                         loadingContacts:false,
-                        contacts:result.data
+                        contacts:result.data,
+                        initLoadingState:"LOADED"
                     })
                 }
             ),
             catchError((error) => {
                 ctx.patchState({
-                    loadingContacts: false
+                    loadingContacts: false,
+                    initLoadingState:"LOADED"
                 })
                 return throwError(error);
                 
