@@ -5,14 +5,24 @@
 export const environment = {
   production: false,
 
-  apiUrl: 'http://localhost:3000',
+  // apiUrl: 'http://localhost:3000',
+  // url: 'http://localhost:4200',
+  // urlToSendMessage: 'http://localhost:3000',
+  // keycloak:{
+  //   secret:"AqetVGJS1jk7s1gcyll0ivvREYRj6R9c",
+  //   clientId:"ysapp-frontend",
+  //   realm:"Yaba-In",
+  //   url:"https://accounts.yaba-in.com/"
+  // },
+
+  apiUrl: 'https://ysapp-api.yaba-in.com',
   url: 'http://localhost:4200',
-  urlToSendMessage: 'http://localhost:3000',
+  urlToSendMessage: 'https://ysapp-api.yaba-in.com',
   keycloak:{
     secret:"AqetVGJS1jk7s1gcyll0ivvREYRj6R9c",
     clientId:"ysapp-frontend",
     realm:"Yaba-In",
-    url:"https://accounts.yaba-in.com/"
+    url:"https://accounts.yaba-in.com"
   },
 
 };

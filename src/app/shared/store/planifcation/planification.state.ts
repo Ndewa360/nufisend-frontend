@@ -9,6 +9,8 @@ import { catchError, of, tap, throwError } from "rxjs";
 export class PlanificationStateModel {
     planifications:PlanificationModel[]
     loadingPlanifications:boolean
+    initLoadingState:'NO_LOADED'|'LOADING'|'LOADED';
+
 }
 
 
@@ -16,7 +18,9 @@ export class PlanificationStateModel {
     name: "planifications",
     defaults:{
         loadingPlanifications:false,
-        planifications:[]
+        planifications:[],
+        initLoadingState:'NO_LOADED',
+        
     }
 })
 @Injectable()
@@ -163,20 +167,23 @@ export class PlanificationState{
         if(state.planifications.length>0) return of(true);
 
         ctx.patchState({
-            loadingPlanifications: true
+            loadingPlanifications: true,
+            initLoadingState:"LOADING"
         })
         return this._planificationsService.getPlanifications().pipe(
             tap(
                 result => {
                     ctx.setState({
                         loadingPlanifications:false,
-                        planifications:result.data
+                        planifications:result.data,
+                        initLoadingState:"LOADED"
                     })
                 }
             ),
             catchError((error) => {
                 ctx.patchState({
-                    loadingPlanifications: false
+                    loadingPlanifications: false,
+                    initLoadingState:"LOADED"
                 })
                 return throwError(error);
                 

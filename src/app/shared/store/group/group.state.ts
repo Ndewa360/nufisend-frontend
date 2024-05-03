@@ -9,6 +9,8 @@ import { catchError, of, tap, throwError } from "rxjs";
 export class GroupStateModel {
     groups:GroupModel[]
     loadingGroups:boolean
+    initLoadingState:'NO_LOADED'|'LOADING'|'LOADED';
+
 }
 
 
@@ -16,6 +18,7 @@ export class GroupStateModel {
     name: "groups",
     defaults:{
         loadingGroups:false,
+        initLoadingState:'NO_LOADED',
         groups:[]
     }
 })
@@ -182,20 +185,25 @@ export class GroupState{
         if(state.groups.length>0) return of(true);
 
         ctx.patchState({
-            loadingGroups: true
+            loadingGroups: true,
+            initLoadingState:"LOADING"
+
         })
         return this._groupsService.getGroups().pipe(
             tap(
                 result => {
                     ctx.setState({
                         loadingGroups:false,
-                        groups:result.data
+                        groups:result.data,
+                        initLoadingState:"LOADED"
                     })
                 }
             ),
             catchError((error) => {
                 ctx.patchState({
-                    loadingGroups: false
+                    loadingGroups: false,
+                    initLoadingState:"LOADED"
+
                 })
                 return throwError(error);
                 

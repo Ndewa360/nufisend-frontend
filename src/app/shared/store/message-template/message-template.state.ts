@@ -8,7 +8,8 @@ import { catchError, of, tap, throwError } from "rxjs";
 
 export class MessageTemplateStateModel {
     messageTemplates:MessageTemplateModel[]
-    loadingMessageTemplates:boolean
+    loadingMessageTemplates:boolean;
+    initLoadingState:'NO_LOADED'|'LOADING'|'LOADED';
 }
 
 
@@ -16,6 +17,7 @@ export class MessageTemplateStateModel {
     name: "messageTemplates",
     defaults:{
         loadingMessageTemplates:false,
+        initLoadingState:'NO_LOADED',
         messageTemplates:[]
     }
 })
@@ -145,7 +147,8 @@ export class MessageTemplateState{
         if(state.messageTemplates.length>0) return of(true);;
 
         ctx.patchState({
-            loadingMessageTemplates: true
+            loadingMessageTemplates: true,
+            initLoadingState:"LOADING"
         })
 
         return this._messageTemplatesService.getMessageTemplates().pipe(
@@ -153,7 +156,9 @@ export class MessageTemplateState{
                 result => {
                     ctx.setState({
                         loadingMessageTemplates:false,
-                        messageTemplates:result.data
+                        messageTemplates:result.data,
+                        initLoadingState:"LOADED"
+
                     })
                 }
             )
