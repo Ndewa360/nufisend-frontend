@@ -25,10 +25,10 @@ export class WebsocketManagerService{
 
   customConnexion(value)
     {
-      
-      this.socket.on('connexion', ()=>{
-          this.socket.emit('connexion', {email: value.email});
-          this.webSocketConnectedEvent.next(true);        
-      })
+      // this.socket.on('connexion', ()=>{
+                 
+      // })
+      this.socket.emit('connexion', {email: value.email});
+        this.webSocketConnectedEvent.next(true); 
     }
 }
