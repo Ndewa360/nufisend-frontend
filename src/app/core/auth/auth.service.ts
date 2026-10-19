@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
 import { environment } from 'environments/environment';
 import { ApiResultFormat } from 'app/shared/store/global';
+import { UserService } from 'app/core/user/user.service';
 
 export interface User {
     _id?: string;
@@ -31,7 +32,10 @@ export class AuthService
     private _authenticated: boolean = false;
     private _user: User | null = null;
 
-    constructor(private _httpClient: HttpClient)
+    constructor(
+        private _httpClient: HttpClient,
+        private _userService: UserService
+    )
     {
         this.check();
     }
@@ -73,6 +77,7 @@ export class AuthService
                 this.accessToken = response.data.accessToken;
                 this._authenticated = true;
                 this._user = response.data.user;
+                this._userService.user = response.data.user;
                 return of(response.data);
             })
         );
@@ -85,6 +90,7 @@ export class AuthService
                 this.accessToken = response.data.accessToken;
                 this._authenticated = true;
                 this._user = response.data.user;
+                this._userService.user = response.data.user;
                 return of(response.data);
             })
         );
@@ -113,6 +119,7 @@ export class AuthService
 
                 this._authenticated = true;
                 this._user = response.data;
+                this._userService.user = response.data;
                 return of(true);
             })
         );

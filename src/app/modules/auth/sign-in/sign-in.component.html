@@ -1,57 +1,147 @@
 <div class="flex flex-col flex-auto items-center sm:justify-center min-w-0 md:p-8">
     <div class="flex md:w-full md:max-w-6xl sm:rounded-2xl sm:shadow overflow-hidden sm:bg-card">
+
+        <!-- Formulaire -->
         <div class="w-full sm:w-auto py-8 px-4 sm:p-12 md:p-16">
             <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+
+                <!-- Logo -->
                 <div class="w-12">
-                    <img src="assets/images/logo/ySapp_logo.png" alt="NufiSend logo">
+                    <img src="assets/images/logo/logo.svg" alt="NufiSend logo">
                 </div>
 
+                <!-- Titre -->
                 <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Se connecter</div>
                 <div class="flex items-baseline mt-0.5 font-medium">
-                    <div>Vous n'avez pas de compte ?</div>
+                    <div>Pas encore de compte ?</div>
                     <a class="ml-1 text-primary-500 hover:underline cursor-pointer" [routerLink]="['/auth/sign-up']">Créer un compte</a>
                 </div>
 
+                <!-- Alerte erreur -->
                 <fuse-alert
                     class="mt-8 -mb-4"
                     *ngIf="showAlert"
                     [appearance]="'outline'"
-                    [showIcon]="false"
+                    [dismissible]="true"
+                    [showIcon]="true"
                     [type]="alert.type"
-                    [@shake]="alert.type === 'error'">
+                    [@shake]="alert.type === 'error'"
+                    (dismissedChanged)="showAlert = !$event">
                     {{ alert.message }}
                 </fuse-alert>
 
+                <!-- Formulaire -->
                 <form class="mt-8" [formGroup]="signInForm" (ngSubmit)="signIn()">
+
+                    <!-- Email -->
                     <mat-form-field class="w-full">
-                        <mat-label>Email</mat-label>
-                        <input id="email" matInput formControlName="email" type="email" autocomplete="email" />
-                        <mat-error *ngIf="signInForm.get('email').hasError('required')">Email obligatoire</mat-error>
-                        <mat-error *ngIf="signInForm.get('email').hasError('email')">Email invalide</mat-error>
+                        <mat-label>Adresse email</mat-label>
+                        <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
+                        <input
+                            id="email"
+                            matInput
+                            formControlName="email"
+                            type="email"
+                            autocomplete="email"
+                            [placeholder]="'exemple@email.com'" />
+                        <mat-error *ngIf="signInForm.get('email').hasError('required')">L'email est obligatoire</mat-error>
+                        <mat-error *ngIf="signInForm.get('email').hasError('email')">Adresse email invalide</mat-error>
                     </mat-form-field>
 
+                    <!-- Mot de passe -->
                     <mat-form-field class="w-full mt-4">
                         <mat-label>Mot de passe</mat-label>
-                        <input id="password" matInput formControlName="password" type="password" autocomplete="current-password" />
-                        <mat-error *ngIf="signInForm.get('password').hasError('required')">Mot de passe obligatoire</mat-error>
+                        <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:lock-closed'"></mat-icon>
+                        <input
+                            id="password"
+                            matInput
+                            formControlName="password"
+                            [type]="hidePassword ? 'password' : 'text'"
+                            autocomplete="current-password" />
+                        <button mat-icon-button type="button" matSuffix
+                            [attr.aria-label]="hidePassword ? 'Afficher le mot de passe' : 'Masquer le mot de passe'"
+                            (click)="hidePassword = !hidePassword">
+                            <mat-icon class="icon-size-5"
+                                [svgIcon]="hidePassword ? 'heroicons_solid:eye' : 'heroicons_solid:eye-slash'">
+                            </mat-icon>
+                        </button>
+                        <mat-error *ngIf="signInForm.get('password').hasError('required')">Le mot de passe est obligatoire</mat-error>
                     </mat-form-field>
 
-                    <button class="fuse-mat-button-large w-full mt-6" mat-flat-button [color]="'primary'" type="submit">
-                        Se connecter
+                    <!-- Bouton connexion -->
+                    <button
+                        class="fuse-mat-button-large w-full mt-6"
+                        mat-flat-button
+                        [color]="'primary'"
+                        [disabled]="signInForm.disabled"
+                        type="submit">
+                        <ng-container *ngIf="!signInForm.disabled">
+                            <mat-icon class="icon-size-5 mr-2" [svgIcon]="'heroicons_solid:arrow-right-on-rectangle'"></mat-icon>
+                            Se connecter
+                        </ng-container>
+                        <mat-progress-spinner
+                            *ngIf="signInForm.disabled"
+                            [diameter]="24"
+                            [mode]="'indeterminate'">
+                        </mat-progress-spinner>
                     </button>
+
                 </form>
             </div>
         </div>
+
+        <!-- Panneau décoratif -->
         <div class="relative hidden md:flex flex-auto items-center justify-center h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l">
+
+            <!-- Cercles décoratifs -->
+            <svg class="absolute inset-0 pointer-events-none" viewBox="0 0 960 540" width="100%" height="100%"
+                preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+                <g class="opacity-10 text-gray-200" fill="none" stroke="currentColor" stroke-width="100">
+                    <circle r="234" cx="196" cy="23"></circle>
+                    <circle r="234" cx="790" cy="491"></circle>
+                </g>
+            </svg>
+
+            <!-- Points décoratifs -->
+            <svg class="absolute -top-16 -right-16 text-gray-700" viewBox="0 0 220 192" width="220" height="192"
+                fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="dots-signin" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <circle cx="1.5" cy="1.5" r="1.5" fill="currentColor"></circle>
+                    </pattern>
+                </defs>
+                <rect width="220" height="192" fill="url(#dots-signin)"></rect>
+            </svg>
+
+            <!-- Contenu -->
             <div class="z-10 relative w-full max-w-2xl">
+                <div class="flex items-center mb-8">
+                    <img class="w-12 mr-4" src="assets/images/logo/logo.svg" alt="NufiSend logo">
+                    <span class="text-2xl font-bold text-white tracking-tight">NufiSend</span>
+                </div>
                 <div class="text-7xl font-bold leading-none text-gray-100">
                     <div>Bienvenue</div>
                     <div>sur NufiSend</div>
                 </div>
                 <div class="mt-6 text-lg tracking-tight leading-6 text-gray-400">
-                    Planifiez et envoyez vos messages WhatsApp en toute simplicité.
+                    Planifiez et envoyez vos messages WhatsApp en toute simplicité. Gérez vos contacts, créez des groupes et automatisez vos communications.
+                </div>
+                <div class="flex items-center mt-8 space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <mat-icon class="text-green-400 icon-size-5" [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
+                        <span class="text-gray-300 text-sm">Envoi en masse</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <mat-icon class="text-green-400 icon-size-5" [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
+                        <span class="text-gray-300 text-sm">Planification</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <mat-icon class="text-green-400 icon-size-5" [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
+                        <span class="text-gray-300 text-sm">Templates</span>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>

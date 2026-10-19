@@ -4,14 +4,8 @@
 
 export const environment = {
   production: false,
-  // apiUrl: 'http://localhost:3000',
-  apiUrl: 'https://ysapp-api.yaba-in.com',
+  apiUrl: 'http://localhost:3000',
   url: 'http://localhost:4200',
   urlToSendMessage: 'http://localhost:3000',
-  keycloak:{
-    secret:"qWuIaeXWEZk9Bi3Q4efVpATtW4TC8MkB",
-    clientId:"ysapp-frontend",
-    realm:"Yaba-In",
-    url:"https://accounts.yaba-in.com/"
-  },
+  
 };

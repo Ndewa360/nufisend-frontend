@@ -93,7 +93,6 @@ export class UserProfileState{
     fetchUserProfile(ctx:StateContext<UserProfileStateModel>,{email}:UserProfileAction.FetchUserProfile)
     {
         const state = ctx.getState();
-        console.log("State ",state)
         if(state.userProfile) return of(true);
 
         ctx.patchState({
@@ -102,7 +101,6 @@ export class UserProfileState{
         return this._userProfilesService.getUserProfile(email).pipe(
             tap(
                 result => {
-                    console.log("Data User profil",result.data)                    
                     ctx.setState({
                         loadingUserProfile:false,
                         userProfile:result.data
