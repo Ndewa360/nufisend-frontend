@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, ReplaySubject, tap } from 'rxjs';
-import { AuthService } from '../auth/auth.service';
-import { KeycloakProfile } from 'keycloak-js';
+import { AuthService, User } from '../auth/auth.service';
 import { Store } from '@ngxs/store';
 import { UserProfileAction } from 'app/shared/store/user-profile';
 import { WebsocketManagerService } from 'app/shared/services/websocket-manager/websocket-manager.service';
@@ -12,44 +11,31 @@ import { WebsocketManagerService } from 'app/shared/services/websocket-manager/w
 })
 export class UserService
 {
-    private _user: ReplaySubject<KeycloakProfile> = new ReplaySubject<KeycloakProfile>(1);
+    private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
 
-    /**
-     * Constructor
-     */
-    constructor(private _httpClient: HttpClient,private authService:AuthService,private _store:Store,private _socketWhatsappService:WebsocketManagerService)
+    constructor(private _httpClient: HttpClient, private authService: AuthService, private _store: Store, private _socketWhatsappService: WebsocketManagerService)
     {
-        this.authService.currentUser.subscribe((value)=>{
-            this.user=value;
-            if(value) {
-                this._store.dispatch(new UserProfileAction.FetchUserProfile(value.email));
-                this._socketWhatsappService.customConnexion(value);
-            }
-        })
+        this.authService.user;
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Setter & getter for user
-     *
-     * @param value
-     */
-    set user(value: KeycloakProfile)
+    set user(value: User | null)
     {
-        // Store the value
-        this._user.next(value);
+        if ( value )
+        {
+            this._user.next(value);
+            this._store.dispatch(new UserProfileAction.FetchUserProfile(value.email));
+            this._socketWhatsappService.customConnexion(value as any);
+        }
     }
 
-    get user$(): Observable<KeycloakProfile>
+    get user$(): Observable<User>
     {
         return this._user.asObservable();
     }
+
     goToUserProfile()
     {
-        return this.authService.redirectToProfile()
+        return;
     }
 
 }

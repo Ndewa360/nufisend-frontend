@@ -1,42 +1,58 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router, CanMatch } from '@angular/router';
-import { KeycloakAuthGuard, KeycloakService } from 'keycloak-angular';
+import { ActivatedRouteSnapshot, CanMatch, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { AuthService } from 'app/core/auth/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
-export class AuthGuard extends KeycloakAuthGuard {
-  
-  constructor(
-    protected readonly router: Router,
-    protected readonly keycloak: KeycloakService
-  ) {
-    super(router, keycloak);
-  }
-  
-  async isAccessAllowed(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Promise<boolean | UrlTree> {
-    
-    if (!this.authenticated) {
-      await this.keycloak.login({
-        redirectUri: window.location.origin + state.url,
-      });
+export class AuthGuard implements CanMatch
+{
+    constructor(
+        private _authService: AuthService,
+        private _router: Router
+    )
+    {
     }
 
-    return this.authenticated;
+    canMatch(route: Route, segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree
+    {
+        return this._check(segments);
+    }
 
-    // // Get the roles required from the route.
-    // const requiredRoles = route.data.roles;
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree
+    {
+        return this._check(state.url ? state.url.split('/') : []);
+    }
 
-    // // Allow the user to proceed if no additional roles are required to access the route.
-    // if (!Array.isArray(requiredRoles) || requiredRoles.length === 0) {
-    //   return true;
-    // }
+    private _check(url: string[] | UrlSegment[] | string): Observable<boolean | UrlTree>
+    {
+        return this._authService.check().pipe(
+            switchMap((authenticated) => {
+                if ( authenticated )
+                {
+                    return of(true);
+                }
 
-    // // Allow the user to proceed if all the required roles are present.
-    // return requiredRoles.every((role) => this.roles.includes(role));
-  }
+                let redirectURL = '/';
+                if ( Array.isArray(url) )
+                {
+                    redirectURL = url.map((u) => (typeof u === 'string' ? u : (u as UrlSegment).path)).join('/');
+                }
+                else if ( typeof url === 'string' )
+                {
+                    redirectURL = url;
+                }
 
-  
+                const queryParams: any = {};
+                if ( redirectURL && redirectURL !== '/' )
+                {
+                    queryParams.redirectURL = redirectURL;
+                }
+
+                return of(this._router.createUrlTree(['/auth/sign-in'], { queryParams }));
+            })
+        );
+    }
 }

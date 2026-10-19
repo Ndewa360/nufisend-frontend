@@ -5,7 +5,7 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
 import { NavigationService } from 'app/core/navigation/navigation.service';
-import { KeycloakProfile } from 'keycloak-js';
+import { User } from 'app/core/auth/auth.service';
 import { UserService } from 'app/core/user/user.service';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { UserProfileState, UserProfileModel, UserProfileAction } from 'app/shared/store/user-profile';
@@ -22,7 +22,7 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
 {
     fixedMenu: boolean = false;
     menuPosition:any;
-    user: KeycloakProfile=null;
+    user: User | null = null;
     userProfile:UserProfileModel=null;
     @ViewChild('stickyMenu') menuElement: ElementRef;
     hasConnectedWhatsApp = false;
@@ -90,12 +90,10 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
                 this.isScreenSmall = !matchingAliases.includes('md');
             });
 
-        // Subscribe to user changes
         this._userService.user$
         .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((user: KeycloakProfile) => {
-            this.user = user;            
-            // Mark for check
+        .subscribe((user: User | null) => {
+            this.user = user;
             this._changeDetectorRef.markForCheck();
         });
 

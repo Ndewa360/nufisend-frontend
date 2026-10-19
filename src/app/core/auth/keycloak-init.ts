@@ -15,6 +15,7 @@ export function initializeKeycloak(keycloak: KeycloakService, router:Router): ()
                     realm: environment.keycloak.realm,
                     clientId: environment.keycloak.clientId,
                     
+                    
                 },
               initOptions: {
                 onLoad: 'check-sso',

@@ -1,73 +1,135 @@
 import { Injectable } from '@angular/core';
-// import { ToastrService } from 'ngx-toastr';
-import { BehaviorSubject, of } from 'rxjs';
-import { KeycloakService } from 'keycloak-angular';
-import { KeycloakProfile } from 'keycloak-js';
+import { HttpClient } from '@angular/common/http';
+import { catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from 'environments/environment';
-// import { WebsocketManagerService } from 'app/shared/services/websocket-manager/websocket-manager.service';
-// import { Socket } from 'ngx-socket-io';
+import { ApiResultFormat } from 'app/shared/store/global';
+
+export interface User {
+    _id?: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    profilePicture?: string;
+    country?: string;
+    location?: string;
+    phoneNumber?: string;
+    hasSyncWhatsApp?: boolean;
+    createdAt?: Date;
+}
+
+export interface AuthResponse {
+    accessToken: string;
+    expiresIn: string;
+    user: User;
+}
 
 @Injectable({
-    providedIn:'root'
+    providedIn: 'root'
 })
-export class AuthService {
- 
-  currentUser: BehaviorSubject<KeycloakProfile> = new BehaviorSubject<KeycloakProfile>(null); 
+export class AuthService
+{
+    private _authenticated: boolean = false;
+    private _user: User | null = null;
 
-  constructor( private readonly keycloak: KeycloakService
-    // ,private socket: WebsocketManagerService
-    ) 
-  {
-    this.checkAuthStatus()
-  }
-
-  async checkAuthStatus()
-  {
-    if(this.keycloak.isLoggedIn())
+    constructor(private _httpClient: HttpClient)
     {
-        this.currentUser.next(await this.keycloak.loadUserProfile())
+        this.check();
     }
-  }
-  public getAuthStatus():boolean
-  {
-    return this.keycloak.isLoggedIn()
-  }
-  public authUserInformations():KeycloakProfile
-  {
-    return this.getAuthStatus()?this.currentUser.getValue():null
-  }
 
-  public redirectToProfile()
-  {
-    this.keycloak.getKeycloakInstance().accountManagement()
-  }
+    set accessToken(token: string)
+    {
+        localStorage.setItem('accessToken', token);
+    }
 
-  getRoles():string[]
-  {
-    return this.getAuthStatus()?this.keycloak.getUserRoles():null;
-  }
- 
-  // Login into your account
-  authLogin(isFirstLogin=false) {
-    if(isFirstLogin) return this.keycloak.login({redirectUri:`${environment.url}/dashboard`});    
-    return this.keycloak.login();    
-  }
+    get accessToken(): string
+    {
+        return localStorage.getItem('accessToken') ?? '';
+    }
 
-  authRegister(isFirstRegistration=false)
-  {
-    if(isFirstRegistration) return this.keycloak.register({redirectUri:`${environment.url}/dashboard`})
-    return this.keycloak.register()
-  }
- 
-  logOut():Promise<any>
-  {
-    return this.keycloak.logout().then(()=>{
-        this.currentUser.next(null)
-    });
-  }
+    get authenticated(): boolean
+    {
+        return this._authenticated;
+    }
 
-  //To clear
-  unlockSession(arg0: { email: string; password: any; }) {
-    return of(true)
-}
+    get user(): User | null
+    {
+        return this._user;
+    }
+
+    set user(value: User | null)
+    {
+        this._user = value;
+    }
+
+    signIn(credentials: { email: string; password: string }): Observable<AuthResponse>
+    {
+        if ( this._authenticated )
+        {
+            return throwError('User is already logged in.');
+        }
+
+        return this._httpClient.post<ApiResultFormat<AuthResponse>>(`${environment.apiUrl}/auth/login`, credentials).pipe(
+            switchMap((response) => {
+                this.accessToken = response.data.accessToken;
+                this._authenticated = true;
+                this._user = response.data.user;
+                return of(response.data);
+            })
+        );
+    }
+
+    signUp(user: { firstName: string; lastName: string; email: string; password: string; country?: string; location?: string; phoneNumber?: string }): Observable<AuthResponse>
+    {
+        return this._httpClient.post<ApiResultFormat<AuthResponse>>(`${environment.apiUrl}/auth/register`, user).pipe(
+            switchMap((response) => {
+                this.accessToken = response.data.accessToken;
+                this._authenticated = true;
+                this._user = response.data.user;
+                return of(response.data);
+            })
+        );
+    }
+
+    signOut(): Observable<boolean>
+    {
+        localStorage.removeItem('accessToken');
+        this._authenticated = false;
+        this._user = null;
+        return of(true);
+    }
+
+    signInUsingToken(): Observable<boolean>
+    {
+        return this._httpClient.get<ApiResultFormat<User>>(`${environment.apiUrl}/auth/me`).pipe(
+            catchError(() => of(false)),
+            switchMap((response: ApiResultFormat<User> | false) => {
+                if ( !response )
+                {
+                    localStorage.removeItem('accessToken');
+                    this._authenticated = false;
+                    this._user = null;
+                    return of(false);
+                }
+
+                this._authenticated = true;
+                this._user = response.data;
+                return of(true);
+            })
+        );
+    }
+
+    check(): Observable<boolean>
+    {
+        if ( this._authenticated )
+        {
+            return of(true);
+        }
+
+        if ( !this.accessToken )
+        {
+            return of(false);
+        }
+
+        return this.signInUsingToken();
+    }
 }
