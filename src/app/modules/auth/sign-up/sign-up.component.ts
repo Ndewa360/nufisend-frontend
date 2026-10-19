@@ -78,7 +78,7 @@ export class AuthSignUpComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe({
                 next: () => {
-                    this._router.navigateByUrl('/dashboard');
+                    this._router.navigate(['/auth/sign-in'], { queryParams: { registered: payload.email } });
                 },
                 error: (err) => {
                     this.signUpForm.enable();

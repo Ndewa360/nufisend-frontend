@@ -15,6 +15,7 @@ export interface User {
     location?: string;
     phoneNumber?: string;
     hasSyncWhatsApp?: boolean;
+    emailConfirmed?: boolean;
     createdAt?: Date;
 }
 
@@ -83,17 +84,29 @@ export class AuthService
         );
     }
 
-    signUp(user: { firstName: string; lastName: string; email: string; password: string; country?: string; location?: string; phoneNumber?: string }): Observable<AuthResponse>
+    signUp(user: { firstName: string; lastName: string; email: string; password: string; country?: string; location?: string; phoneNumber?: string }): Observable<ApiResultFormat<{ user: User }>>
     {
-        return this._httpClient.post<ApiResultFormat<AuthResponse>>(`${environment.apiUrl}/auth/register`, user).pipe(
-            switchMap((response) => {
-                this.accessToken = response.data.accessToken;
-                this._authenticated = true;
-                this._user = response.data.user;
-                this._userService.user = response.data.user;
-                return of(response.data);
-            })
-        );
+        return this._httpClient.post<ApiResultFormat<{ user: User }>>(`${environment.apiUrl}/auth/register`, user);
+    }
+
+    forgotPassword(email: string): Observable<ApiResultFormat<{ message: string }>>
+    {
+        return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/forgot-password`, { email });
+    }
+
+    resetPassword(payload: { token: string; password: string }): Observable<ApiResultFormat<{ message: string }>>
+    {
+        return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/reset-password`, payload);
+    }
+
+    confirmEmail(token: string): Observable<ApiResultFormat<{ message: string }>>
+    {
+        return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/confirm-email`, { token });
+    }
+
+    resendConfirmation(email: string): Observable<ApiResultFormat<{ message: string }>>
+    {
+        return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/resend-confirmation`, { email });
     }
 
     signOut(): Observable<boolean>

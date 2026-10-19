@@ -68,6 +68,26 @@
                         <mat-error *ngIf="signInForm.get('password').hasError('required')">Le mot de passe est obligatoire</mat-error>
                     </mat-form-field>
 
+                    <!-- Mot de passe oublié -->
+                    <div class="flex items-center justify-end mt-1">
+                        <a class="text-sm font-medium text-primary-500 hover:underline cursor-pointer"
+                            [routerLink]="['/auth/forgot-password']">Mot de passe oublié ?</a>
+                    </div>
+
+                    <!-- Renvoyer la confirmation -->
+                    <div class="mt-4" *ngIf="showResendConfirmation && !resendConfirmationSent">
+                        <button
+                            class="fuse-mat-button-large w-full"
+                            mat-stroked-button
+                            type="button"
+                            (click)="resendConfirmation()">
+                            Renvoyer l'email de confirmation
+                        </button>
+                    </div>
+                    <div class="mt-4 text-sm text-green-600" *ngIf="resendConfirmationSent">
+                        Un nouvel email de confirmation a été envoyé à votre adresse.
+                    </div>
+
                     <!-- Bouton connexion -->
                     <button
                         class="fuse-mat-button-large w-full mt-6"

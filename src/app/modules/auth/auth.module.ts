@@ -12,12 +12,18 @@ import { AuthSignOutComponent } from 'app/modules/auth/sign-out/sign-out.compone
 import { authRoutes } from 'app/modules/auth/auth.routing';
 import { AuthSignInComponent } from './sign-in/sign-in.component';
 import { AuthSignUpComponent } from './sign-up/sign-up.component';
+import { AuthForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { AuthResetPasswordComponent } from './reset-password/reset-password.component';
+import { AuthConfirmEmailComponent } from './confirm-email/confirm-email.component';
 
 @NgModule({
     declarations: [
         AuthSignOutComponent,
         AuthSignInComponent,
-        AuthSignUpComponent
+        AuthSignUpComponent,
+        AuthForgotPasswordComponent,
+        AuthResetPasswordComponent,
+        AuthConfirmEmailComponent
     ],
     imports: [
         RouterModule.forChild(authRoutes),
