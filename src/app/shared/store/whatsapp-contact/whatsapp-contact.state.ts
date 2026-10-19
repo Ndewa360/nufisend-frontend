@@ -15,7 +15,7 @@ export class WhatsappContactStateModel {
 @State<WhatsappContactStateModel>({
     name: "whatsapp_contacts",
     defaults:{
-        startLoading:true,
+        startLoading:false,
         percentLoading:0,
         contacts:[]
     }
@@ -47,7 +47,7 @@ export class WhatsappContactState{
     static selectStateByWhatsappContactId(contactId:string)
     {
         return createSelector([WhatsappContactState],(state)=>{
-            let data=state.contacts.find((contact)=>contact._id==contactId)
+            let data=state.contacts.find((contact)=>contact.id==contactId)
             if(data) return data
             return null;
         })        

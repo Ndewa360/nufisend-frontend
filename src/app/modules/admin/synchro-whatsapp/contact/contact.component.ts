@@ -26,7 +26,9 @@ export class ContactComponent {
   @Select(WhatsappContactState.selectStateLoading) loadingContactStart$:Observable<boolean>;
   @Select(WhatsappContactState.selectStateData) contactList$:Observable<WhatsappContactModel[]>;
   @Select(WhatsappContactState.selectStatePercent) loadingPercent$:Observable<number>;
-  isWhatsappContactLoading=true
+  isWhatsappContactLoading=false
+  contactsLoading=false;
+  userProfile:UserProfileModel=null;
   percent=0;
 
   @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
@@ -74,9 +76,13 @@ export class ContactComponent {
     {
         // this.contacts$ = this._contactsService.contacts$;
         this.loadingContactStart$.pipe(takeUntil(this._unsubscribeAll)).subscribe((loading)=>{
-            this.isWhatsappContactLoading=loading;
-            // Mark for check
-           this._changeDetectorRef.markForCheck();
+            this.contactsLoading=loading;
+            this.refreshLoadingState();
+        })
+
+        this.userProfile$.pipe(takeUntil(this._unsubscribeAll)).subscribe((profile)=>{
+            this.userProfile=profile;
+            this.refreshLoadingState();
         })
 
         this.loadingPercent$.pipe(takeUntil(this._unsubscribeAll)).subscribe((percent)=>{
@@ -161,13 +167,21 @@ export class ContactComponent {
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
+    /**
+     * A user that is not synced with WhatsApp should never see the loading
+     * placeholder: only synced users load their WhatsApp contacts.
+     */
+    refreshLoadingState()
+    {
+        this.isWhatsappContactLoading = !this.userProfile || (!!this.userProfile.hasSyncWhatsApp && this.contactsLoading);
+        this._changeDetectorRef.markForCheck();
+    }
+
     
 
     selectContact(contact)
     {
         this.selectedContact= contact
-        // Go back to the list
-        this._router.navigate(['./',contact._id], {relativeTo: this._activatedRoute});
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }

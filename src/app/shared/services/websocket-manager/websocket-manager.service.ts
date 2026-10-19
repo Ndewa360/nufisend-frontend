@@ -25,10 +25,18 @@ export class WebsocketManagerService{
 
   customConnexion(value)
     {
-      // this.socket.on('connexion', ()=>{
-                 
-      // })
-      this.socket.emit('connexion', {email: value.email});
-        this.webSocketConnectedEvent.next(true); 
+      const token = localStorage.getItem('accessToken') ?? '';
+      try {
+        // Refresh the auth token used by the socket handshake and reconnect if
+        // the previous (unauthenticated) attempt was rejected.
+        (this.socket.ioSocket as any).auth = { token };
+        if (!this.socket.ioSocket.connected) {
+          this.socket.ioSocket.connect();
+        }
+      } catch (e) {
+        console.log('Socket connection error', e);
+      }
+      this.socket.emit('connexion', {email: value?.email});
+      this.webSocketConnectedEvent.next(true); 
     }
 }

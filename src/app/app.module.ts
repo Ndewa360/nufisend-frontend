@@ -62,7 +62,9 @@ const routerConfig: ExtraOptions = {
 
         SocketIoModule.forRoot({
             url:environment.apiUrl,
-            options:{}
+            options:{
+                auth: (cb) => cb({ token: localStorage.getItem('accessToken') ?? '' })
+            }
         })
     ],
     bootstrap   : [

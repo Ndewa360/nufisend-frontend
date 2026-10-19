@@ -5,6 +5,7 @@ import { UserProfileAction } from "./user-profile.actions";
 import { UserProfileService } from "./user-profile.service";
 import { ToastrService } from "ngx-toastr";
 import { catchError, of, tap, throwError } from "rxjs";
+import { GlobalAction } from "../global";
 
 export class UserProfileStateModel {
     userProfile:UserProfileModel
@@ -76,7 +77,7 @@ export class UserProfileState{
                 userProfile:{...state.userProfile,hasSyncWhatsApp:status}
             }
         )
-        return of(true)
+        return ctx.dispatch(new GlobalAction.ChangeWhatsAppConnectedStatus(status));
     }
     @Action(UserProfileAction.updateLoadingUserProfileState)
     updateLoadingUserProfileState(ctx:StateContext<UserProfileStateModel>,{status}:UserProfileAction.updateLoadingUserProfileState)
@@ -105,6 +106,7 @@ export class UserProfileState{
                         loadingUserProfile:false,
                         userProfile:result.data
                     })
+                    ctx.dispatch(new GlobalAction.ChangeWhatsAppConnectedStatus(!!result.data.hasSyncWhatsApp))
                 }
             )
         )

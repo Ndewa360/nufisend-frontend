@@ -1,6 +1,7 @@
 export interface WhatsappContactModel
 {
     id:string;
+    server?:string;
     isBlocked:boolean;
     isBusiness:boolean;
     isEnterprise:boolean;
@@ -16,4 +17,5 @@ export interface WhatsappContactModel
     number:string;
     pushname:string;
     shortName:string;
+    countryCode?:string;
 }

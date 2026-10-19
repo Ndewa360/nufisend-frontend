@@ -50,7 +50,8 @@ export class QrcodeSynchroStatutComponent implements OnInit {
   startWathappSync()
   {
     this.isWaitingWhatsappSync=true;
-    // this.syncQrCodeService.subscribeToQrCode();
+    this.hasQrCodeIsGenerated=false;
+    this.syncQrCodeService.startSync();
   }
 
   endWhatsappSync()

@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { UserProfileAction } from 'app/shared/store/user-profile';
-import { BehaviorSubject, map } from 'rxjs';
-import { WebsocketManagerService } from '../websocket-manager/websocket-manager.service';
 import { WhatsappQrCodeAction } from 'app/shared/store';
 import { Socket } from 'ngx-socket-io';
 
@@ -11,8 +9,8 @@ import { Socket } from 'ngx-socket-io';
 })
 export class SyncQrcodeService {
 
-  constructor(private socket: Socket,private store:Store) {
-    this.initSubscriptionEvent();    
+  constructor(private socket: Socket, private store: Store) {
+    this.initSubscriptionEvent();
   }
 
   initSubscriptionEvent()
@@ -34,6 +32,19 @@ export class SyncQrcodeService {
     });
   }
 
+  /**
+   * Ask the backend to (re)start a WhatsApp sync session and generate a fresh
+   * QR code. The backend derives the user from the authenticated socket.
+   */
+  startSync()
+  {
+    this.store.dispatch([
+      new WhatsappQrCodeAction.SetLoadingQrCode(true),
+      new WhatsappQrCodeAction.SetWhatsAppQrCode(null)
+    ])
+    this.socket.emit("connexion", {})
+  }
+
   unSubscribeToQrCode(userEmail)
   {
     this.store.dispatch(
@@ -53,8 +64,6 @@ export class SyncQrcodeService {
     });
   }
 
- 
-
   handleSuccessfullyUnSync()
   {
     this.socket.on('disconnected', (value)=>{
@@ -62,7 +71,4 @@ export class SyncQrcodeService {
       this.store.dispatch(new UserProfileAction.updateLoadingUserProfileState(false))
     });
   }
-
-  
-
 }

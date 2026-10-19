@@ -74,8 +74,8 @@
                                         <a 
                                             (click)="selectContact(contact)"
                                             class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
-                                            [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedContact || selectedContact._id !== contact._id,
-                                                        'bg-primary-50 dark:bg-hover': selectedContact && selectedContact._id === contact._id}"
+                                            [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedContact || selectedContact.id !== contact.id,
+                                                        'bg-primary-50 dark:bg-hover': selectedContact && selectedContact.id === contact.id}"
                                             >
                                             <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
                                                 <ng-container *ngIf="contact.avatar">
