@@ -41,7 +41,7 @@ export class MessageProcessing
             receiverFullName:`${contact.fullName}`,
             receiverEmail: receiverEmail?receiverEmail:"",
             dateToSend:`${(dateToSend?new Date(dateToSend):new Date()).toLocaleDateString()}`,
-            plateform: "Ysapp"
+            plateform: "NufiSend"
         }
     }    
         
