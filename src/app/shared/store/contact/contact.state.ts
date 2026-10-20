@@ -183,7 +183,10 @@ export class ContactState{
     fetchAllContats(ctx:StateContext<ContactStateModel>)
     {
         const state = ctx.getState();
-        if(state.contacts.length>0) return of(true);
+        if(state.contacts.length>0) {
+            if(state.initLoadingState !== "LOADED") ctx.patchState({initLoadingState:"LOADED"});
+            return of(true);
+        }
 
         ctx.patchState({
             loadingContacts: true,

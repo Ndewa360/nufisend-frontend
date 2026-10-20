@@ -181,8 +181,10 @@ export class GroupState{
     fetchAllContats(ctx:StateContext<GroupStateModel>)
     {
         const state = ctx.getState();
-        console.log("State ",state)
-        if(state.groups.length>0) return of(true);
+        if(state.groups.length>0) {
+            if(state.initLoadingState !== "LOADED") ctx.patchState({initLoadingState:"LOADED"});
+            return of(true);
+        }
 
         ctx.patchState({
             loadingGroups: true,

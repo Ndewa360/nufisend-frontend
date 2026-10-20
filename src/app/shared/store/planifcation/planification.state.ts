@@ -164,7 +164,10 @@ export class PlanificationState{
     fetchAllPlanifications(ctx:StateContext<PlanificationStateModel>)
     {
         const state = ctx.getState();
-        if(state.planifications.length>0) return of(true);
+        if(state.planifications.length>0) {
+            if(state.initLoadingState !== "LOADED") ctx.patchState({initLoadingState:"LOADED"});
+            return of(true);
+        }
 
         ctx.patchState({
             loadingPlanifications: true,

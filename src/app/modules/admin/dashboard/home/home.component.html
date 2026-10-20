@@ -11,7 +11,7 @@
                            <div class="text-lg font-medium tracking-tight leading-6 truncate">Groupes</div>
                        </div>
                        <div class="flex flex-col items-center mt-2">
-                           <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-blue-500">{{(planification$ | async ).length}}</div>
+                           <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-blue-500">{{(planification$ | async)?.length || 0}}</div>
                            <div class="text-lg font-medium text-blue-600 dark:text-blue-500">Privés</div>                      
                        </div>
                    </div>
@@ -22,7 +22,7 @@
                             <div class="text-lg font-medium tracking-tight leading-6 truncate">Contacts</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-green-500">{{(contacts$ | async ).length}}</div>
+                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-green-500">{{(contacts$ | async)?.length || 0}}</div>
                             <div class="text-lg font-medium text-green-600 dark:text-green-500">Privés</div>                      
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                             <div class="text-lg font-medium tracking-tight leading-6 truncate">Template de message</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{(templateMessage$ | async).length}}</div>
+                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{(templateMessage$ | async)?.length || 0}}</div>
                             <div class="text-lg font-medium text-amber-600 dark:text-amber-500">Privés</div>                      
                         </div>
                     </div>
@@ -44,7 +44,7 @@
                             <div class="text-lg font-medium tracking-tight leading-6 truncate">Tâches planifiées</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{(planification$ | async).length}}</div>
+                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{(planification$ | async)?.length || 0}}</div>
                             <div class="text-lg font-medium text-amber-600 dark:text-amber-500">Privés</div>                      
                         </div>
                     </div>                    

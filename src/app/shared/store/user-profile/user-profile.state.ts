@@ -108,7 +108,14 @@ export class UserProfileState{
                     })
                     ctx.dispatch(new GlobalAction.ChangeWhatsAppConnectedStatus(!!result.data.hasSyncWhatsApp))
                 }
-            )
+            ),
+            catchError((error) => {
+                this._toastrService.error(error?.error?.message || "Impossible de charger le profil", 'Erreur');
+                ctx.patchState({
+                    loadingUserProfile: false
+                })
+                return throwError(error);
+            })
         )
     }
 }

@@ -144,7 +144,10 @@ export class MessageTemplateState{
     fetchAllTemplates(ctx:StateContext<MessageTemplateStateModel>)
     {
         const state = ctx.getState();
-        if(state.messageTemplates.length>0) return of(true);;
+        if(state.messageTemplates.length>0) {
+            if(state.initLoadingState !== "LOADED") ctx.patchState({initLoadingState:"LOADED"});
+            return of(true);
+        }
 
         ctx.patchState({
             loadingMessageTemplates: true,
@@ -161,7 +164,15 @@ export class MessageTemplateState{
 
                     })
                 }
-            )
+            ),
+            catchError((error) => {
+                this._toastrService.error(error?.error?.message || "Impossible de charger les templates", 'Erreur');
+                ctx.patchState({
+                    loadingMessageTemplates: false,
+                    initLoadingState: "LOADED"
+                })
+                return throwError(error);
+            })
         )
     }
 }

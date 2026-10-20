@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { catchError, forkJoin, Observable, of, timeout } from 'rxjs';
 import { MessagesService } from 'app/layout/common/messages/messages.service';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { NotificationsService } from 'app/layout/common/notifications/notifications.service';
@@ -37,13 +37,17 @@ export class InitialDataResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
-        // Fork join multiple API endpoint calls to wait all of them to finish
+        // Fork join multiple API endpoint calls to wait all of them to finish.
+        // Le timeout + catchError evitent de bloquer la navigation (splash screen infini).
         return forkJoin([
             this._navigationService.get(),
             this._messagesService.getAll(),
             this._notificationsService.getAll(),
             this._quickChatService.getChats(),
             this._shortcutsService.getAll(),            
-        ]);
+        ]).pipe(
+            timeout(20000),
+            catchError(() => of(null))
+        );
     }
 }
