@@ -1,29 +1,277 @@
-@import url("https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css");
-@import url("https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css");
+.nufisend-landing {
+    --nufi-ink: #03252e;
+    --nufi-primary: #058856;
+    --nufi-accent: #02c25f;
+    --nufi-mint: #f1f8f4;
 
-
-.bg-main-color {
-  background-color: #166534;
-}
-/* Animation des éléments */
-.fade-up {
-  opacity: 0;
-  transform: translateY(50px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-.fade-up.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-/* Style pour le menu fixe */
-.fixed-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
+    background: #ffffff;
+    color: #3c514a;
+    font-family: "Inter var", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
 }
 
-input {
-  background:white !important;
+/* ----------------------------------------------------------------------------------------------------- */
+/*  Hero
+/* ----------------------------------------------------------------------------------------------------- */
+.nufisend-landing .nufi-hero {
+    isolation: isolate;
+    background:
+        radial-gradient(1100px 560px at 8% -12%, rgba(2, 194, 95, 0.13), transparent 62%),
+        radial-gradient(900px 520px at 96% 8%, rgba(5, 136, 86, 0.11), transparent 58%),
+        linear-gradient(180deg, #f1f8f4 0%, #ffffff 100%);
+}
+
+.nufisend-landing .nufi-hero-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        linear-gradient(to right, rgba(3, 37, 46, 0.055) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(3, 37, 46, 0.055) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 82% 64% at 50% 38%, #000 22%, transparent 74%);
+    mask-image: radial-gradient(ellipse 82% 64% at 50% 38%, #000 22%, transparent 74%);
+}
+
+.nufisend-landing .nufi-orb {
+    position: absolute;
+    z-index: -1;
+    border-radius: 9999px;
+    filter: blur(72px);
+    pointer-events: none;
+}
+
+.nufisend-landing .nufi-orb-a {
+    top: -9rem;
+    right: -7rem;
+    width: 30rem;
+    height: 30rem;
+    background: rgba(2, 194, 95, 0.16);
+}
+
+.nufisend-landing .nufi-orb-b {
+    bottom: -12rem;
+    left: -9rem;
+    width: 26rem;
+    height: 26rem;
+    background: rgba(5, 136, 86, 0.13);
+}
+
+.nufisend-landing .nufi-underline {
+    position: relative;
+    display: inline-block;
+    isolation: isolate;
+}
+
+.nufisend-landing .nufi-underline::after {
+    content: "";
+    position: absolute;
+    right: 1%;
+    bottom: 0.08em;
+    left: 1%;
+    z-index: -1;
+    height: 0.26em;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, rgba(2, 194, 95, 0.38), rgba(5, 136, 86, 0.16));
+}
+
+.nufisend-landing .nufi-hero-copy > * {
+    animation: nufi-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nufisend-landing .nufi-hero-copy > *:nth-child(1) {
+    animation-delay: 0.02s;
+}
+
+.nufisend-landing .nufi-hero-copy > *:nth-child(2) {
+    animation-delay: 0.08s;
+}
+
+.nufisend-landing .nufi-hero-copy > *:nth-child(3) {
+    animation-delay: 0.14s;
+}
+
+.nufisend-landing .nufi-hero-copy > *:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.nufisend-landing .nufi-hero-copy > *:nth-child(5) {
+    animation-delay: 0.26s;
+}
+
+.nufisend-landing .nufi-hero-visual {
+    animation: nufi-hero-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+}
+
+.nufisend-landing .nufi-float {
+    animation: nufi-float 6s ease-in-out infinite;
+}
+
+.nufisend-landing .nufi-float-delay {
+    animation-delay: -2.4s;
+}
+
+.nufisend-landing .nufi-float-slow {
+    animation-duration: 8s;
+}
+
+@keyframes nufi-rise {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes nufi-hero-in {
+    from {
+        opacity: 0;
+        transform: translateY(26px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes nufi-float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  Scroll reveal
+/* ----------------------------------------------------------------------------------------------------- */
+.nufisend-landing [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+        opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+}
+
+.nufisend-landing [data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  Components
+/* ----------------------------------------------------------------------------------------------------- */
+.nufisend-landing .nufi-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    background: #f1f8f4;
+    color: #047047;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 0 1px #dceae3;
+}
+
+.nufisend-landing .nufi-card {
+    transition:
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+    .nufisend-landing .nufi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 26px 54px -32px rgba(3, 37, 46, 0.3);
+    }
+}
+
+.nufisend-landing .nufi-faq-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+}
+
+.nufisend-landing .nufi-faq-body > div {
+    overflow: hidden;
+}
+
+.nufisend-landing .nufi-faq-body.is-open {
+    grid-template-rows: 1fr;
+}
+
+.nufisend-landing .nufi-dark-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+    background-size: 24px 24px;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 18%, transparent 76%);
+    mask-image: radial-gradient(ellipse at center, #000 18%, transparent 76%);
+    opacity: 0.45;
+}
+
+.nufisend-landing .nufi-cta-glow {
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+    filter: blur(80px);
+}
+
+.nufisend-landing .nufi-cta-glow-a {
+    top: -14rem;
+    left: 50%;
+    width: 38rem;
+    height: 26rem;
+    transform: translateX(-50%);
+    background: rgba(2, 194, 95, 0.22);
+}
+
+.nufisend-landing .nufi-cta-glow-b {
+    right: -10rem;
+    bottom: -16rem;
+    width: 30rem;
+    height: 30rem;
+    background: rgba(5, 136, 86, 0.26);
+}
+
+.nufisend-landing .nufi-scrollbar-none {
+    scrollbar-width: none;
+}
+
+.nufisend-landing .nufi-scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  Reduced motion
+/* ----------------------------------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .nufisend-landing [data-reveal] {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .nufisend-landing .nufi-hero-copy > *,
+    .nufisend-landing .nufi-hero-visual,
+    .nufisend-landing .nufi-float {
+        animation: none;
+    }
 }

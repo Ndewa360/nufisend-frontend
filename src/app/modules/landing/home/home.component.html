@@ -1,265 +1,786 @@
-<div class="w-full min-w-0 bg-gray-100 font-sans">
+<div class="nufisend-landing w-full min-w-0 font-sans">
     <app-navbar></app-navbar>
-    <!-- Section principale - Description des fonctionnalités -->
-    <section class="py-12 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-main-color mb-6 text-center">Des fonctionnalités puissantes pour faciliter votre communication</h2>
-            <!-- Description des fonctionnalités -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Fonctionnalité 1 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up">
-                    <div class="text-center mb-4">
-                        <img src="./../../../../assets/images/ui/img/synchro-watshapp.png" alt="Synchronisation des Contacts" class="mx-auto">
+
+    <main>
+        <!-- Hero -->
+        <section id="top" class="nufi-hero relative overflow-hidden pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-24">
+            <div class="nufi-hero-grid"></div>
+            <div class="nufi-orb nufi-orb-a"></div>
+            <div class="nufi-orb nufi-orb-b"></div>
+
+            <div class="mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+                <div class="nufi-hero-copy mx-auto w-full max-w-2xl lg:mx-0">
+                    <div class="inline-flex items-center gap-2.5 rounded-full border border-nufi-200/80 bg-white/80 px-3.5 py-2 text-[12px] font-semibold text-nufi-700 shadow-sm backdrop-blur">
+                        <span class="relative flex h-2 w-2">
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-nufi-400 opacity-75"></span>
+                            <span class="relative inline-flex h-2 w-2 rounded-full bg-nufi-600"></span>
+                        </span>
+                        Votre communication WhatsApp, centralisée
                     </div>
-                    <h3 class="text-xl font-bold text-main-color mb-2">Synchronisation des Contacts</h3>
-                    <p class="text-gray-700">Importez facilement vos contacts depuis WhatsApp dans notre application pour une gestion simplifiée.</p>
-                </div>
-                <!-- Fonctionnalité 2 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="text-center mb-4">
-                        <img src="./../../../../assets/images/ui/img/difusion_group_whatsapp-removebg-preview.png" alt="Création de Groupes de Diffusion" class="mx-auto">
+
+                    <h1 class="mt-6 text-[2.6rem] font-extrabold leading-[1.05] tracking-[-0.045em] text-nufi-900 sm:text-[3.4rem] lg:text-[3.75rem]">
+                        Le bon message,
+                        <span class="block text-nufi-600">au bon moment.</span>
+                    </h1>
+
+                    <p class="mt-6 max-w-xl text-[17px] leading-8 text-slate-600">
+                        NufiSend synchronise vos contacts WhatsApp, organise vos groupes de diffusion et programme vos messages.
+                        Une seule interface pour communiquer avec <span class="nufi-underline font-semibold text-nufi-800">tous vos contacts</span>, sans copier-coller.
+                    </p>
+
+                    <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <a
+                            routerLink="/auth/sign-up"
+                            class="group inline-flex items-center justify-center gap-2 rounded-full bg-nufi-600 px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_18px_38px_-14px_rgba(5,136,86,0.55)] transition duration-300 hover:-translate-y-0.5 hover:bg-nufi-700 hover:shadow-[0_22px_44px_-14px_rgba(4,112,71,0.6)] focus:outline-none focus-visible:ring-4 focus-visible:ring-nufi-200">
+                            Créer un compte gratuit
+                            <mat-icon class="icon-size-5 transition-transform duration-300 group-hover:translate-x-0.5" svgIcon="heroicons_solid:arrow-right"></mat-icon>
+                        </a>
+                        <a
+                            href="#features"
+                            class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/80 px-6 py-3.5 text-[14px] font-bold text-nufi-900 shadow-sm backdrop-blur transition duration-300 hover:border-nufi-200 hover:bg-white focus:outline-none focus-visible:ring-4 focus-visible:ring-nufi-100">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-nufi-50 text-nufi-600">
+                                <mat-icon class="icon-size-4" svgIcon="heroicons_solid:chevron-down"></mat-icon>
+                            </span>
+                            Découvrir NufiSend
+                        </a>
                     </div>
-                    <h3 class="text-xl font-bold text-main-color mb-2">Création de Groupes de Diffusion</h3>
-                    <p class="text-gray-700">Regroupez vos contacts dans des groupes de diffusion personnalisés pour des communications ciblées.</p>
-                </div>
-                <!-- Fonctionnalité 3 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="400">
-                    <div class="text-center mb-4">
-                        <img src="./../../../../assets/images/ui/img/planing_whatsapp-removebg-preview.png" alt="Messages Automatisés" class="mx-auto w-50">
+
+                    <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-[12px] font-medium text-slate-500">
+                        <span class="inline-flex items-center gap-1.5">
+                            <mat-icon class="icon-size-4 text-nufi-500" svgIcon="heroicons_solid:check-circle"></mat-icon>
+                            Gratuit pour démarrer
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <mat-icon class="icon-size-4 text-nufi-500" svgIcon="heroicons_solid:check-circle"></mat-icon>
+                            Synchronisation par QR code
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <mat-icon class="icon-size-4 text-nufi-500" svgIcon="heroicons_solid:check-circle"></mat-icon>
+                            Sans carte bancaire
+                        </span>
                     </div>
-                    <h3 class="text-xl font-bold text-main-color mb-2">Messages Automatisés</h3>
-                    <p class="text-gray-700">Programmez des messages automatisés à des dates précises pour une communication régulière et efficace.</p>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Section des captures d'écran -->
-    <section class="bg-gray-200 py-12">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-main-color mb-6 text-center">Aperçu de l'Application</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Capture d'écran 1 -->
-                <div class="rounded-lg overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="600">
-                    <img src="screenshot1.png" alt="Capture d'écran 1">
-                    <p class="text-lg mt-2 text-gray-700">Gérez facilement vos contacts et créez des groupes de diffusion personnalisés.</p>
-                </div>
-                <!-- Capture d'écran 2 -->
-                <div class="rounded-lg overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="800">
-                    <img src="screenshot2.png" alt="Capture d'écran 2">
-                    <p class="text-lg mt-2 text-gray-700">Planifiez des messages automatisés pour une communication efficace à tout moment.</p>
-                </div>
-                <!-- Capture d'écran 3 -->
-                <div class="rounded-lg overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="1000">
-                    <img src="screenshot3.png" alt="Capture d'écran 3">
-                    <p class="text-lg mt-2 text-gray-700">Personnalisez vos messages et suivez l'engagement de vos contacts.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+                <!-- Product preview -->
+                <div class="nufi-hero-visual relative mx-auto w-full max-w-[560px] lg:mx-0 lg:max-w-none">
+                    <div class="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-tr from-nufi-200/50 via-white/0 to-nufi-300/40 blur-2xl"></div>
 
+                    <div class="relative overflow-hidden rounded-[1.6rem] border border-white/80 bg-white shadow-[0_40px_90px_-36px_rgba(3,37,46,0.45)] ring-1 ring-nufi-900/5">
+                        <div class="flex items-center gap-2 border-b border-slate-100 bg-slate-50/80 px-4 py-3">
+                            <span class="h-2.5 w-2.5 rounded-full bg-red-300"></span>
+                            <span class="h-2.5 w-2.5 rounded-full bg-amber-300"></span>
+                            <span class="h-2.5 w-2.5 rounded-full bg-emerald-300"></span>
+                            <div class="ml-3 flex-1 rounded-full bg-white px-3 py-1 text-[10px] font-medium text-slate-400 ring-1 ring-slate-100">
+                                app.nufisend.com
+                            </div>
+                            <mat-icon class="icon-size-4 text-nufi-600" svgIcon="heroicons_solid:lock-closed"></mat-icon>
+                        </div>
 
-    <section class="bg-main-color text-white py-8">
-        <div class="container mx-auto px-2 pt-4 pb-12 text-gray-800">
-          <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-white">
-            Pricing
-          </h2>
-          <div class="w-full mb-4">
-            <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
-          </div>
-          <div class="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
-            <div class="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
-              <div class="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                <div class="p-8 text-3xl font-bold text-center border-b-4">
-                  Gratuit
-                </div>
-                <ul class="w-full text-center text-sm">
-                  <li class="border-b py-4">10 Messages planifiés</li>
-                  <li class="border-b py-4">Importation de contacts</li>
-                  <li class="border-b py-4">Synchronisation WhatsApp</li>
-                </ul>
-              </div>
-              <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                <div class="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
-                  0 FCFA
-                  <span class="text-base">pour un utilisateur</span>
-                </div>
-                <div class="flex items-center justify-center">
-                  <button routerLink="/auth/sign-in" class="mx-auto bg-main-color lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                    Débuter
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 shadow-lg z-10">
-              <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
-                <div class="w-full p-8 text-3xl font-bold text-center">Basic</div>
-                <div class="h-1 w-full gradient my-0 py-0 rounded-t"></div>
-                <ul class="w-full text-center text-base font-bold">
-                  <li class="border-b py-4">+100 Messages planifiés</li>
-                  <li class="border-b py-4">Importation de contacts WhatsApp</li>
-                  <li class="border-b py-4">Synchronisation WhatsApp</li>
-                  <li class="border-b py-4">Groupes de difussions</li>
-                </ul>
-              </div>
-              <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                <div class="w-full pt-6 text-4xl font-bold text-center">
-                  500 FCFA
-                  <span class="text-base">/ par mois</span>
-                </div>
-                <div class="flex items-center justify-center">
-                  <button routerLink="/auth/sign-in" class="mx-auto bg-main-color lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                    Débuter
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
-              <div class="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                <div class="p-8 text-3xl font-bold text-center border-b-4">
-                  Pro
-                </div>
-                <ul class="w-full text-center text-sm">
-                  <li class="border-b py-4">Messages planifiés illimités</li>
-                  <li class="border-b py-4">Importation de contacts WhatsApp</li>
-                  <li class="border-b py-4">Intégration annuaire Google</li>
-                  <li class="border-b py-4">Annuaire partagé entre plusieurs comptes</li>
-                  <li class="border-b py-4">Se connecter avec son compte Google</li>
-                </ul>
-              </div>
-              <div class="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                <div class="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
-                  2000 FCFA <br>
-                  <span class="text-base">/ par mois / 50 messages planifiés</span>
-                </div>
-                <div class="flex items-center justify-center">
-                  <button routerLink="/auth/sign-in" class="mx-auto  bg-main-color lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                    Débuter
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+                        <div class="grid grid-cols-[92px_1fr] sm:grid-cols-[122px_1fr]">
+                            <aside class="border-r border-slate-100 bg-slate-50/60 p-3">
+                                <div class="mb-5 flex items-center gap-2">
+                                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-white p-1 shadow-sm ring-1 ring-slate-100">
+                                        <img src="assets/images/logo/nufisend_n-nobg.png" alt="" class="h-full w-full object-contain">
+                                    </span>
+                                    <span class="hidden text-[11px] font-extrabold tracking-tight text-nufi-900 sm:block">NufiSend</span>
+                                </div>
 
-    <!-- Section Avantages du Marketing Digital -->
-    <section class="py-12 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-main-color mb-6 text-center">Les avantages du Marketing Digital avec notre application</h2>
-            <!-- Description des avantages -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Avantage 1 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up">
-                    <div class="text-center mb-4">
-                        <img src="benefit1.png" alt="Avantage 1" class="mx-auto">
+                                <ul class="space-y-1">
+                                    <li class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[10px] font-medium text-slate-500">
+                                        <mat-icon class="icon-size-4" svgIcon="heroicons_solid:home"></mat-icon>
+                                        <span class="hidden sm:inline">Tableau de bord</span>
+                                    </li>
+                                    <li class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[10px] font-medium text-slate-500">
+                                        <mat-icon class="icon-size-4" svgIcon="heroicons_solid:users"></mat-icon>
+                                        <span class="hidden sm:inline">Contacts</span>
+                                    </li>
+                                    <li class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[10px] font-medium text-slate-500">
+                                        <mat-icon class="icon-size-4" svgIcon="heroicons_solid:user-group"></mat-icon>
+                                        <span class="hidden sm:inline">Groupes</span>
+                                    </li>
+                                    <li class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[10px] font-medium text-slate-500">
+                                        <mat-icon class="icon-size-4" svgIcon="heroicons_solid:template"></mat-icon>
+                                        <span class="hidden sm:inline">Modèles</span>
+                                    </li>
+                                    <li class="flex items-center gap-2 rounded-lg bg-nufi-600 px-2 py-1.5 text-[10px] font-semibold text-white shadow-sm">
+                                        <mat-icon class="icon-size-4" svgIcon="heroicons_solid:paper-airplane"></mat-icon>
+                                        <span class="hidden sm:inline">Campagnes</span>
+                                    </li>
+                                </ul>
+
+                                <div class="mt-6 hidden rounded-xl border border-nufi-100 bg-white p-2.5 sm:block">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                        <span class="text-[8px] font-semibold text-slate-500">WhatsApp connecté</span>
+                                    </div>
+                                </div>
+                            </aside>
+
+                            <div class="p-4 sm:p-5">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <div class="text-[9px] font-bold uppercase tracking-[0.18em] text-nufi-600">Campagne</div>
+                                        <div class="mt-1 text-[15px] font-bold text-nufi-900 sm:text-[17px]">Promo du week-end</div>
+                                    </div>
+                                    <span class="rounded-full bg-nufi-50 px-2 py-1 text-[9px] font-bold text-nufi-700 ring-1 ring-nufi-100">Brouillon</span>
+                                </div>
+
+                                <div class="mt-4 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Destinataires</span>
+                                        <span class="text-[9px] font-bold text-nufi-600">128 contacts</span>
+                                    </div>
+                                    <div class="mt-2.5 flex items-center gap-2">
+                                        <div class="flex -space-x-1.5">
+                                            <span class="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-nufi-200 text-[8px] font-bold text-nufi-800">A</span>
+                                            <span class="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-emerald-200 text-[8px] font-bold text-emerald-800">M</span>
+                                            <span class="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-amber-200 text-[8px] font-bold text-amber-800">S</span>
+                                            <span class="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-slate-200 text-[8px] font-bold text-slate-600">+</span>
+                                        </div>
+                                        <span class="text-[10px] font-medium text-slate-500">Clients fidèles</span>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 rounded-xl rounded-tl-sm bg-[#E7FFDB] p-3 shadow-sm ring-1 ring-emerald-900/5">
+                                    <p class="text-[11px] leading-relaxed text-slate-700">
+                                        Bonjour, profitez de -20% sur toute la boutique ce week-end. Commandez directement sur WhatsApp.
+                                    </p>
+                                    <div class="mt-2 flex items-center justify-end gap-1 text-[8px] text-slate-500">
+                                        18:00
+                                        <mat-icon class="icon-size-3 text-sky-500" svgIcon="heroicons_solid:check-circle"></mat-icon>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 flex items-center justify-between gap-2 rounded-xl border border-slate-100 bg-white px-3 py-2">
+                                    <span class="flex items-center gap-1.5 text-[10px] font-medium text-slate-500">
+                                        <mat-icon class="icon-size-4 text-nufi-600" svgIcon="heroicons_solid:calendar"></mat-icon>
+                                        Aujourd’hui · 18:00
+                                    </span>
+                                    <span class="rounded-lg bg-nufi-600 px-2.5 py-1.5 text-[9px] font-bold text-white">Programmer</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-bold text-main-color mb-2">Augmentation de la visibilité</h3>
-                    <p class="text-gray-700">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla.</p>
-                </div>
-                <!-- Avantage 2 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="text-center mb-4">
-                        <img src="benefit2.png" alt="Avantage 2" class="mx-auto">
+
+                    <div class="nufi-float absolute -left-2 top-8 rounded-2xl border border-white bg-white/95 p-2.5 shadow-xl backdrop-blur sm:-left-7">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366]/10">
+                                <img src="assets/images/logo/whatsapp_logo.png" alt="" class="h-4 w-4 object-contain">
+                            </span>
+                            <div>
+                                <div class="text-[9px] font-bold text-nufi-900">WhatsApp connecté</div>
+                                <div class="text-[8px] text-slate-400">Session active</div>
+                            </div>
+                            <span class="ml-1 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-bold text-main-color mb-2">Amélioration de l'engagement</h3>
-                    <p class="text-gray-700">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla.</p>
-                </div>
-                <!-- Avantage 3 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="400">
-                    <div class="text-center mb-4">
-                        <img src="benefit3.png" alt="Avantage 3" class="mx-auto">
+
+                    <div class="nufi-float nufi-float-delay absolute -bottom-4 -right-2 rounded-2xl border border-white bg-white/95 p-2.5 shadow-xl backdrop-blur sm:-right-6">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-nufi-50 text-nufi-600">
+                                <mat-icon class="icon-size-4" svgIcon="heroicons_solid:check"></mat-icon>
+                            </span>
+                            <div>
+                                <div class="text-[9px] font-bold text-nufi-900">Message envoyé</div>
+                                <div class="text-[8px] text-slate-400">à 128 contacts</div>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-bold text-main-color mb-2">Optimisation des campagnes</h3>
-                    <p class="text-gray-700">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla.</p>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Section des clients -->
-    <section class="py-12 bg-main-color text-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-6 text-center">Ce que nos clients disent</h2>
-            <!-- Commentaires des clients -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Commentaire 1 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up">
-                    <p class="text-gray-700">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, lorem at commodo lacinia."</p>
-                    <p class="text-main-color font-bold mt-4">- Client 1</p>
-                </div>
-                <!-- Commentaire 2 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="200">
-                    <p class="text-gray-700">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, lorem at commodo lacinia."</p>
-                    <p class="text-main-color font-bold mt-4">- Client 2</p>
-                </div>
-                <!-- Commentaire 3 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="400">
-                    <p class="text-gray-700">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, lorem at commodo lacinia."</p>
-                    <p class="text-main-color font-bold mt-4">- Client 3</p>
-                </div>
-                <!-- Commentaire 4 -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-6" data-aos="fade-up" data-aos-delay="600">
-                    <p class="text-gray-700">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fringilla, lorem at commodo lacinia."</p>
-                    <p class="text-main-color font-bold mt-4">- Client 4</p>
+            <!-- Capabilities strip -->
+            <div class="relative mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:mt-20 lg:px-8">
+                <div class="grid grid-cols-2 gap-4 rounded-2xl border border-nufi-100 bg-white/80 p-5 shadow-sm backdrop-blur sm:grid-cols-4 sm:gap-6 sm:p-6" data-reveal>
+                    <div class="flex items-start gap-3">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
+                            <mat-icon class="icon-size-5" svgIcon="heroicons_solid:refresh"></mat-icon>
+                        </span>
+                        <div>
+                            <div class="text-[13px] font-bold text-nufi-900">Synchronisation</div>
+                            <div class="mt-0.5 text-[11px] text-slate-500">Contacts toujours à jour</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
+                            <mat-icon class="icon-size-5" svgIcon="heroicons_solid:user-group"></mat-icon>
+                        </span>
+                        <div>
+                            <div class="text-[13px] font-bold text-nufi-900">Groupes</div>
+                            <div class="mt-0.5 text-[11px] text-slate-500">Ciblez en quelques clics</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
+                            <mat-icon class="icon-size-5" svgIcon="heroicons_solid:clock"></mat-icon>
+                        </span>
+                        <div>
+                            <div class="text-[13px] font-bold text-nufi-900">Planification</div>
+                            <div class="mt-0.5 text-[11px] text-slate-500">Envoyez au bon moment</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
+                            <mat-icon class="icon-size-5" svgIcon="heroicons_solid:template"></mat-icon>
+                        </span>
+                        <div>
+                            <div class="text-[13px] font-bold text-nufi-900">Modèles</div>
+                            <div class="mt-0.5 text-[11px] text-slate-500">Réutilisez vos messages</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Section sur l'entreprise Yaba-In -->
-    <section class="py-12 bg-gray-900 text-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-6 text-center">À propos de notre entreprise</h2>            
-            <div class="flex flex-colt-4 ">
-                <div class="text-right w-2/5" data-aos="fade-up">
-                    <img src="./../../../../assets/images/logo/yaba-in.png" alt="Logo de Yaba-In" class="mx-auto  w-50">
+        <!-- Features -->
+        <section id="features" class="scroll-mt-24 bg-white py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-2xl text-center" data-reveal>
+                    <span class="nufi-eyebrow">Fonctionnalités</span>
+                    <h2 class="mt-4 text-[2rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-nufi-900 sm:text-[2.6rem]">
+                        Tout ce qu’il faut pour communiquer à grande échelle.
+                    </h2>
+                    <p class="mt-4 text-[16px] leading-7 text-slate-500">
+                        De la synchronisation de vos contacts à l’envoi programmé, NufiSend réunit vos outils de communication WhatsApp dans un espace simple et clair.
+                    </p>
                 </div>
-                <div data-aos="fade-up" class="w-3/5 text-2xl" data-aos-delay="200">
-                        <p class="text-gray-400 mb-2">Chez Yaba-In, nous nous engageons à fournir des solutions de communication numérique innovantes et efficaces pour répondre aux besoins de nos clients.</p>
-                        <p class="text-gray-400">Notre mission est d'aider nos clients à tirer le meilleur parti de leur communication digitale, en leur offrant des outils puissants et des services de qualité.</p>
+
+                <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <article class="nufi-card group rounded-2xl border border-slate-200/80 bg-white p-6 hover:border-nufi-200" data-reveal>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600 ring-1 ring-nufi-100 transition-colors duration-300 group-hover:bg-nufi-600 group-hover:text-white">
+                            <mat-icon class="icon-size-6" svgIcon="heroicons_solid:refresh"></mat-icon>
+                        </div>
+                        <h3 class="mt-5 text-[17px] font-bold text-nufi-900">Synchronisation des contacts</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Importez vos contacts WhatsApp en un clic et gardez votre annuaire à jour, sans saisie manuelle.
+                        </p>
+                    </article>
+
+                    <article class="nufi-card group rounded-2xl border border-slate-200/80 bg-white p-6 hover:border-nufi-200" data-reveal style="transition-delay: 60ms">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600 ring-1 ring-nufi-100 transition-colors duration-300 group-hover:bg-nufi-600 group-hover:text-white">
+                            <mat-icon class="icon-size-6" svgIcon="heroicons_solid:user-group"></mat-icon>
+                        </div>
+                        <h3 class="mt-5 text-[17px] font-bold text-nufi-900">Groupes de diffusion</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Créez des segments précis par client, quartier, équipe ou centre d’intérêt pour cibler vos envois.
+                        </p>
+                    </article>
+
+                    <article class="nufi-card group rounded-2xl border border-slate-200/80 bg-white p-6 hover:border-nufi-200" data-reveal style="transition-delay: 120ms">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600 ring-1 ring-nufi-100 transition-colors duration-300 group-hover:bg-nufi-600 group-hover:text-white">
+                            <mat-icon class="icon-size-6" svgIcon="heroicons_solid:template"></mat-icon>
+                        </div>
+                        <h3 class="mt-5 text-[17px] font-bold text-nufi-900">Modèles de messages</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Enregistrez vos annonces, rappels et réponses récurrentes, puis réutilisez-les en un instant.
+                        </p>
+                    </article>
+
+                    <article class="nufi-card group rounded-2xl border border-slate-200/80 bg-white p-6 hover:border-nufi-200" data-reveal>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600 ring-1 ring-nufi-100 transition-colors duration-300 group-hover:bg-nufi-600 group-hover:text-white">
+                            <mat-icon class="icon-size-6" svgIcon="heroicons_solid:calendar"></mat-icon>
+                        </div>
+                        <h3 class="mt-5 text-[17px] font-bold text-nufi-900">Envois programmés</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Choisissez la date et l’heure de vos campagnes. NufiSend s’occupe de l’envoi, même quand vous êtes occupé.
+                        </p>
+                    </article>
+
+                    <article class="nufi-card group rounded-2xl border border-slate-200/80 bg-white p-6 hover:border-nufi-200" data-reveal style="transition-delay: 60ms">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600 ring-1 ring-nufi-100 transition-colors duration-300 group-hover:bg-nufi-600 group-hover:text-white">
+                            <mat-icon class="icon-size-6" svgIcon="heroicons_solid:chart-bar"></mat-icon>
+                        </div>
+                        <h3 class="mt-5 text-[17px] font-bold text-nufi-900">Suivi des campagnes</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Retrouvez vos messages programmés et envoyés dans un tableau de bord clair, sans perdre le fil.
+                        </p>
+                    </article>
+
+                    <article class="nufi-card group rounded-2xl border border-slate-200/80 bg-white p-6 hover:border-nufi-200" data-reveal style="transition-delay: 120ms">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600 ring-1 ring-nufi-100 transition-colors duration-300 group-hover:bg-nufi-600 group-hover:text-white">
+                            <mat-icon class="icon-size-6" svgIcon="heroicons_solid:book-open"></mat-icon>
+                        </div>
+                        <h3 class="mt-5 text-[17px] font-bold text-nufi-900">Annuaire centralisé</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Tous vos contacts, groupes et informations réunis au même endroit. Fini les listes éparpillées.
+                        </p>
+                    </article>
                 </div>
-                
             </div>
-            <!-- Logo de l'entreprise -->
-            
-        </div>
-    </section>
+        </section>
 
-    <!-- Section Contact -->
-    <section class="py-12 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-6 text-center">Contactez-nous</h2>
-            <div class="flex  mt-8 justify-center">
-                <div class="text-right w-2/5">
-                    <img src="./../../../../assets/images/logo/logo.svg" alt="NufiSend" class="mx-auto w-50">
+        <!-- How it works -->
+        <section id="how-it-works" class="scroll-mt-24 bg-nufi-50/70 py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-2xl text-center" data-reveal>
+                    <span class="nufi-eyebrow">Comment ça marche</span>
+                    <h2 class="mt-4 text-[2rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-nufi-900 sm:text-[2.6rem]">
+                        Trois étapes. C’est tout.
+                    </h2>
+                    <p class="mt-4 text-[16px] leading-7 text-slate-500">
+                        Pas d’installation compliquée, pas de nouveau numéro à communiquer. Votre WhatsApp reste votre WhatsApp.
+                    </p>
                 </div>
-               <div class="">
-                <div data-aos="fade-up mb-2">
-                    <h3 class="text-xl font-semibold mb-2">Adresse</h3>
-                    <p class="text-gray-700">Carrefour Prison, Bangangté, Cameroun</p>
+
+                <div class="relative mt-14 grid gap-5 md:grid-cols-3">
+                    <div class="pointer-events-none absolute left-[17%] right-[17%] top-12 hidden h-px bg-gradient-to-r from-transparent via-nufi-200 to-transparent md:block"></div>
+
+                    <article class="nufi-card relative rounded-2xl border border-nufi-100 bg-white p-7" data-reveal>
+                        <div class="flex items-center justify-between">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-nufi-900 text-[15px] font-extrabold text-white shadow-lg">01</span>
+                            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
+                                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:qrcode"></mat-icon>
+                            </span>
+                        </div>
+                        <h3 class="mt-6 text-[17px] font-bold text-nufi-900">Connectez votre WhatsApp</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Scannez le QR code depuis votre espace NufiSend et laissez vos contacts se synchroniser.
+                        </p>
+                    </article>
+
+                    <article class="nufi-card relative rounded-2xl border border-nufi-100 bg-white p-7" data-reveal style="transition-delay: 80ms">
+                        <div class="flex items-center justify-between">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-nufi-900 text-[15px] font-extrabold text-white shadow-lg">02</span>
+                            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
+                                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:chat-alt-2"></mat-icon>
+                            </span>
+                        </div>
+                        <h3 class="mt-6 text-[17px] font-bold text-nufi-900">Préparez votre campagne</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Choisissez un groupe ou des contacts, rédigez votre message ou sélectionnez un modèle existant.
+                        </p>
+                    </article>
+
+                    <article class="nufi-card relative rounded-2xl border border-nufi-100 bg-white p-7" data-reveal style="transition-delay: 160ms">
+                        <div class="flex items-center justify-between">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-nufi-900 text-[15px] font-extrabold text-white shadow-lg">03</span>
+                            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
+                                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:clock"></mat-icon>
+                            </span>
+                        </div>
+                        <h3 class="mt-6 text-[17px] font-bold text-nufi-900">Programmez et laissez faire</h3>
+                        <p class="mt-2 text-[14px] leading-6 text-slate-500">
+                            Sélectionnez la date et l’heure. Votre message part au bon moment, sans intervention de votre part.
+                        </p>
+                    </article>
                 </div>
-                <div data-aos="fade-up" data-aos-delay="200">
-                    <h3 class="text-xl font-semibold mb-2">Email</h3>
-                    <p class="text-gray-700">contact@yaba-in.com</p>
+
+                <div class="mt-10 flex justify-center" data-reveal>
+                    <a routerLink="/auth/sign-up" class="group inline-flex items-center gap-2 text-[14px] font-bold text-nufi-700 transition hover:text-nufi-800">
+                        Essayer gratuitement
+                        <mat-icon class="icon-size-4 transition-transform duration-300 group-hover:translate-x-1" svgIcon="heroicons_solid:arrow-right"></mat-icon>
+                    </a>
                 </div>
-               </div>
             </div>
-            <!-- Logo de l'entreprise -->
-           
-        </div>
-    </section>
+        </section>
 
-    <!-- Section Newsletter -->
-    <section class="py-12 bg-main-color text-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-6 text-center">Abonnez-vous à notre Newsletter</h2>
-            <form class="flex justify-center items-center">
-                <input type="email" placeholder="Votre adresse email" class="py-3 px-4 w-full md:w-2/3 lg:w-1/2 rounded-l-lg focus:outline-none">
-                <button class=" text-main-color py-3 px-6 rounded-r-lg hover:bg-green-900 bg-green-700 transition duration-300">S'abonner</button>
-            </form>
-        </div>
-    </section>
+        <!-- Use cases -->
+        <section id="use-cases" class="scroll-mt-24 bg-white py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="grid items-end gap-6 lg:grid-cols-[0.9fr_1.1fr]" data-reveal>
+                    <div>
+                        <span class="nufi-eyebrow">Cas d’usage</span>
+                        <h2 class="mt-4 text-[2rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-nufi-900 sm:text-[2.6rem]">
+                            Pensé pour vos conversations du quotidien.
+                        </h2>
+                    </div>
+                    <p class="text-[16px] leading-7 text-slate-500 lg:pb-2">
+                        Une promo à annoncer, un rappel à envoyer, une information à partager ? NufiSend s’adapte à votre façon de communiquer.
+                    </p>
+                </div>
+
+                <div class="mt-12 grid gap-5 md:grid-cols-2">
+                    <article class="nufi-card group relative overflow-hidden rounded-3xl border border-nufi-100 bg-nufi-50/60 p-7 sm:p-8" data-reveal>
+                        <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-nufi-100/80 transition-transform duration-500 group-hover:scale-110"></div>
+                        <div class="relative">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-nufi-600 shadow-sm ring-1 ring-nufi-100">
+                                <mat-icon class="icon-size-6" svgIcon="heroicons_solid:shopping-bag"></mat-icon>
+                            </span>
+                            <h3 class="mt-5 text-[19px] font-bold text-nufi-900">Commerces & boutiques</h3>
+                            <p class="mt-2 max-w-md text-[14px] leading-6 text-slate-600">
+                                Annoncez une promotion, un nouvel arrivage ou une horaire exceptionnelle à toute votre clientèle en quelques secondes.
+                            </p>
+                            <div class="mt-5 flex flex-wrap gap-2">
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Promotions</span>
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Nouveautés</span>
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Fidélisation</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="nufi-card group relative overflow-hidden rounded-3xl border border-nufi-100 bg-nufi-50/60 p-7 sm:p-8" data-reveal style="transition-delay: 70ms">
+                        <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-nufi-100/80 transition-transform duration-500 group-hover:scale-110"></div>
+                        <div class="relative">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-nufi-600 shadow-sm ring-1 ring-nufi-100">
+                                <mat-icon class="icon-size-6" svgIcon="heroicons_solid:user-group"></mat-icon>
+                            </span>
+                            <h3 class="mt-5 text-[19px] font-bold text-nufi-900">Associations & communautés</h3>
+                            <p class="mt-2 max-w-md text-[14px] leading-6 text-slate-600">
+                                Partagez une information importante à tous vos membres, sans créer de groupe WhatsApp interminable.
+                            </p>
+                            <div class="mt-5 flex flex-wrap gap-2">
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Annonces</span>
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Événements</span>
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Rappels</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="nufi-card group relative overflow-hidden rounded-3xl border border-nufi-100 bg-nufi-50/60 p-7 sm:p-8" data-reveal>
+                        <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-nufi-100/80 transition-transform duration-500 group-hover:scale-110"></div>
+                        <div class="relative">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-nufi-600 shadow-sm ring-1 ring-nufi-100">
+                                <mat-icon class="icon-size-6" svgIcon="heroicons_solid:academic-cap"></mat-icon>
+                            </span>
+                            <h3 class="mt-5 text-[19px] font-bold text-nufi-900">Écoles & formations</h3>
+                            <p class="mt-2 max-w-md text-[14px] leading-6 text-slate-600">
+                                Envoyez les rappels de cours, les résultats ou les changements d’emploi du temps à vos étudiants et parents.
+                            </p>
+                            <div class="mt-5 flex flex-wrap gap-2">
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Rentrée</span>
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Résultats</span>
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Planning</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="nufi-card group relative overflow-hidden rounded-3xl border border-nufi-100 bg-nufi-50/60 p-7 sm:p-8" data-reveal style="transition-delay: 70ms">
+                        <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-nufi-100/80 transition-transform duration-500 group-hover:scale-110"></div>
+                        <div class="relative">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-nufi-600 shadow-sm ring-1 ring-nufi-100">
+                                <mat-icon class="icon-size-6" svgIcon="heroicons_solid:briefcase"></mat-icon>
+                            </span>
+                            <h3 class="mt-5 text-[19px] font-bold text-nufi-900">Équipes & services</h3>
+                            <p class="mt-2 max-w-md text-[14px] leading-6 text-slate-600">
+                                Coordonnez vos équipes et vos clients sans multiplier les applications ni les fils de discussion.
+                            </p>
+                            <div class="mt-5 flex flex-wrap gap-2">
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Coordination</span>
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Suivi</span>
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-nufi-700 ring-1 ring-nufi-100">Support</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security -->
+        <section id="security" class="relative scroll-mt-24 overflow-hidden bg-nufi-900 py-20 sm:py-24">
+            <div class="nufi-dark-grid"></div>
+            <div class="absolute -left-40 top-10 h-96 w-96 rounded-full bg-nufi-600/20 blur-[100px]"></div>
+
+            <div class="relative mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+                <div data-reveal>
+                    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-nufi-300">
+                        <mat-icon class="icon-size-4" svgIcon="heroicons_solid:shield-check"></mat-icon>
+                        Sécurité & contrôle
+                    </span>
+                    <h2 class="mt-5 text-[2rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-white sm:text-[2.6rem]">
+                        Vos contacts restent vos contacts.
+                    </h2>
+                    <p class="mt-5 max-w-xl text-[16px] leading-8 text-slate-300">
+                        NufiSend ne modifie pas votre carnet d’adresses. Vous gardez le contrôle sur votre connexion WhatsApp et pouvez la déconnecter à tout moment.
+                    </p>
+
+                    <ul class="mt-8 space-y-4">
+                        <li class="flex items-start gap-3">
+                            <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-nufi-accent/10 text-nufi-accent">
+                                <mat-icon class="icon-size-4" svgIcon="heroicons_solid:check"></mat-icon>
+                            </span>
+                            <div>
+                                <div class="text-[14px] font-bold text-white">Connexion WhatsApp par QR code</div>
+                                <div class="mt-0.5 text-[13px] text-slate-400">Votre numéro reste le vôtre, sans nouveau compte à créer.</div>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-nufi-accent/10 text-nufi-accent">
+                                <mat-icon class="icon-size-4" svgIcon="heroicons_solid:check"></mat-icon>
+                            </span>
+                            <div>
+                                <div class="text-[14px] font-bold text-white">Mots de passe protégés</div>
+                                <div class="mt-0.5 text-[13px] text-slate-400">Vos mots de passe sont stockés sous forme de hash, jamais en clair.</div>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-nufi-accent/10 text-nufi-accent">
+                                <mat-icon class="icon-size-4" svgIcon="heroicons_solid:check"></mat-icon>
+                            </span>
+                            <div>
+                                <div class="text-[14px] font-bold text-white">Sessions protégées</div>
+                                <div class="mt-0.5 text-[13px] text-slate-400">Chaque session est authentifiée par un jeton sécurisé.</div>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <a routerLink="/auth/sign-up" class="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-[14px] font-bold text-nufi-900 transition duration-300 hover:bg-nufi-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/20">
+                        Commencer maintenant
+                        <mat-icon class="icon-size-5" svgIcon="heroicons_solid:arrow-right"></mat-icon>
+                    </a>
+                </div>
+
+                <div class="relative mx-auto w-full max-w-md lg:ml-auto" data-reveal style="transition-delay: 100ms">
+                    <div class="absolute -inset-4 rounded-[2rem] bg-gradient-to-tr from-nufi-500/20 to-transparent blur-2xl"></div>
+                    <div class="relative rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 p-2">
+                                    <img src="assets/images/logo/whatsapp_logo.png" alt="" class="h-full w-full object-contain">
+                                </span>
+                                <div>
+                                    <div class="text-[14px] font-bold text-white">Session WhatsApp</div>
+                                    <div class="mt-0.5 text-[11px] text-slate-400">Connectée · +237 •• •• •• ••</div>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-2.5 py-1 text-[10px] font-bold text-emerald-300 ring-1 ring-emerald-400/20">
+                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                                Active
+                            </span>
+                        </div>
+
+                        <div class="mt-6 space-y-2.5">
+                            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3">
+                                <span class="text-[12px] text-slate-400">Appareil</span>
+                                <span class="text-[12px] font-semibold text-white">WhatsApp Web</span>
+                            </div>
+                            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3">
+                                <span class="text-[12px] text-slate-400">Contacts synchronisés</span>
+                                <span class="text-[12px] font-semibold text-white">1 248</span>
+                            </div>
+                            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3">
+                                <span class="text-[12px] text-slate-400">Dernière activité</span>
+                                <span class="text-[12px] font-semibold text-white">À l’instant</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 flex items-start gap-2.5 rounded-xl border border-emerald-400/15 bg-emerald-400/5 p-3.5">
+                            <mat-icon class="icon-size-5 shrink-0 text-emerald-300" svgIcon="heroicons_solid:lock-closed"></mat-icon>
+                            <p class="text-[12px] leading-5 text-emerald-100/90">
+                                Vous gardez le contrôle de votre carnet d’adresses et de votre session WhatsApp.
+                            </p>
+                        </div>
+
+                        <div class="mt-5 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[12px] font-semibold text-slate-300">
+                            <mat-icon class="icon-size-4" svgIcon="heroicons_solid:qrcode"></mat-icon>
+                            Déconnexion possible à tout moment
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing -->
+        <section id="pricing" class="scroll-mt-24 bg-white py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-2xl text-center" data-reveal>
+                    <span class="nufi-eyebrow">Tarifs</span>
+                    <h2 class="mt-4 text-[2rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-nufi-900 sm:text-[2.6rem]">
+                        Des tarifs simples, sans surprise.
+                    </h2>
+                    <p class="mt-4 text-[16px] leading-7 text-slate-500">
+                        Commencez gratuitement. Passez à une offre supérieure lorsque votre volume de messages augmente.
+                    </p>
+                </div>
+
+                <div class="mt-14 grid items-stretch gap-5 lg:grid-cols-3">
+                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-7" data-reveal>
+                        <div>
+                            <div class="text-[15px] font-bold text-nufi-900">Découverte</div>
+                            <p class="mt-1 text-[13px] text-slate-500">Pour tester NufiSend à votre rythme.</p>
+                            <div class="mt-6 flex items-end gap-1">
+                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">0</span>
+                                <span class="pb-1 text-[14px] font-semibold text-slate-500">FCFA</span>
+                            </div>
+                            <div class="mt-1 text-[12px] text-slate-400">Pour toujours</div>
+                        </div>
+                        <ul class="mt-6 flex-1 space-y-3">
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                10 messages programmés
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Contacts illimités
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Synchronisation WhatsApp
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Groupes de diffusion
+                            </li>
+                        </ul>
+                        <a routerLink="/auth/sign-up" class="mt-7 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
+                            Commencer gratuitement
+                        </a>
+                    </article>
+
+                    <article class="nufi-card relative flex flex-col rounded-3xl bg-nufi-900 p-7 text-white shadow-[0_30px_70px_-30px_rgba(3,37,46,0.55)] ring-1 ring-nufi-700" data-reveal style="transition-delay: 80ms">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-nufi-accent px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-nufi-900 shadow-lg">
+                            Recommandé
+                        </span>
+                        <div>
+                            <div class="text-[15px] font-bold text-white">Essentiel</div>
+                            <p class="mt-1 text-[13px] text-slate-400">Pour communiquer régulièrement.</p>
+                            <div class="mt-6 flex items-end gap-1">
+                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-white">500</span>
+                                <span class="pb-1 text-[14px] font-semibold text-slate-300">FCFA</span>
+                            </div>
+                            <div class="mt-1 text-[12px] text-slate-400">par mois</div>
+                        </div>
+                        <ul class="mt-6 flex-1 space-y-3">
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
+                                100 messages programmés / mois
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
+                                Tout ce que propose Découverte
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
+                                Modèles de messages
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
+                                Support prioritaire
+                            </li>
+                        </ul>
+                        <a routerLink="/auth/sign-up" class="mt-7 inline-flex items-center justify-center gap-2 rounded-xl bg-nufi-accent px-5 py-3 text-[13px] font-bold text-nufi-900 transition duration-300 hover:bg-white">
+                            Choisir Essentiel
+                        </a>
+                    </article>
+
+                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-7" data-reveal style="transition-delay: 160ms">
+                        <div>
+                            <div class="text-[15px] font-bold text-nufi-900">Pro</div>
+                            <p class="mt-1 text-[13px] text-slate-500">Pour les équipes qui communiquent beaucoup.</p>
+                            <div class="mt-6 flex items-end gap-1">
+                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">2 000</span>
+                                <span class="pb-1 text-[14px] font-semibold text-slate-500">FCFA</span>
+                            </div>
+                            <div class="mt-1 text-[12px] text-slate-400">par mois</div>
+                        </div>
+                        <ul class="mt-6 flex-1 space-y-3">
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Messages programmés illimités
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Tout ce que propose Essentiel
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Annuaire partagé entre plusieurs comptes
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Support dédié
+                            </li>
+                        </ul>
+                        <a routerLink="/auth/sign-up" class="mt-7 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
+                            Choisir Pro
+                        </a>
+                    </article>
+                </div>
+
+                <p class="mt-8 text-center text-[12px] text-slate-400">
+                    Besoin d’une offre adaptée à votre organisation ?
+                    <a href="mailto:contact@yaba-in.com" class="font-semibold text-nufi-700 hover:underline">Parlons-en.</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="scroll-mt-24 bg-nufi-50/70 py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+                    <div class="lg:sticky lg:top-28 lg:self-start" data-reveal>
+                        <span class="nufi-eyebrow">FAQ</span>
+                        <h2 class="mt-4 text-[2rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-nufi-900 sm:text-[2.6rem]">
+                            Questions fréquentes
+                        </h2>
+                        <p class="mt-4 max-w-md text-[16px] leading-7 text-slate-500">
+                            Tout ce qu’il faut savoir avant de connecter votre WhatsApp à NufiSend.
+                        </p>
+
+                        <div class="mt-8 rounded-2xl border border-nufi-100 bg-white p-5">
+                            <div class="flex items-start gap-3">
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
+                                    <mat-icon class="icon-size-5" svgIcon="heroicons_solid:mail"></mat-icon>
+                                </span>
+                                <div>
+                                    <div class="text-[14px] font-bold text-nufi-900">Une autre question ?</div>
+                                    <p class="mt-1 text-[13px] leading-5 text-slate-500">
+                                        Écrivez-nous, nous vous répondons avec plaisir.
+                                    </p>
+                                    <a href="mailto:contact@yaba-in.com" class="mt-2 inline-flex items-center gap-1 text-[13px] font-bold text-nufi-700 hover:underline">
+                                        contact@yaba-in.com
+                                        <mat-icon class="icon-size-4" svgIcon="heroicons_solid:arrow-right"></mat-icon>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3" data-reveal style="transition-delay: 80ms">
+                        <div *ngFor="let item of faqItems; let i = index" class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-colors duration-300 hover:border-nufi-200">
+                            <button
+                                type="button"
+                                class="flex w-full items-center justify-between gap-5 px-5 py-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-nufi-300 sm:px-6 sm:py-5"
+                                (click)="toggleFaq(i)"
+                                [attr.aria-expanded]="openFaq === i"
+                                [attr.aria-controls]="'faq-panel-' + i">
+                                <span class="text-[14px] font-bold text-nufi-900 sm:text-[15px]">{{ item.question }}</span>
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-nufi-50 text-nufi-600 transition-colors duration-300">
+                                    <mat-icon class="icon-size-4" [svgIcon]="openFaq === i ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                                </span>
+                            </button>
+                            <div [id]="'faq-panel-' + i" class="nufi-faq-body" [class.is-open]="openFaq === i">
+                                <div>
+                                    <p class="px-5 pb-5 text-[14px] leading-6 text-slate-500 sm:px-6 sm:pb-6">{{ item.answer }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section id="cta" class="scroll-mt-24 bg-white px-4 pb-20 pt-4 sm:px-6 sm:pb-24 lg:px-8">
+            <div class="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-nufi-900 px-6 py-16 text-center sm:px-12 sm:py-20 lg:px-20" data-reveal>
+                <div class="nufi-cta-glow nufi-cta-glow-a"></div>
+                <div class="nufi-cta-glow nufi-cta-glow-b"></div>
+                <div class="relative z-10 mx-auto max-w-2xl">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-nufi-300">
+                        <mat-icon class="icon-size-4" svgIcon="heroicons_solid:sparkles"></mat-icon>
+                        Prêt à commencer ?
+                    </span>
+                    <h2 class="mt-5 text-[2rem] font-extrabold leading-[1.12] tracking-[-0.035em] text-white sm:text-[2.8rem]">
+                        Vos prochaines communications WhatsApp commencent ici.
+                    </h2>
+                    <p class="mx-auto mt-5 max-w-xl text-[16px] leading-7 text-slate-300">
+                        Créez votre compte, connectez votre WhatsApp et préparez votre première campagne en quelques minutes.
+                    </p>
+                    <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                        <a routerLink="/auth/sign-up" class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-[14px] font-bold text-nufi-900 transition duration-300 hover:bg-nufi-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/20">
+                            Créer un compte gratuit
+                            <mat-icon class="icon-size-5" svgIcon="heroicons_solid:arrow-right"></mat-icon>
+                        </a>
+                        <a routerLink="/auth/sign-in" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-6 py-3.5 text-[14px] font-bold text-white transition duration-300 hover:bg-white/10">
+                            Se connecter
+                        </a>
+                    </div>
+                    <p class="mt-5 text-[12px] text-slate-400">
+                        Gratuit pour démarrer · Aucune carte bancaire requise
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <app-footer></app-footer>
 </div>

@@ -3,14 +3,16 @@
         <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
 
             <!-- Logo -->
-            <div class="w-12 mx-auto">
-                <img src="assets/images/logo/logo.svg" alt="NufiSend logo">
+            <div class="flex justify-center">
+                <a routerLink="/home" class="inline-flex" aria-label="NufiSend - Accueil">
+                    <img src="assets/images/logo/nufisend-logo.png" alt="NufiSend" class="h-11 w-auto">
+                </a>
             </div>
 
             <!-- Icône succès -->
             <div class="flex items-center justify-center mt-8">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900">
-                    <mat-icon class="text-green-500 icon-size-8" [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
+                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-nufi-50 dark:bg-nufi-900">
+                    <mat-icon class="text-nufi-600 icon-size-8" [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
                 </div>
             </div>
 
@@ -40,7 +42,15 @@
             <!-- Lien retour -->
             <div class="mt-8 text-md font-medium text-secondary text-center">
                 <span>Retourner à la page de</span>
-                <a class="ml-1 text-primary-500 hover:underline" [routerLink]="['/auth/sign-in']">connexion</a>
+                <a class="ml-1 text-nufi-600 hover:underline" [routerLink]="['/auth/sign-in']">connexion</a>
+            </div>
+
+            <!-- Retour à l'accueil -->
+            <div class="mt-6 text-center">
+                <a routerLink="/home" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-nufi-700">
+                    <mat-icon class="icon-size-4" [svgIcon]="'heroicons_solid:arrow-left'"></mat-icon>
+                    Retour à l'accueil
+                </a>
             </div>
 
         </div>

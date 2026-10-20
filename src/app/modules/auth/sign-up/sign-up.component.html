@@ -6,15 +6,15 @@
             <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
 
                 <!-- Logo -->
-                <div class="w-12">
-                    <img src="assets/images/logo/logo.svg" alt="NufiSend logo">
-                </div>
+                <a routerLink="/home" class="inline-flex" aria-label="NufiSend - Accueil">
+                    <img src="assets/images/logo/nufisend-logo.png" alt="NufiSend" class="h-11 w-auto">
+                </a>
 
                 <!-- Titre -->
                 <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Créer un compte</div>
                 <div class="flex items-baseline mt-0.5 font-medium">
                     <div>Vous avez déjà un compte ?</div>
-                    <a class="ml-1 text-primary-500 hover:underline cursor-pointer" [routerLink]="['/auth/sign-in']">Se connecter</a>
+                    <a class="ml-1 text-nufi-600 hover:underline cursor-pointer" [routerLink]="['/auth/sign-in']">Se connecter</a>
                 </div>
 
                 <!-- Alerte -->
@@ -114,23 +114,31 @@
                     </button>
 
                 </form>
+
+                <!-- Retour à l'accueil -->
+                <div class="mt-8 text-center">
+                    <a routerLink="/home" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-nufi-700">
+                        <mat-icon class="icon-size-4" [svgIcon]="'heroicons_solid:arrow-left'"></mat-icon>
+                        Retour à l'accueil
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Panneau décoratif -->
-        <div class="relative hidden md:flex flex-auto items-center justify-center h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l">
+        <div class="relative hidden md:flex flex-auto items-center justify-center h-full p-16 lg:px-28 overflow-hidden bg-nufi-900 dark:border-l">
 
             <!-- Cercles décoratifs -->
             <svg class="absolute inset-0 pointer-events-none" viewBox="0 0 960 540" width="100%" height="100%"
                 preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-                <g class="opacity-10 text-gray-200" fill="none" stroke="currentColor" stroke-width="100">
+                <g class="opacity-10 text-white" fill="none" stroke="currentColor" stroke-width="100">
                     <circle r="234" cx="196" cy="23"></circle>
                     <circle r="234" cx="790" cy="491"></circle>
                 </g>
             </svg>
 
             <!-- Points décoratifs -->
-            <svg class="absolute -top-16 -right-16 text-gray-700" viewBox="0 0 220 192" width="220" height="192"
+            <svg class="absolute -top-16 -right-16 text-white/10" viewBox="0 0 220 192" width="220" height="192"
                 fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="dots-signup" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -142,35 +150,34 @@
 
             <!-- Contenu -->
             <div class="z-10 relative w-full max-w-2xl">
-                <div class="flex items-center mb-8">
-                    <img class="w-12 mr-4" src="assets/images/logo/logo.svg" alt="NufiSend logo">
-                    <span class="text-2xl font-bold text-white tracking-tight">NufiSend</span>
-                </div>
-                <div class="text-7xl font-bold leading-none text-gray-100">
+                <a routerLink="/home" class="mb-8 inline-flex items-center" aria-label="NufiSend - Accueil">
+                    <img class="h-9 w-auto" src="assets/images/logo/nufisend-logo-white.png" alt="NufiSend">
+                </a>
+                <div class="text-7xl font-bold leading-none text-white">
                     <div>Rejoignez</div>
                     <div>NufiSend</div>
                 </div>
-                <div class="mt-6 text-lg tracking-tight leading-6 text-gray-400">
-                    Créez votre compte gratuitement et commencez à planifier vos envois WhatsApp dès aujourd'hui.
+                <div class="mt-6 text-lg tracking-tight leading-6 text-slate-300">
+                    Créez votre compte gratuitement et commencez à programmer vos envois WhatsApp dès aujourd'hui.
                 </div>
                 <div class="flex flex-col mt-8 space-y-3">
                     <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-green-500 bg-opacity-20">
-                            <mat-icon class="text-green-400 icon-size-4" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-nufi-500/20">
+                            <mat-icon class="text-nufi-accent icon-size-4" [svgIcon]="'heroicons_solid:check'"></mat-icon>
                         </div>
-                        <span class="text-gray-300 text-sm">Synchronisation WhatsApp par QR code</span>
+                        <span class="text-slate-300 text-sm">Synchronisation WhatsApp par QR code</span>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-green-500 bg-opacity-20">
-                            <mat-icon class="text-green-400 icon-size-4" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-nufi-500/20">
+                            <mat-icon class="text-nufi-accent icon-size-4" [svgIcon]="'heroicons_solid:check'"></mat-icon>
                         </div>
-                        <span class="text-gray-300 text-sm">Gestion de contacts et groupes</span>
+                        <span class="text-slate-300 text-sm">Gestion de contacts et groupes</span>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-green-500 bg-opacity-20">
-                            <mat-icon class="text-green-400 icon-size-4" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-nufi-500/20">
+                            <mat-icon class="text-nufi-accent icon-size-4" [svgIcon]="'heroicons_solid:check'"></mat-icon>
                         </div>
-                        <span class="text-gray-300 text-sm">Planification automatique des messages</span>
+                        <span class="text-slate-300 text-sm">Planification automatique des messages</span>
                     </div>
                 </div>
             </div>

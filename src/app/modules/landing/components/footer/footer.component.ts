@@ -1,11 +1,12 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
-  selector: 'app-footer',
-  templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss'],
-  encapsulation:ViewEncapsulation.None
+    selector     : 'app-footer',
+    templateUrl  : './footer.component.html',
+    styleUrls    : ['./footer.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
-export class FooterComponent {
-  date = new Date().getFullYear();
+export class FooterComponent
+{
+    readonly date = new Date().getFullYear();
 }

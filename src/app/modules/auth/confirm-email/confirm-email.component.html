@@ -5,9 +5,9 @@
             <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
 
                 <!-- Logo -->
-                <div class="w-12">
-                    <img src="assets/images/logo/logo.svg" alt="NufiSend logo">
-                </div>
+                <a routerLink="/home" class="inline-flex" aria-label="NufiSend - Accueil">
+                    <img src="assets/images/logo/nufisend-logo.png" alt="NufiSend" class="h-11 w-auto">
+                </a>
 
                 <!-- Titre -->
                 <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Confirmation email</div>
@@ -35,28 +35,35 @@
                     [routerLink]="['/auth/sign-in']">
                     {{ emailConfirmed ? 'Se connecter' : 'Retour à la connexion' }}
                 </a>
+
+                <!-- Retour à l'accueil -->
+                <div class="mt-8 text-center">
+                    <a routerLink="/home" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-nufi-700">
+                        <mat-icon class="icon-size-4" [svgIcon]="'heroicons_solid:arrow-left'"></mat-icon>
+                        Retour à l'accueil
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Panneau décoratif -->
-        <div class="relative hidden md:flex flex-auto items-center justify-center h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l">
+        <div class="relative hidden md:flex flex-auto items-center justify-center h-full p-16 lg:px-28 overflow-hidden bg-nufi-900 dark:border-l">
             <svg class="absolute inset-0 pointer-events-none" viewBox="0 0 960 540" width="100%" height="100%"
                 preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-                <g class="opacity-10 text-gray-200" fill="none" stroke="currentColor" stroke-width="100">
+                <g class="opacity-10 text-white" fill="none" stroke="currentColor" stroke-width="100">
                     <circle r="234" cx="196" cy="23"></circle>
                     <circle r="234" cx="790" cy="491"></circle>
                 </g>
             </svg>
             <div class="z-10 relative w-full max-w-2xl">
-                <div class="flex items-center mb-8">
-                    <img class="w-12 mr-4" src="assets/images/logo/logo.svg" alt="NufiSend logo">
-                    <span class="text-2xl font-bold text-white tracking-tight">NufiSend</span>
-                </div>
-                <div class="text-6xl font-bold leading-none text-gray-100">
+                <a routerLink="/home" class="mb-8 inline-flex items-center" aria-label="NufiSend - Accueil">
+                    <img class="h-9 w-auto" src="assets/images/logo/nufisend-logo-white.png" alt="NufiSend">
+                </a>
+                <div class="text-6xl font-bold leading-none text-white">
                     <div>Presque</div>
                     <div>terminé</div>
                 </div>
-                <div class="mt-6 text-lg tracking-tight leading-6 text-gray-400">
+                <div class="mt-6 text-lg tracking-tight leading-6 text-slate-300">
                     La confirmation de votre email protège votre compte et débloque l'accès à NufiSend.
                 </div>
             </div>

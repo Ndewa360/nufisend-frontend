@@ -1,12 +1,65 @@
-<!-- Pied de page -->
-<footer class="bg-gray-900 py-6 text-center text-white">
-  <div class="container mx-auto">
-      <ul class="flex justify-center space-x-4">
-          <li><a href="#" class="hover:underline">Accueil</a></li>
-          <li><a href="#" class="hover:underline">Fonctionnalités</a></li>
-          <li><a href="#" class="hover:underline">Clients</a></li>
-          <li><a href="#" class="hover:underline">Contact</a></li>
-      </ul>
-      <p class="mt-4">&copy; 2024 NufiSend. Tous droits réservés.</p>
-  </div>
+<footer id="contact" class="bg-nufi-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6 lg:px-8">
+        <div class="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr]">
+            <div>
+                <a routerLink="/home" class="inline-flex items-center" aria-label="NufiSend - Accueil">
+                    <img src="assets/images/logo/nufisend-logo-white.png" alt="NufiSend" class="h-10 w-auto">
+                </a>
+                <p class="mt-5 max-w-xs text-[14px] leading-6 text-slate-400">
+                    La communication WhatsApp simplifiée. Synchronisez vos contacts, organisez vos groupes et programmez vos messages.
+                </p>
+                <div class="mt-6 flex items-center gap-2 text-[12px] font-semibold text-nufi-300">
+                    <span class="h-1.5 w-1.5 rounded-full bg-nufi-accent"></span>
+                    Conçu au Cameroun, pour vos conversations.
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[12px] font-bold uppercase tracking-[0.16em] text-slate-500">Produit</div>
+                <ul class="mt-4 space-y-3">
+                    <li><a href="#features" class="nufi-footer-link">Fonctionnalités</a></li>
+                    <li><a href="#how-it-works" class="nufi-footer-link">Comment ça marche</a></li>
+                    <li><a href="#pricing" class="nufi-footer-link">Tarifs</a></li>
+                    <li><a href="#faq" class="nufi-footer-link">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="text-[12px] font-bold uppercase tracking-[0.16em] text-slate-500">Compte</div>
+                <ul class="mt-4 space-y-3">
+                    <li><a routerLink="/auth/sign-up" class="nufi-footer-link">Créer un compte</a></li>
+                    <li><a routerLink="/auth/sign-in" class="nufi-footer-link">Se connecter</a></li>
+                    <li><a routerLink="/auth/forgot-password" class="nufi-footer-link">Mot de passe oublié</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="text-[12px] font-bold uppercase tracking-[0.16em] text-slate-500">Contact</div>
+                <ul class="mt-4 space-y-3 text-[13px] text-slate-400">
+                    <li class="flex items-start gap-2.5">
+                        <mat-icon class="icon-size-4 mt-0.5 shrink-0 text-nufi-400" svgIcon="heroicons_solid:location-marker"></mat-icon>
+                        <span>Carrefour Prison<br>Bangangté, Cameroun</span>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <mat-icon class="icon-size-4 shrink-0 text-nufi-400" svgIcon="heroicons_solid:mail"></mat-icon>
+                        <a href="mailto:contact@yaba-in.com" class="nufi-footer-link">contact@yaba-in.com</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-14 flex flex-col gap-5 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-[12px] text-slate-500">
+                © {{ date }} NufiSend. Tous droits réservés.
+                <span class="mx-1.5 text-slate-700">·</span>
+                Édité par Yaba-In.
+            </p>
+            <a href="#top" class="inline-flex items-center gap-2 text-[12px] font-semibold text-slate-400 transition hover:text-white">
+                Retour en haut
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5">
+                    <mat-icon class="icon-size-4" svgIcon="heroicons_solid:arrow-up"></mat-icon>
+                </span>
+            </a>
+        </div>
+    </div>
 </footer>

@@ -9,3 +9,18 @@
 .timepicker-backdrop-overlay {
     z-index: 10000000 !important;
 }
+
+html {
+    scroll-behavior: smooth;
+}
+
+::selection {
+    background: rgba(5, 136, 86, 0.18);
+    color: #03252e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}

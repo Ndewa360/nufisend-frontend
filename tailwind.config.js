@@ -9,8 +9,10 @@ const generatePalette = require(path.resolve(__dirname, ('src/@fuse/tailwind/uti
  * Uses the generatePalette helper method to generate
  * Tailwind-like color palettes automatically
  */
+const nufiSendPalette = generatePalette('#058856');
+
 const customPalettes = {
-    brand: generatePalette('#2196F3')
+    brand: nufiSendPalette
 };
 
 /**
@@ -20,8 +22,8 @@ const themes = {
     // Default theme is required for theming system to work correctly!
     'default': {
         primary  : {
-            ...colors.indigo,
-            DEFAULT: colors.green[800]
+            ...nufiSendPalette,
+            DEFAULT: '#058856'
         },
         accent   : {
             ...colors.slate,
@@ -99,7 +101,15 @@ const config = {
                 'spin-slow': 'spin 3s linear infinite'
             },
             colors                  : {
-                gray: colors.slate
+                gray: colors.slate,
+                nufi: {
+                    ...nufiSendPalette,
+                    DEFAULT: '#058856',
+                    ink    : '#03252E',
+                    accent : '#02C25F',
+                    text   : '#3C514A',
+                    muted  : '#6B7F78'
+                }
             },
             flex                    : {
                 '0': '0 0 auto'

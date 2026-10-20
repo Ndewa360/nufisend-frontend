@@ -57,13 +57,10 @@
                             "node_modules/ngx-toastr/toastr.css",
                             "node_modules/dropzone/dist/min/dropzone.min.css",
                             "src/styles/styles.scss",
-                            "src/styles/tailwind.scss",
-                            "node_modules/aos/dist/aos.css"
-
+                            "src/styles/tailwind.scss"
                         ],
                         "scripts": [
-                            "node_modules/dropzone/dist/min/dropzone.min.js",
-                            "node_modules/aos/dist/aos.js"
+                            "node_modules/dropzone/dist/min/dropzone.min.js"
                         ]
                     },
                     "configurations": {
