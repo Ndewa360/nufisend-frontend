@@ -99,6 +99,11 @@ export class AuthService
         return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/reset-password`, payload);
     }
 
+    changePassword(payload: { currentPassword: string; newPassword: string }): Observable<ApiResultFormat<{ message: string }>>
+    {
+        return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/change-password`, payload);
+    }
+
     confirmEmail(token: string): Observable<ApiResultFormat<{ message: string }>>
     {
         return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/confirm-email`, { token });

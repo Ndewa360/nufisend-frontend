@@ -10,8 +10,10 @@ export const appRoutes: Route[] = [
     {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'dashboard'},
 
     {
+        // Pas de NoAuthGuard ici : les liens de confirmation / reset d'email
+        // doivent rester accessibles meme si l'utilisateur est deja connecte.
+        // Les pages sign-in / sign-up / forgot-password ont leur propre garde.
         path: 'auth',
-        canMatch: [NoAuthGuard],
         component: LayoutComponent,
         data: {
             layout: 'empty'
