@@ -28,10 +28,4 @@ export namespace GroupAction
         constructor(public id:string){}
     }
 
-    //Sync group
-    export class SyncGroup
-    {
-        static readonly type = '[Group] Sync Group'
-        constructor(){}
-    }
 }

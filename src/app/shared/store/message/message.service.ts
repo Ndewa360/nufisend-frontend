@@ -21,11 +21,19 @@ export class MessageService
      */
     sendMessage(message:MessageModel): Observable<ApiResultFormat<MessageModel>>
     {
-        let formData = new FormData();
-        for ( var key in message ) {
-            if(key=="planification") formData.append(key,JSON.stringify( message[key]));
-            else formData.append(key, message[key]);
-        }
+        const formData = new FormData();
+        Object.entries(message || {}).forEach(([key, value]) => {
+            if (value === undefined || value === null) return;
+            if (key === "planification") {
+                formData.append(key, JSON.stringify(value));
+            } else if (Array.isArray(value)) {
+                formData.append(key, value.join(","));
+            } else if (value instanceof File || value instanceof Blob) {
+                formData.append(key, value);
+            } else {
+                formData.append(key, String(value));
+            }
+        });
         return this._httpClient.post<ApiResultFormat<MessageModel>>(`${environment.apiUrl}/message/post`, formData)
     }
     

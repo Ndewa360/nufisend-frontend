@@ -54,4 +54,14 @@ export class ContactService
     {
         return this._httpClient.post<ApiResultFormat<null>>(`${environment.apiUrl}/contacts/sync-whatsapp`,{})
     }
+
+    /**
+     * Import contacts from a CSV file
+     */
+    importContacts(file: File): Observable<ApiResultFormat<null>>
+    {
+        const formData = new FormData();
+        formData.append('files', file, file.name);
+        return this._httpClient.post<ApiResultFormat<null>>(`${environment.apiUrl}/contacts/import`, formData)
+    }
 }

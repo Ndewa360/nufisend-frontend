@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { Actions, Store } from '@ngxs/store';
-import { Subject } from 'rxjs';
+import { Actions, Store, ofActionCompleted } from '@ngxs/store';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { saveAs } from 'file-saver';
+import { ContactAction, ContactState } from 'app/shared/store';
 
 @Component({
   selector: 'app-upload-file',
@@ -14,7 +15,7 @@ export class UploadFileComponent implements OnInit{
 
   
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  submitted:boolean=false;
+  submitted:Observable<boolean>;
   importContactForm : UntypedFormGroup;
   file:File=null;
 
@@ -28,7 +29,9 @@ export class UploadFileComponent implements OnInit{
     private _matDialog: MatDialog, 
 
 )
-{}
+{
+    this.submitted = this._store.select(ContactState.selectStateLoading);
+}
 
   // -----------------------------------------------------------------------------------------------------
     // @ Lifecycle hooks
@@ -44,19 +47,26 @@ export class UploadFileComponent implements OnInit{
         stepSelectContacts: this._formBuilder.group({}),
         stepSelectTypeMessage: this._formBuilder.group({}),
       });
-      
+
+      this._ngxsAction.pipe(
+        ofActionCompleted(ContactAction.ImportContact),
+        takeUntil(this._unsubscribeAll)
+      ).subscribe(({result}) => {
+        if (!result.successful) return;
+        this.matDialogRef.close();
+      });
     }
 
   saveAndClose(): void
   {
-    this.submitted=false;
       // Close the dialog
     this.matDialogRef.close();
   }
 
   importFile()
   {
-
+    if (!this.file) return;
+    this._store.dispatch(new ContactAction.ImportContact(this.file));
   }
     /**
    * On destroy

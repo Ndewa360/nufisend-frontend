@@ -179,6 +179,34 @@ export class ContactState{
         )
     }
 
+    @Action(ContactAction.ImportContact)
+    importContacts(ctx:StateContext<ContactStateModel>, {file}:ContactAction.ImportContact)
+    {
+        ctx.patchState({
+            loadingContacts: true
+        })
+
+        return this._contactsService.importContacts(file).pipe(
+            tap(
+                ()=>{
+                    this._toastrService.success("Contacts importés avec success", 'Contact');
+                    ctx.patchState({
+                        loadingContacts:false,
+                        initLoadingState:"NO_LOADED"
+                    })
+                    ctx.dispatch(new ContactAction.FetchAllContact());
+                }
+            ),
+            catchError((error) => {
+                this._toastrService.error(error?.error?.message || "Echec de l'import", 'Erreur');
+                ctx.patchState({
+                    loadingContacts: false
+                })
+                return throwError(error);
+            })
+        )
+    }
+
     @Action(ContactAction.FetchAllContact)
     fetchAllContats(ctx:StateContext<ContactStateModel>)
     {

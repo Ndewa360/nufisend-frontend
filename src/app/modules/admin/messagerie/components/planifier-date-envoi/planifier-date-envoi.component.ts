@@ -25,6 +25,7 @@ export class PlanifierDateEnvoiComponent implements OnInit, AfterViewInit {
 
   listOfDay=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"]
   listOfMonth=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Decembre"]
+  timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Douala"
 
   ngxMaterialTimePickerTheme:NgxMaterialTimepickerTheme = {
     container: {
@@ -151,7 +152,8 @@ export class PlanifierDateEnvoiComponent implements OnInit, AfterViewInit {
         type:"isAllDay",
         startDate:value.startAllPlage.toISOString(),
         endDate:value.endAllPlage.toISOString(),
-        time:value.timeAllPlage
+        time:value.timeAllPlage,
+        timezone:this.timezone
       })
     }
 
@@ -168,6 +170,7 @@ export class PlanifierDateEnvoiComponent implements OnInit, AfterViewInit {
         time:value.timeCurrentPlage,
         every:value.numberOfCurrent,
         recurency:"day",
+        timezone:this.timezone
       };
 
       switch (value.typeOfCurrent) {
@@ -207,7 +210,8 @@ export class PlanifierDateEnvoiComponent implements OnInit, AfterViewInit {
       planifObj.push({
         type:"isRandom",
         dates:this.selectedRandomDate,
-        time:value.timeRandomPlage
+        time:value.timeRandomPlage,
+        timezone:this.timezone
       })
     }
     if(planifObj.length>0) this.planficationDateEvent.emit({planif:planifObj,hasPlanification:true});

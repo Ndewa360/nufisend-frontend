@@ -46,12 +46,4 @@ export class MessageTemplateService
     {
         return this._httpClient.delete<ApiResultFormat<null>>(`${environment.apiUrl}/message-template/${id}`)
     }
-
-    /**
-     * Sync Message Template
-     */
-    syncMessageTemplates(): Observable<ApiResultFormat<null>>
-    {
-        return this._httpClient.post<ApiResultFormat<null>>(`${environment.apiUrl}/message-template/sync-whatsapp`,{})
-    }
 }

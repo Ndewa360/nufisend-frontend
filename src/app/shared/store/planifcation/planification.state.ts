@@ -132,34 +132,6 @@ export class PlanificationState{
         )
     }
 
-    @Action(PlanificationAction.SyncPlanification)
-    syncWhatsappPlanification(ctx:StateContext<PlanificationStateModel>)
-    {
-        const state = ctx.getState();
-        ctx.patchState({
-            loadingPlanifications: true
-        })
-
-        return this._planificationsService.syncPlanifications().pipe(
-            tap(
-                (result)=>{                    
-                    this._toastrService.success(`Planification synchronisé avec success`, 'Planification');
-                    ctx.patchState({
-                        loadingPlanifications:false,
-                    });
-                }
-            ),
-            catchError((error) => {
-                this._toastrService.error(error?.error?.message, 'Erreur');
-                ctx.patchState({
-                    loadingPlanifications: false
-                })
-                return throwError(error);
-                
-            })
-        )
-    }
-
     @Action(PlanificationAction.FetchAllPlanification)
     fetchAllPlanifications(ctx:StateContext<PlanificationStateModel>)
     {

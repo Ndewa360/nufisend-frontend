@@ -34,4 +34,11 @@ export namespace ContactAction
         static readonly type = '[Contact] Sync Contact'
         constructor(){}
     }
+
+    //Import contacts from CSV
+    export class ImportContact
+    {
+        static readonly type = '[Contact] Import Contact'
+        constructor(public file:File){}
+    }
 }

@@ -130,39 +130,12 @@ export class GroupState{
             tap(
                 (result)=>{                    
                     let groupIndex = state.groups.findIndex((c)=>c._id==id),groups = [...state.groups];
-                    this._toastrService.success(`Group ${groups[groupIndex].name} supprimé avec success`, 'Group');
-                    groups.splice(groupIndex,1);
+                    const deletedGroup = groupIndex > -1 ? groups[groupIndex] : null;
+                    this._toastrService.success(`Group ${deletedGroup?.name || ""} supprimé avec success`, 'Group');
+                    if (groupIndex > -1) groups.splice(groupIndex,1);
                     ctx.patchState({
                         loadingGroups:false,
                         groups:[...groups]
-                    })
-                }
-            ),
-            catchError((error) => {
-                this._toastrService.error(error?.error?.message, 'Erreur');
-                ctx.patchState({
-                    loadingGroups: false
-                })
-                return throwError(error);
-                
-            })
-        )
-    }
-
-    @Action(GroupAction.SyncGroup)
-    syncWhatsappGroup(ctx:StateContext<GroupStateModel>)
-    {
-        const state = ctx.getState();
-        ctx.patchState({
-            loadingGroups: true
-        })
-
-        return this._groupsService.syncGroups().pipe(
-            tap(
-                (result)=>{                    
-                    this._toastrService.success(`Group synchronisé avec success`, 'Group');
-                    ctx.patchState({
-                        loadingGroups:false,
                     })
                 }
             ),

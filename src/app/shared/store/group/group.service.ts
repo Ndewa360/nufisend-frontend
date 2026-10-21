@@ -47,11 +47,4 @@ export class GroupService
         return this._httpClient.delete<ApiResultFormat<null>>(`${environment.apiUrl}/groups/${id}`)
     }
 
-    /**
-     * Sync contact
-     */
-    syncGroups(): Observable<ApiResultFormat<null>>
-    {
-        return this._httpClient.post<ApiResultFormat<null>>(`${environment.apiUrl}/groups/sync-whatsapp`,{})
-    }
 }

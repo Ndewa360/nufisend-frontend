@@ -27,11 +27,4 @@ export namespace PlanificationAction
         static readonly type = '[Planification] Delete Planification'
         constructor(public id:string){}
     }
-
-    //Sync planification
-    export class SyncPlanification
-    {
-        static readonly type = '[Planification] Sync Planification'
-        constructor(){}
-    }
 }

@@ -27,11 +27,4 @@ export namespace MessageTemplateAction
         static readonly type = '[MessageTemplate] Delete MessageTemplate'
         constructor(public id:string){}
     }
-
-    //Sync contact
-    export class SyncMessageTemplate
-    {
-        static readonly type = '[MessageTemplate] Sync MessageTemplate'
-        constructor(){}
-    }
 }

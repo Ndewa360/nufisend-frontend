@@ -24,14 +24,6 @@ export class PlanificationService
     }
 
     /**
-     * Create planification
-     */
-    createPlanification(planification:PlanificationModel): Observable<ApiResultFormat<PlanificationModel>>
-    {
-        return this._httpClient.post<ApiResultFormat<PlanificationModel>>(`${environment.apiUrl}/planifications`, planification)
-    }
-
-    /**
      * Update planification
      */
     updatePlanification(planification:PlanificationModel,id:string): Observable<ApiResultFormat<PlanificationModel>>
@@ -45,13 +37,5 @@ export class PlanificationService
     deletePlanification(id:string): Observable<ApiResultFormat<null>>
     {
         return this._httpClient.delete<ApiResultFormat<null>>(`${environment.apiUrl}/planifications/${id}`)
-    }
-
-    /**
-     * Sync planification
-     */
-    syncPlanifications(): Observable<ApiResultFormat<null>>
-    {
-        return this._httpClient.post<ApiResultFormat<null>>(`${environment.apiUrl}/planifications/sync-whatsapp`,{})
     }
 }
