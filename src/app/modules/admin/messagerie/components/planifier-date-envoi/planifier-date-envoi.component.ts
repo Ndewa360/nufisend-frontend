@@ -91,7 +91,7 @@ export class PlanifierDateEnvoiComponent implements OnInit, AfterViewInit {
   {
     let newDateIndex = this.selectedRandomDate.findIndex((foundDate)=>foundDate==dateString);
     
-    if(newDateIndex>=-1) this.selectedRandomDate.splice(newDateIndex,1);
+    if(newDateIndex > -1) this.selectedRandomDate.splice(newDateIndex,1);
     calendar.updateTodaysDate();
   }
 

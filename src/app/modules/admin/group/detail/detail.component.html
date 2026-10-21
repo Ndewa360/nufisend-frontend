@@ -1,5 +1,5 @@
 <div class="flex flex-col w-full">
-    <ng-container *ngIf="!(isLoading | async); else waitForLoading">
+    <ng-container *ngIf="!isLoading; else waitForLoading">
         <ng-container *ngIf="groupModel">
             <!-- View mode -->
             <ng-container *ngIf="!editMode">

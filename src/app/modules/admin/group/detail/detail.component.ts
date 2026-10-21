@@ -3,7 +3,7 @@ import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } fr
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Store, Actions, ofActionCompleted, ofActionErrored, ofActionSuccessful } from '@ngxs/store';
-import { Overlay } from 'ngx-toastr';
+import { Overlay } from '@angular/cdk/overlay';
 import { Subject, takeUntil } from 'rxjs';
 import { ListComponent } from '../list/list.component';
 import { ContactModel, GroupAction, GroupModel, GroupState } from 'app/shared/store';

@@ -168,6 +168,18 @@ export class ContactComponent {
     // -----------------------------------------------------------------------------------------------------
 
     /**
+     * On backdrop clicked
+     */
+    onBackdropClicked(): void
+    {
+        // Clear the selected contact
+        this.selectedContact = null;
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+    }
+
+    /**
      * A user that is not synced with WhatsApp should never see the loading
      * placeholder: only synced users load their WhatsApp contacts.
      */

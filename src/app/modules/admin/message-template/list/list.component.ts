@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestro
 import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MessageTemplateAction, MessageTemplateModel, MessageTemplateState } from 'app/shared/store';
 import { MessageTemplateService } from 'app/shared/store/';
 import { Observable, Subject, takeUntil, switchMap, fromEvent, filter, tap } from 'rxjs';
@@ -179,5 +180,19 @@ export class ListComponent implements OnInit, OnDestroy{
     trackByFn(index: number, item: any): any
     {
         return item.id || index;
+    }
+
+    /**
+     * Dropped event
+     *
+     * @param event
+     */
+    dropped(event: CdkDragDrop<MessageTemplateModel[]>): void
+    {
+        // Move the item in the array
+        moveItemInArray(this.messageTemplates, event.previousIndex, event.currentIndex);
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
 }

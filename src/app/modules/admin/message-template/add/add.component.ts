@@ -6,7 +6,7 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { MessageTemplateAction, MessageTemplateModel } from 'app/shared/store';
 import { assign } from 'lodash';
-import { OverlayRef, Overlay } from 'ngx-toastr';
+import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { Subject, tap, debounceTime, takeUntil, filter } from 'rxjs';
 import { ListComponent } from '../list/list.component';
 import { FormUtils } from 'app/shared/utils/form-utils';

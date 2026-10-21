@@ -100,13 +100,14 @@ export class ContactState{
             tap(
                 (result)=>{
                     
-                    let contactIndex = state.contacts.findIndex((c)=>c._id==id),contacts = state.contacts;
-                    contact[contactIndex]=result.data
+                    const contacts = [...state.contacts];
+                    const contactIndex = contacts.findIndex((c)=>c._id==id);
+                    if(contactIndex > -1) contacts[contactIndex]=result.data;
                     ctx.patchState({
                         loadingContacts:false,
                         contacts
                     })
-                    this._toastrService.success(`Contact ${contact.fullName} modifié avec success`, 'Contact');
+                    this._toastrService.success(`Contact ${result.data?.fullName ?? contact.fullName} modifié avec success`, 'Contact');
                 }
             ),
             catchError((error) => {
