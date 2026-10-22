@@ -90,25 +90,8 @@ export class ListComponent implements OnInit, OnDestroy{
 
         // Subscribe to search input field value changes
         this.searchInputControl.valueChanges
-            .pipe(
-                takeUntil(this._unsubscribeAll),
-                tap((query:string) =>
-                    {
-                        if(query.length<2)
-                        {
-                            this.contactsFiltered=[...this.contacts]
-                            return;
-                        }
-                        // Search
-                        this.contactsFiltered=this.contacts.filter
-                            (
-                                (contact)=> `${contact.fullName} ${contact.jobTitle} ${contact.company}`.toLowerCase().includes(query.toLowerCase())
-                            )
-                            this._changeDetectorRef.markForCheck();
-                    }
-                )
-            )
-            .subscribe();
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((query: string) => this._filterContacts(query));
 
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
@@ -270,5 +253,47 @@ export class ListComponent implements OnInit, OnDestroy{
     trackByFn(index: number, item: any): any
     {
         return item._id || index;
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Private methods
+    // -----------------------------------------------------------------------------------------------------
+
+    private _filterContacts(query: string): void
+    {
+        const normalizedQuery = this._normalize(query);
+
+        if ( !normalizedQuery )
+        {
+            this.contactsFiltered = [...this.contacts];
+        }
+        else
+        {
+            this.contactsFiltered = this.contacts.filter((contact) => {
+                const emails = (contact.emails || []).map((email) => email.email).join(' ');
+                const phones = (contact.phoneNumbers || []).map((phone) => phone.phoneNumber).join(' ');
+
+                return this._normalize([
+                    contact.fullName,
+                    contact.jobTitle,
+                    contact.company,
+                    contact.organization,
+                    contact.address,
+                    emails,
+                    phones
+                ].filter(Boolean).join(' ')).includes(normalizedQuery);
+            });
+        }
+
+        this._changeDetectorRef.markForCheck();
+    }
+
+    private _normalize(value: string | undefined | null): string
+    {
+        return String(value ?? '')
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '')
+            .toLowerCase()
+            .trim();
     }
 }

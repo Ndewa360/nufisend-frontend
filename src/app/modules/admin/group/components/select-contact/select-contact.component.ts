@@ -52,16 +52,21 @@ export class SelectContactComponent {
         takeUntil(this._unsubscribeAll),
         tap((query:string) =>
             {
-                if(query.length<2)
+                const normalizedQuery = (query || '').trim().toLowerCase();
+
+                if(!normalizedQuery)
                 {
                     this.contactsFiltered=[...this.contacts]
+                    this._changeDetectorRef.markForCheck();
                     return;
                 }
                 // Search
                 this.contactsFiltered=this.contacts.filter
                     (
                         (contact)=> {
-                          return `${contact.fullName} ${contact.jobTitle} ${contact.company}`.toLowerCase().includes(query.toLowerCase())
+                          const emails = (contact.emails || []).map((email) => email.email).join(' ');
+                          const phones = (contact.phoneNumbers || []).map((phone) => phone.phoneNumber).join(' ');
+                          return `${contact.fullName || ''} ${contact.jobTitle || ''} ${contact.company || ''} ${emails} ${phones}`.toLowerCase().includes(normalizedQuery)
                         }
                     )
               // Mark for check

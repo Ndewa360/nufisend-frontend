@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map, Observable, ReplaySubject, switchMap, take, tap } from 'rxjs';
+import { Observable, ReplaySubject, map, of, take } from 'rxjs';
 import { Notification } from 'app/layout/common/notifications/notifications.types';
+
+export type NewNotification = Omit<Notification, 'id' | 'read' | 'time'> & {
+    read?: boolean;
+    time?: string;
+};
 
 @Injectable({
     providedIn: 'root'
@@ -9,12 +13,14 @@ import { Notification } from 'app/layout/common/notifications/notifications.type
 export class NotificationsService
 {
     private _notifications: ReplaySubject<Notification[]> = new ReplaySubject<Notification[]>(1);
+    private _currentNotifications: Notification[] = [];
 
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient)
+    constructor()
     {
+        this._notifications.next(this._currentNotifications);
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -38,11 +44,7 @@ export class NotificationsService
      */
     getAll(): Observable<Notification[]>
     {
-        return this._httpClient.get<Notification[]>('api/common/notifications').pipe(
-            tap((notifications) => {
-                this._notifications.next(notifications);
-            })
-        );
+        return this.notifications$.pipe(take(1));
     }
 
     /**
@@ -50,21 +52,18 @@ export class NotificationsService
      *
      * @param notification
      */
-    create(notification: Notification): Observable<Notification>
+    create(notification: NewNotification): Observable<Notification>
     {
-        return this.notifications$.pipe(
-            take(1),
-            switchMap(notifications => this._httpClient.post<Notification>('api/common/notifications', {notification}).pipe(
-                map((newNotification) => {
+        const newNotification: Notification = {
+            ...notification,
+            id  : this._generateId(),
+            read: notification.read ?? false,
+            time: notification.time || new Date().toISOString()
+        };
 
-                    // Update the notifications with the new notification
-                    this._notifications.next([...notifications, newNotification]);
+        this._setNotifications([newNotification, ...this._currentNotifications]);
 
-                    // Return the new notification from observable
-                    return newNotification;
-                })
-            ))
-        );
+        return of(newNotification);
     }
 
     /**
@@ -75,28 +74,13 @@ export class NotificationsService
      */
     update(id: string, notification: Notification): Observable<Notification>
     {
-        return this.notifications$.pipe(
-            take(1),
-            switchMap(notifications => this._httpClient.patch<Notification>('api/common/notifications', {
-                id,
-                notification
-            }).pipe(
-                map((updatedNotification: Notification) => {
+        const updatedNotification = { ...notification, id };
 
-                    // Find the index of the updated notification
-                    const index = notifications.findIndex(item => item.id === id);
-
-                    // Update the notification
-                    notifications[index] = updatedNotification;
-
-                    // Update the notifications
-                    this._notifications.next(notifications);
-
-                    // Return the updated notification
-                    return updatedNotification;
-                })
-            ))
+        this._setNotifications(
+            this._currentNotifications.map((item) => item.id === id ? updatedNotification : item)
         );
+
+        return of(updatedNotification);
     }
 
     /**
@@ -106,25 +90,13 @@ export class NotificationsService
      */
     delete(id: string): Observable<boolean>
     {
-        return this.notifications$.pipe(
-            take(1),
-            switchMap(notifications => this._httpClient.delete<boolean>('api/common/notifications', {params: {id}}).pipe(
-                map((isDeleted: boolean) => {
+        const exists = this._currentNotifications.some((notification) => notification.id === id);
 
-                    // Find the index of the deleted notification
-                    const index = notifications.findIndex(item => item.id === id);
-
-                    // Delete the notification
-                    notifications.splice(index, 1);
-
-                    // Update the notifications
-                    this._notifications.next(notifications);
-
-                    // Return the deleted status
-                    return isDeleted;
-                })
-            ))
+        this._setNotifications(
+            this._currentNotifications.filter((notification) => notification.id !== id)
         );
+
+        return of(exists);
     }
 
     /**
@@ -132,23 +104,29 @@ export class NotificationsService
      */
     markAllAsRead(): Observable<boolean>
     {
-        return this.notifications$.pipe(
-            take(1),
-            switchMap(notifications => this._httpClient.get<boolean>('api/common/notifications/mark-all-as-read').pipe(
-                map((isUpdated: boolean) => {
-
-                    // Go through all notifications and set them as read
-                    notifications.forEach((notification, index) => {
-                        notifications[index].read = true;
-                    });
-
-                    // Update the notifications
-                    this._notifications.next(notifications);
-
-                    // Return the updated status
-                    return isUpdated;
-                })
-            ))
+        this._setNotifications(
+            this._currentNotifications.map((notification) => ({ ...notification, read: true }))
         );
+
+        return of(true);
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Private methods
+    // -----------------------------------------------------------------------------------------------------
+
+    private _setNotifications(notifications: Notification[]): void
+    {
+        this._currentNotifications = notifications;
+        this._notifications.next(notifications);
+    }
+
+    private _generateId(): string
+    {
+        if (typeof crypto !== 'undefined' && typeof (crypto as any).randomUUID === 'function') {
+            return (crypto as any).randomUUID();
+        }
+
+        return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
 }

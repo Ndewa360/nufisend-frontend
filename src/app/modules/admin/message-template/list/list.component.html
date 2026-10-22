@@ -27,10 +27,10 @@
                         <div class="text-4xl font-extrabold tracking-tight leading-none">Template de messages</div>
                         <div class="ml-0.5 font-medium text-secondary">
                             <ng-container *ngIf="!(loading$ |async); else waitForLoadingDataMessage">
-                                <ng-container *ngIf="messageTemplatesCount > 0">
-                                    {{messageTemplatesCount}}
+                                <ng-container *ngIf="messageTemplatesFiltered.length > 0">
+                                    {{messageTemplatesFiltered.length}}
                                 </ng-container>
-                                {{messageTemplatesCount | i18nPlural: {
+                                {{messageTemplatesFiltered.length | i18nPlural: {
                                 '=0'   : 'Aucun template de message',
                                 '=1'   : 'template',
                                 'other': 'templates'
@@ -42,7 +42,23 @@
                         </div>
                     </div>
                     <!-- Actions -->
-                    <div class="mt-4 sm:mt-0">
+                    <div class="flex items-center mt-4 sm:mt-0">
+                        <!-- Search -->
+                        <div class="flex-auto">
+                            <mat-form-field
+                                class="fuse-mat-dense fuse-mat-rounded w-full min-w-50"
+                                subscriptSizing="dynamic">
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                                <input
+                                    matInput
+                                    [formControl]="searchInputControl"
+                                    [autocomplete]="'off'"
+                                    placeholder="Rechercher un template">
+                            </mat-form-field>
+                        </div>
                         <!-- Add template button -->
                         <button
                             class="ml-3"
@@ -59,15 +75,15 @@
                 <!-- Contacts list -->
                 <div class="relative">
                    <ng-container *ngIf="!(loading$ |async); else waitForLoadingData">
-                    <ng-container *ngIf="messageTemplates && messageTemplates.length > 0; else noMessageTemplates">
+                    <ng-container *ngIf="messageTemplatesFiltered && messageTemplatesFiltered.length > 0; else noMessageTemplates">
                         <div
                             class="divide-y"
                             cdkDropList
-                            [cdkDropListData]="messageTemplates"
+                            [cdkDropListData]="messageTemplatesFiltered"
                             (cdkDropListDropped)="dropped($event)">
     
                             <!-- MessageTemplate -->
-                            <ng-container *ngFor="let messageTemplate of messageTemplates; let first = first; trackBy: trackByFn">
+                            <ng-container *ngFor="let messageTemplate of messageTemplatesFiltered; let first = first; trackBy: trackByFn">
                                 <div
                                     [id]="'messageTemplate-' + messageTemplate._id"
                                     class="group w-full select-none hover:bg-gray-100 dark:hover:bg-hover h-16"
@@ -157,7 +173,7 @@
                     <ng-template #noMessageTemplates>
                         <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
                             <img class="mb-3 mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 7rem;">
-                                <p class="mb-0">Aucun template trouvé</p>
+                                <p class="mb-0">{{messageTemplatesCount > 0 ? 'Aucun template ne correspond à votre recherche' : 'Aucun template trouvé'}}</p>
                         </div>
                     </ng-template>
                    </ng-container>

@@ -7,7 +7,7 @@
         <mat-icon [svgIcon]="'heroicons_outline:search'"></mat-icon>
     </button>
     <div
-        class="absolute inset-0 flex items-center shrink-0 z-99  bg-green-800 "
+        class="absolute inset-0 flex items-center shrink-0 z-99 bg-green-800"
         *ngIf="opened"
         @slideInTop
         @slideOutTop>
@@ -18,7 +18,7 @@
             class="w-full h-full px-16 sm:px-18"
             [formControl]="searchControl"
             [matAutocomplete]="matAutocomplete"
-            [placeholder]="'Search...'"
+            placeholder="Rechercher..."
             (keydown)="onKeydown($event)"
             #barSearchInput>
         <mat-autocomplete
@@ -29,7 +29,7 @@
             <mat-option
                 class="py-0 px-6 text-md pointer-events-none text-secondary bg-transparent"
                 *ngIf="resultSets && !resultSets.length">
-                No results found!
+                Aucun résultat trouvé
             </mat-option>
             <ng-container *ngFor="let resultSet of resultSets; trackBy: trackByFn">
                 <mat-optgroup class="flex items-center mt-2 px-2">
@@ -39,19 +39,9 @@
                     <mat-option
                         class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover"
                         [routerLink]="result.link"
-                        [value]="result.value">
-                        <!-- Contacts -->
-                        <ng-container *ngIf="resultSet.id === 'contacts'">
-                            <ng-container *ngTemplateOutlet="contactResult; context: {$implicit: result}"></ng-container>
-                        </ng-container>
-                        <!-- Pages -->
-                        <ng-container *ngIf="resultSet.id === 'pages'">
-                            <ng-container *ngTemplateOutlet="pageResult; context: {$implicit: result}"></ng-container>
-                        </ng-container>
-                        <!-- Tasks -->
-                        <ng-container *ngIf="resultSet.id === 'tasks'">
-                            <ng-container *ngTemplateOutlet="taskResult; context: {$implicit: result}"></ng-container>
-                        </ng-container>
+                        [value]="result.value || result.title || result.link"
+                        (click)="onResultClick()">
+                        <ng-container *ngTemplateOutlet="searchResult; context: {$implicit: result}"></ng-container>
                     </mat-option>
                 </ng-container>
             </ng-container>
@@ -78,7 +68,7 @@
                 matInput
                 [formControl]="searchControl"
                 [matAutocomplete]="matAutocomplete"
-                [placeholder]="'Search...'"
+                placeholder="Rechercher..."
                 (keydown)="onKeydown($event)">
         </mat-form-field>
         <mat-autocomplete
@@ -89,7 +79,7 @@
             <mat-option
                 class="py-0 px-6 text-md pointer-events-none text-secondary bg-transparent"
                 *ngIf="resultSets && !resultSets.length">
-                No results found!
+                Aucun résultat trouvé
             </mat-option>
             <ng-container *ngFor="let resultSet of resultSets; trackBy: trackByFn">
                 <mat-optgroup class="flex items-center mt-2 px-2">
@@ -99,19 +89,9 @@
                     <mat-option
                         class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover"
                         [routerLink]="result.link"
-                        [value]="result.value">
-                        <!-- Contacts -->
-                        <ng-container *ngIf="resultSet.id === 'contacts'">
-                            <ng-container *ngTemplateOutlet="contactResult; context: {$implicit: result}"></ng-container>
-                        </ng-container>
-                        <!-- Pages -->
-                        <ng-container *ngIf="resultSet.id === 'pages'">
-                            <ng-container *ngTemplateOutlet="pageResult; context: {$implicit: result}"></ng-container>
-                        </ng-container>
-                        <!-- Tasks -->
-                        <ng-container *ngIf="resultSet.id === 'tasks'">
-                            <ng-container *ngTemplateOutlet="taskResult; context: {$implicit: result}"></ng-container>
-                        </ng-container>
+                        [value]="result.value || result.title || result.link"
+                        (click)="onResultClick()">
+                        <ng-container *ngTemplateOutlet="searchResult; context: {$implicit: result}"></ng-container>
                     </mat-option>
                 </ng-container>
             </ng-container>
@@ -119,58 +99,29 @@
     </div>
 </ng-container>
 
-<!-- Contact result template -->
+<!-- Search result template -->
 <ng-template
-    #contactResult
+    #searchResult
     let-result>
     <div class="flex items-center">
         <div class="flex shrink-0 items-center justify-center w-8 h-8 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-800">
             <img
                 *ngIf="result.avatar"
-                [src]="result.avatar">
+                class="w-full h-full object-cover"
+                [src]="result.avatar"
+                [alt]="result.title">
             <mat-icon
                 class="m-0 icon-size-5 text-primary dark:text-primary-400"
                 *ngIf="!result.avatar"
-                [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
+                [svgIcon]="result.icon || 'heroicons_outline:search'"></mat-icon>
         </div>
-        <div class="ml-3 truncate">
-            <span [innerHTML]="result.name"></span>
+        <div class="ml-3 min-w-0">
+            <div class="truncate leading-normal">{{result.title}}</div>
+            <div
+                class="truncate leading-normal text-sm text-secondary"
+                *ngIf="result.description">
+                {{result.description}}
+            </div>
         </div>
-    </div>
-</ng-template>
-
-<!-- Page result template -->
-<ng-template
-    #pageResult
-    let-result>
-    <div class="flex flex-col">
-        <div
-            class="truncate leading-normal"
-            [innerHTML]="result.title"></div>
-        <div class="truncate leading-normal text-sm text-secondary">
-            {{result.link}}
-        </div>
-    </div>
-</ng-template>
-
-<!-- Task result template -->
-<ng-template
-    #taskResult
-    let-result>
-    <div class="flex items-center">
-        <ng-container *ngIf="result.completed">
-            <mat-icon
-                class="mr-0 text-primary dark:text-primary-400"
-                [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
-        </ng-container>
-        <ng-container *ngIf="!result.completed">
-            <mat-icon
-                class="mr-0 text-hint"
-                [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
-        </ng-container>
-        <div
-            class="ml-3 truncate leading-normal"
-            [ngClass]="{'line-through text-hint': result.completed}"
-            [innerHTML]="result.title"></div>
     </div>
 </ng-template>

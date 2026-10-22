@@ -1,9 +1,9 @@
 import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatAutocomplete } from '@angular/material/autocomplete';
-import { debounceTime, filter, map, Subject, takeUntil } from 'rxjs';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations/public-api';
+import { SearchResultSet, SearchService } from 'app/layout/common/search/search.service';
 
 @Component({
     selector     : 'search',
@@ -17,10 +17,10 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy
     @Input() appearance: 'basic' | 'bar' = 'basic';
     @Input() debounce: number = 300;
     @Input() minLength: number = 2;
-    @Output() search: EventEmitter<any> = new EventEmitter<any>();
+    @Output() search: EventEmitter<SearchResultSet[]> = new EventEmitter<SearchResultSet[]>();
 
     opened: boolean = false;
-    resultSets: any[];
+    resultSets: SearchResultSet[];
     searchControl: UntypedFormControl = new UntypedFormControl();
     private _matAutocomplete: MatAutocomplete;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -30,8 +30,8 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy
      */
     constructor(
         private _elementRef: ElementRef,
-        private _httpClient: HttpClient,
-        private _renderer2: Renderer2
+        private _renderer2: Renderer2,
+        private _searchService: SearchService
     )
     {
     }
@@ -113,34 +113,26 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy
         this.searchControl.valueChanges
             .pipe(
                 debounceTime(this.debounce),
-                takeUntil(this._unsubscribeAll),
-                map((value) => {
-
-                    // Set the resultSets to null if there is no value or
-                    // the length of the value is smaller than the minLength
-                    // so the autocomplete panel can be closed
-                    if ( !value || value.length < this.minLength )
-                    {
-                        this.resultSets = null;
-                    }
-
-                    // Continue
-                    return value;
-                }),
-                // Filter out undefined/null/false statements and also
-                // filter out the values that are smaller than minLength
-                filter(value => value && value.length >= this.minLength)
+                takeUntil(this._unsubscribeAll)
             )
             .subscribe((value) => {
-                this._httpClient.post('api/common/search', {query: value})
-                    .subscribe((resultSets: any) => {
+                const query = typeof value === 'string' ? value.trim() : '';
 
-                        // Store the result sets
-                        this.resultSets = resultSets;
+                // Close the autocomplete when the query is too short
+                if ( !query || query.length < this.minLength )
+                {
+                    this.resultSets = null;
+                    this.search.next([]);
+                    return;
+                }
 
-                        // Execute the event
-                        this.search.next(resultSets);
-                    });
+                const resultSets = this._searchService.search(query);
+
+                // Store the result sets
+                this.resultSets = resultSets;
+
+                // Execute the event
+                this.search.next(resultSets);
             });
     }
 
@@ -209,6 +201,17 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy
 
         // Close the search
         this.opened = false;
+    }
+
+    /**
+     * Close the bar search after selecting a result
+     */
+    onResultClick(): void
+    {
+        if ( this.appearance === 'bar' )
+        {
+            this.close();
+        }
     }
 
     /**

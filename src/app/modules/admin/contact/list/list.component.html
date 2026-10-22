@@ -58,7 +58,7 @@
                                     matInput
                                     [formControl]="searchInputControl"
                                     [autocomplete]="'off'"
-                                    [placeholder]="'Search contacts'">
+                                    placeholder="Rechercher un contact">
                             </mat-form-field>
                         </div>
                         <!-- Add contact button -->
@@ -147,7 +147,7 @@
                         <ng-template #noContacts>
                             <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
                                 <img class="mb-3 mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 7rem;">
-                                    <p class="mb-0">Aucun contact trouvé</p>
+                                    <p class="mb-0">{{contactsCount > 0 ? 'Aucun contact ne correspond à votre recherche' : 'Aucun contact'}}</p>
                             </div>
                         </ng-template>
                     </ng-container>                   

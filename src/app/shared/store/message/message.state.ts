@@ -5,6 +5,7 @@ import { catchError, tap, throwError } from "rxjs";
 import { MessageAction } from "./message.actions";
 import { MessageService } from "./message.service";
 import { PlanificationAction } from "../planifcation";
+import { NotificationsService } from "app/layout/common/notifications/notifications.service";
 
 export class MessageStateModel {
     sendingMessage:boolean
@@ -21,7 +22,8 @@ export class MessageStateModel {
 export class MessageState{
     constructor(
         private _messageService:MessageService,
-        private _toastrService:ToastrService
+        private _toastrService:ToastrService,
+        private _notificationsService:NotificationsService
     ){}
 
     @Selector()
@@ -47,6 +49,13 @@ export class MessageState{
                         sendingMessage:false
                     })
                     this._toastrService.success("Message envoyé avec succès", 'WhatsApp Message');
+                    this._notificationsService.create({
+                        icon: 'feather:send',
+                        title: message.isSentToNow ? 'Message envoyé' : 'Message planifié',
+                        description: message.title,
+                        link: '/messagerie',
+                        useRouter: true
+                    }).subscribe();
                     if(!message.isSentToNow) ctx.dispatch(new PlanificationAction.AddPlanification(result.data))
                 }
             ),

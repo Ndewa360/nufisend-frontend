@@ -56,9 +56,12 @@ export class SelectContactsGroupsComponent implements OnInit {
                 takeUntil(this._unsubscribeAll),
                 tap((query:string) =>
                     {
-                        if(query.length<2)
+                        const normalizedQuery = (query || '').trim().toLowerCase();
+
+                        if(!normalizedQuery)
                         {
                             this.contactsGroupsFiltered=[...this.contactsGroups]
+                            this._changeDetectorRef.markForCheck();
                             return;
                         }
                         // Search
@@ -66,9 +69,13 @@ export class SelectContactsGroupsComponent implements OnInit {
                             (
                                 (contact)=> {
                                   let field="";
-                                  if(contact.isGroup) field=contact.data.name;
-                                  else field=`${contact.data.fullName} ${contact.data.jobTitle} ${contact.data.company}`;
-                                  return field.toLowerCase().includes(query.toLowerCase())
+                                  if(contact.isGroup) field=contact.data.name || '';
+                                  else {
+                                    const emails = (contact.data.emails || []).map((email) => email.email).join(' ');
+                                    const phones = (contact.data.phoneNumbers || []).map((phone) => phone.phoneNumber).join(' ');
+                                    field=`${contact.data.fullName || ''} ${contact.data.jobTitle || ''} ${contact.data.company || ''} ${emails} ${phones}`;
+                                  }
+                                  return field.toLowerCase().includes(normalizedQuery)
                                 }
                             )
                       // Mark for check

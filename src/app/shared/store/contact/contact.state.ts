@@ -5,6 +5,7 @@ import { ContactAction } from "./contact.actions";
 import { ContactService } from "./contact.service";
 import { ToastrService } from "ngx-toastr";
 import { catchError, of, tap, throwError } from "rxjs";
+import { NotificationsService } from "app/layout/common/notifications/notifications.service";
 
 export class ContactStateModel {
     contacts:ContactModel[]
@@ -26,7 +27,8 @@ export class ContactStateModel {
 export class ContactState{
     constructor(
         private _contactsService:ContactService,
-        private _toastrService:ToastrService
+        private _toastrService:ToastrService,
+        private _notificationsService:NotificationsService
     ){}
 
     @Selector()
@@ -164,6 +166,13 @@ export class ContactState{
             tap(
                 ()=>{
                     this._toastrService.success(`Contact synchronisé avec success`, 'Contact');
+                    this._notificationsService.create({
+                        icon: 'feather:refresh-cw',
+                        title: 'Contacts WhatsApp synchronisés',
+                        description: 'Votre liste de contacts a été mise à jour.',
+                        link: '/annuaire/contacts',
+                        useRouter: true
+                    }).subscribe();
                     // Force a full reload so newly synced contacts appear immediately
                     ctx.setState({
                         loadingContacts: false,
@@ -198,6 +207,13 @@ export class ContactState{
                         ? `${summary.created} créé(s), ${summary.updated} mis à jour, ${summary.skipped} ignoré(s)`
                         : '';
                     this._toastrService.success(details || "Contacts importés avec success", 'Import terminé');
+                    this._notificationsService.create({
+                        icon: 'feather:upload',
+                        title: 'Import de contacts terminé',
+                        description: details || 'Vos contacts ont été importés.',
+                        link: '/annuaire/contacts',
+                        useRouter: true
+                    }).subscribe();
                     ctx.patchState({
                         loadingContacts:false,
                         contacts:[],

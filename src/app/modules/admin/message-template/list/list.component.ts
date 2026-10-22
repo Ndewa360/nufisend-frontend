@@ -73,10 +73,16 @@ export class ListComponent implements OnInit, OnDestroy{
                 // Update the counts
                 this.messageTemplatesCount = conts.length;
                 this.messageTemplates=[...conts]
+                this._filterMessageTemplates(this.searchInputControl.value);
                 this._changeDetectorRef.markForCheck()
                 // Mark for check
                 
             });
+
+        // Subscribe to search input field value changes
+        this.searchInputControl.valueChanges
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((query: string) => this._filterMessageTemplates(query));
 
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
@@ -190,9 +196,52 @@ export class ListComponent implements OnInit, OnDestroy{
     dropped(event: CdkDragDrop<MessageTemplateModel[]>): void
     {
         // Move the item in the array
-        moveItemInArray(this.messageTemplates, event.previousIndex, event.currentIndex);
+        moveItemInArray(this.messageTemplatesFiltered, event.previousIndex, event.currentIndex);
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Private methods
+    // -----------------------------------------------------------------------------------------------------
+
+    private _filterMessageTemplates(query: string): void
+    {
+        const normalizedQuery = this._normalize(query);
+
+        if ( !normalizedQuery )
+        {
+            this.messageTemplatesFiltered = [...this.messageTemplates];
+        }
+        else
+        {
+            this.messageTemplatesFiltered = this.messageTemplates.filter((messageTemplate) => {
+                return this._normalize([
+                    messageTemplate.title,
+                    messageTemplate.description,
+                    this._plainText(messageTemplate.content)
+                ].filter(Boolean).join(' ')).includes(normalizedQuery);
+            });
+        }
+
+        this._changeDetectorRef.markForCheck();
+    }
+
+    private _normalize(value: string | undefined | null): string
+    {
+        return String(value ?? '')
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    private _plainText(value: string | undefined | null): string
+    {
+        return String(value ?? '')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
     }
 }

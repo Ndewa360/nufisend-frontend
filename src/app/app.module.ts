@@ -1,4 +1,6 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExtraOptions, PreloadAllModules, RouterModule } from '@angular/router';
@@ -20,6 +22,8 @@ import { UserProfileState } from './shared/store/user-profile';
 import { SocketIoModule } from 'ngx-socket-io';
 import { GroupState } from './shared/store/group';
 import { PlanificationState } from './shared/store/planifcation';
+
+registerLocaleData(localeFr);
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -70,7 +74,9 @@ const routerConfig: ExtraOptions = {
     bootstrap   : [
         AppComponent
     ],
-    providers: []
+    providers: [
+        { provide: LOCALE_ID, useValue: 'fr-FR' }
+    ]
 })
 export class AppModule
 {

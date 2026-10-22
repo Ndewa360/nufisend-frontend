@@ -109,7 +109,7 @@ export class ContactComponent {
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((data)=> {
             this.contacts = this.sortAlpha(data ? [...data] : []);
-            this.contactsFiltered = [...this.contacts];
+            this._filterContacts(this.searchInputControl.value);
             this._changeDetectorRef.markForCheck();
         })
           
@@ -142,27 +142,10 @@ export class ContactComponent {
                 this._changeDetectorRef.markForCheck();
             });
 
-            // Subscribe to search input field value changes
+        // Subscribe to search input field value changes
         this.searchInputControl.valueChanges
-        .pipe(
-            takeUntil(this._unsubscribeAll),
-            tap((query:string) =>
-                {
-                    if(query.length<2)
-                    {
-                        this.contactsFiltered=[...this.contacts]
-                        return;
-                    }
-                    // Search
-                    this.contactsFiltered=this.sortAlpha(this.contacts.filter
-                        (
-                            (contact)=> `${contact.name} ${contact.number}`.toLowerCase().includes(query.toLowerCase())
-                        ))
-                        this._changeDetectorRef.markForCheck();
-                }
-            )
-        )
-        .subscribe();
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((query: string) => this._filterContacts(query));
     }
 
     /**
@@ -233,6 +216,37 @@ export class ContactComponent {
     trackByFn(index: number, item: any): any
     {
         return item.id || index;
+    }
+
+    private _filterContacts(query: string): void
+    {
+        const normalizedQuery = this._normalize(query);
+
+        if ( !normalizedQuery )
+        {
+            this.contactsFiltered = [...this.contacts];
+        }
+        else
+        {
+            this.contactsFiltered = this.sortAlpha(this.contacts.filter((contact) => {
+                return this._normalize([
+                    contact.name,
+                    contact.pushname,
+                    contact.number
+                ].filter(Boolean).join(' ')).includes(normalizedQuery);
+            }));
+        }
+
+        this._changeDetectorRef.markForCheck();
+    }
+
+    private _normalize(value: string | undefined | null): string
+    {
+        return String(value ?? '')
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '')
+            .toLowerCase()
+            .trim();
     }
 
     /**
