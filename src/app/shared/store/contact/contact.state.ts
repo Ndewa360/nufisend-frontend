@@ -155,18 +155,21 @@ export class ContactState{
     @Action(ContactAction.SyncContact)
     syncWhatsappContact(ctx:StateContext<ContactStateModel>)
     {
-        const state = ctx.getState();
         ctx.patchState({
             loadingContacts: true
         })
 
         return this._contactsService.syncContacts().pipe(
             tap(
-                (result)=>{                    
+                ()=>{
                     this._toastrService.success(`Contact synchronisé avec success`, 'Contact');
-                    ctx.patchState({
-                        loadingContacts:false,
-                    })
+                    // Force a full reload so newly synced contacts appear immediately
+                    ctx.setState({
+                        loadingContacts: false,
+                        contacts: [],
+                        initLoadingState: 'NO_LOADED'
+                    });
+                    ctx.dispatch(new ContactAction.FetchAllContact());
                 }
             ),
             catchError((error) => {
@@ -175,7 +178,6 @@ export class ContactState{
                     loadingContacts: false
                 })
                 return throwError(error);
-                
             })
         )
     }

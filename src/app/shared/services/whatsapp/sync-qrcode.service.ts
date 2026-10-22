@@ -63,29 +63,35 @@ export class SyncQrcodeService {
     ]);
 
     if (this.socket.ioSocket?.connected) {
-      log('startSync() -> emitting connexion immediately');
+      log('startSync() -> socket already connected, emitting connexion');
       this.socket.emit('connexion', {});
-    } else {
-      log('startSync() -> socket not connected, waiting for connect event');
-      const onConnect = () => {
-        log('startSync() -> socket connected, emitting connexion');
-        this.socket.emit('connexion', {});
-        (this.socket.ioSocket as any).off('connect', onConnect);
-      };
-      (this.socket.ioSocket as any).once('connect', onConnect);
+      return;
+    }
 
-      // Attempt to connect if not already connecting
+    log('startSync() -> socket not connected, waiting for connect event');
+    const onConnect = () => {
+      log('startSync() -> socket connected, emitting connexion');
+      this.socket.emit('connexion', {});
+    };
+    (this.socket.ioSocket as any).once('connect', onConnect);
+
+    // Only connect if not already in the process of connecting
+    if (!(this.socket.ioSocket as any).active) {
       try {
         const token = localStorage.getItem('accessToken') ?? '';
         (this.socket.ioSocket as any).auth = { token };
+        log('startSync() -> calling socket.connect()');
         this.socket.ioSocket.connect();
       } catch (e) {
         log('startSync() socket connect error', e);
+        (this.socket.ioSocket as any).off('connect', onConnect);
         this.store.dispatch([
           new WhatsappQrCodeAction.SetLoadingQrCode(false),
           new WhatsappContactAction.SetSyncError("Impossible de se connecter au serveur.")
         ]);
       }
+    } else {
+      log('startSync() -> socket already connecting (active), waiting for connect event');
     }
   }
 

@@ -1,7 +1,7 @@
 <ng-container *ngIf="!isWhatsappContactLoading; else toLoading">
     <div class="flex flex-col">
         <!-- Whatsapp Sync -->
-        <ng-container *ngIf="((userProfile$|async).hasSyncWhatsApp); else hasNoSyncWhatsapp">
+        <ng-container *ngIf="(userProfile$|async)?.hasSyncWhatsApp; else hasNoSyncWhatsapp">
     
                 <mat-drawer-container
                     class="flex-auto h-full bg-card dark:bg-transparent"

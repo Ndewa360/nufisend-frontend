@@ -1,17 +1,18 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MatDrawer } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { Actions, Select, Store, ofActionCompleted, ofActionSuccessful } from '@ngxs/store';
+import { Actions, Select, Store, ofActionCompleted } from '@ngxs/store';
 import { WhatsappDataService } from 'app/shared/services/whatsapp/whatsapp-data.service';
+import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
 import { ContactState, ContactModel, ContactAction, WhatsappContactModel, WhatsappContactState } from 'app/shared/store';
 import { ContactService } from 'app/shared/store/contact/contact.service';
 import { UserProfileState, UserProfileModel } from 'app/shared/store/user-profile';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, combineLatest, combineLatestAll, mergeAll, mergeMap, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-whatsapp-contact',
@@ -60,8 +61,8 @@ export class ContactComponent {
         private _fuseConfirmationService: FuseConfirmationService,
         private _toastrService:ToastrService,
         private whatsappDataService: WhatsappDataService,
+        private _syncQrcodeService: SyncQrcodeService,
         private _ngxsAction:Actions
-
     )
     {
     }
@@ -75,7 +76,6 @@ export class ContactComponent {
      */
     ngOnInit(): void
     {
-        // this.contacts$ = this._contactsService.contacts$;
         this.loadingContactStart$.pipe(takeUntil(this._unsubscribeAll)).subscribe((loading)=>{
             this.contactsLoading=loading;
             this.refreshLoadingState();
@@ -84,22 +84,29 @@ export class ContactComponent {
         this.userProfile$.pipe(takeUntil(this._unsubscribeAll)).subscribe((profile)=>{
             this.userProfile=profile;
             this.refreshLoadingState();
+            // If user is already synced but contacts store is empty (e.g. page reload),
+            // auto-trigger a re-sync to reload contacts from the live WhatsApp session.
+            if (profile?.hasSyncWhatsApp && !this.contactsLoading) {
+                const currentContacts = this._store.selectSnapshot(WhatsappContactState.selectStateData);
+                if (!currentContacts || currentContacts.length === 0) {
+                    this.contactsLoading = true;
+                    this.refreshLoadingState();
+                    this._syncQrcodeService.startSync();
+                }
+            }
         })
 
         this.loadingPercent$.pipe(takeUntil(this._unsubscribeAll)).subscribe((percent)=>{
             this.percent=percent;
-            // Mark for check
-           this._changeDetectorRef.markForCheck();
+            this._changeDetectorRef.markForCheck();
         })
 
         this.contactList$
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((data)=> {
-          if(data.length==0) return; 
-            this.contacts=[...data];
-            this.contactsFiltered=[...data]
-           // Mark for check
-           this._changeDetectorRef.markForCheck();
+            this.contacts = data ? [...data] : [];
+            this.contactsFiltered = data ? [...data] : [];
+            this._changeDetectorRef.markForCheck();
         })
           
         this._ngxsAction.pipe(
