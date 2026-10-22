@@ -61,9 +61,9 @@ const routerConfig: ExtraOptions = {
         ToastrModule.forRoot(),
 
         SocketIoModule.forRoot({
-            url:environment.apiUrl,
-            options:{
-                auth: (cb) => cb({ token: localStorage.getItem('accessToken') ?? '' })
+            url: environment.apiUrl,
+            options: {
+                autoConnect: false
             }
         })
     ],

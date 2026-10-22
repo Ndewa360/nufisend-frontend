@@ -25,6 +25,13 @@ export namespace WhatsappContactAction
         constructor(public percent:number){}
     }
 
+    //Set sync error message
+    export class SetSyncError
+    {
+        static readonly type = '[WhatsappContact] Set Sync Error'
+        constructor(public message:string){}
+    }
+
 
     //Sync contact
     export class SyncWhatsappContact

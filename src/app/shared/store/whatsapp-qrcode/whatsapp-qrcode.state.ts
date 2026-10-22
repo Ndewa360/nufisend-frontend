@@ -15,7 +15,7 @@ export class WhatsappQrCodeStateModel {
     name: "whatsapp_qrcode",
     defaults:{
         qrCode:null,
-        hasLoadingQrCode:true
+        hasLoadingQrCode:false
     }
 })
 @Injectable()

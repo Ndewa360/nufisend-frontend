@@ -123,6 +123,9 @@
                     <mat-icon class="icon-size-24 font-bold tracking-tight leading-none text-yellow-500" svgIcon="mat_solid:warning"></mat-icon>
                 </div>
                 <div class="text-lg font-medium ">Veuillez synchronizer votre Whatsapp pour voir vos contacts</div>
+                <div *ngIf="(syncError$ | async) as syncError" class="mt-4 px-4 py-3 rounded bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 max-w-lg text-center">
+                    {{syncError}}
+                </div>
             </ng-container>
         </ng-template>
     </div> 
@@ -132,11 +135,11 @@
     <div class="flex flex-col items-center mt-2">
         <ng-container *ngIf="percent==0; else hasNoPercentToShow">
             <mat-progress-bar  [mode]="'indeterminate'"></mat-progress-bar>
-            <div class="text-lg font-medium ">Veuillez patientez...</div>
+            <div class="text-lg font-medium ">Preparation de la synchronisation...</div>
         </ng-container>
         <ng-template #hasNoPercentToShow>
             <mat-progress-bar  [mode]="'determinate'" [value]="percent"></mat-progress-bar>
-            <div class="text-lg font-medium ">chargement de vos contacts ({{percent}}%)</div>
+            <div class="text-lg font-medium ">Chargement de vos contacts ({{percent}}%)</div>
         </ng-template>
     </div>
 </ng-template>

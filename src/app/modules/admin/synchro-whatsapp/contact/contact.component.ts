@@ -26,6 +26,7 @@ export class ContactComponent {
   @Select(WhatsappContactState.selectStateLoading) loadingContactStart$:Observable<boolean>;
   @Select(WhatsappContactState.selectStateData) contactList$:Observable<WhatsappContactModel[]>;
   @Select(WhatsappContactState.selectStatePercent) loadingPercent$:Observable<number>;
+  @Select(WhatsappContactState.selectStateSyncError) syncError$:Observable<string>;
   isWhatsappContactLoading=false
   contactsLoading=false;
   userProfile:UserProfileModel=null;

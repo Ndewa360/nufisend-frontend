@@ -1,9 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { ApexOptions } from 'apexcharts';
-import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
-import { WhatsappDataService } from 'app/shared/services/whatsapp/whatsapp-data.service';
+import { Select } from '@ngxs/store';
 import { WhatsappContactState, WhatsappContactModel } from 'app/shared/store';
 import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profile';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -19,14 +16,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>
   @Select(WhatsappContactState.selectStateData) contactList$:Observable<WhatsappContactModel[]>;
 
-    chartGithubIssues: ApexOptions = {};
-    chartTaskDistribution: ApexOptions = {};
-    chartBudgetDistribution: ApexOptions = {};
-    chartWeeklyExpenses: ApexOptions = {};
-    chartMonthlyExpenses: ApexOptions = {};
-    chartYearlyExpenses: ApexOptions = {};
-    data: any;
-    selectedProject: string = 'ACME Corp. Backend App';
     contactsNbre=0;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -34,9 +23,7 @@ export class HomeComponent implements OnInit, OnDestroy {
      * Constructor
      */
     constructor(
-        private _router: Router,        
-        private syncQrCodeService:SyncQrcodeService,
-        private store:Store
+        private _router: Router,
     )
     {
     }
@@ -72,6 +59,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     // -----------------------------------------------------------------------------------------------------
 
     /**
+     * Navigate to the messaging module
+     */
+    goToMessages(): void
+    {
+        this._router.navigate(['/messagerie']);
+    }
+
+    /**
+     * Navigate to the settings page
+     */
+    goToSettings(): void
+    {
+        this._router.navigate(['/settings']);
+    }
+
+    /**
      * Track by function for ngFor loops
      *
      * @param index
@@ -81,10 +84,4 @@ export class HomeComponent implements OnInit, OnDestroy {
     {
         return item.id || index;
     }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Private methods
-    // -----------------------------------------------------------------------------------------------------
-
-  
 }

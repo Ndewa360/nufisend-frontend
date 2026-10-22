@@ -9,6 +9,7 @@ export class WhatsappContactStateModel {
     contacts:WhatsappContactModel[]
     startLoading:boolean
     percentLoading:number
+    syncError:string
 }
 
 
@@ -17,7 +18,8 @@ export class WhatsappContactStateModel {
     defaults:{
         startLoading:false,
         percentLoading:0,
-        contacts:[]
+        contacts:[],
+        syncError:null
     }
 })
 @Injectable()
@@ -44,6 +46,12 @@ export class WhatsappContactState{
         return state.contacts
     }
 
+    @Selector()
+    static selectStateSyncError(state:WhatsappContactStateModel)
+    {
+        return state.syncError
+    }
+
     static selectStateByWhatsappContactId(contactId:string)
     {
         return createSelector([WhatsappContactState],(state)=>{
@@ -67,6 +75,16 @@ export class WhatsappContactState{
     {
         ctx.patchState({
             percentLoading:percent
+        })
+        return of(true)
+    }
+
+    @Action(WhatsappContactAction.SetSyncError)
+    setSyncError(ctx:StateContext<WhatsappContactStateModel>, {message}:WhatsappContactAction.SetSyncError)
+    {
+        ctx.patchState({
+            syncError:message,
+            startLoading:false
         })
         return of(true)
     }

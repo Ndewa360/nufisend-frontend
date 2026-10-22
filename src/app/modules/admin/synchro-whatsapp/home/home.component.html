@@ -28,7 +28,8 @@
                     <button
                         class="bg-accent"
                         mat-flat-button
-                        [color]="'accent'">
+                        [color]="'accent'"
+                        (click)="goToMessages()">
                         <mat-icon
                             class="icon-size-5"
                             [svgIcon]="'heroicons_solid:mail'"></mat-icon>
@@ -36,7 +37,8 @@
                     </button>
                     <button
                         mat-flat-button
-                        [color]="'primary'">
+                        [color]="'primary'"
+                        (click)="goToSettings()">
                         <mat-icon
                             class="icon-size-5"
                             [svgIcon]="'heroicons_solid:cog'"></mat-icon>

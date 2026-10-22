@@ -74,7 +74,9 @@ export class UserProfileState{
         const state = ctx.getState();
         ctx.patchState(
             {
-                userProfile:{...state.userProfile,hasSyncWhatsApp:status}
+                userProfile: state.userProfile
+                    ? {...state.userProfile,hasSyncWhatsApp:status}
+                    : { hasSyncWhatsApp: status }
             }
         )
         return ctx.dispatch(new GlobalAction.ChangeWhatsAppConnectedStatus(status));
