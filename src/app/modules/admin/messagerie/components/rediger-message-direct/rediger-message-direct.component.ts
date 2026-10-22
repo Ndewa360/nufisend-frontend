@@ -63,7 +63,7 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
         // Create the form
         this.composeForm = this._formBuilder.group({
             subject: [''],
-            body   : ['', [Validators.required]],
+            body   : [''],
             title  : ['', [Validators.required]]
         });
 
@@ -77,6 +77,17 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
             // Mark for check
             this._changeDetectorRef.markForCheck();
         });
+
+      this.composeForm.controls.title.valueChanges
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => {
+                this.sendMessage(
+                    this.selectedMessageTemplate,
+                    this.selectedMessageTemplate ? null : this.composeForm.value.body,
+                    this.selectedFiles.length > 0 ? this.selectedFiles[0] : null
+                );
+                this._changeDetectorRef.markForCheck();
+            });
 
       this.composeForm.controls.subject.valueChanges
             .pipe(
@@ -154,7 +165,7 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
       this.sendMessage(this.selectedMessageTemplate,this.selectedMessageTemplate?null:this.composeForm.value.body,this.selectedFiles[0])
     }
 
-    sendMessage(messageTemplate:MessageTemplateModel,message:string,file:File)
+    sendMessage(messageTemplate:MessageTemplateModel | null,message:string | null,file?:File | null)
     {
       this.sendMessageData.next({messageTemplate:messageTemplate,message:message,file:file,title:this.composeForm.value.title})
     }

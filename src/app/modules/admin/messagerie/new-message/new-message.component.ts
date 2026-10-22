@@ -4,6 +4,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { ContactModel, ContactState, GroupModel, MessageAction, MessageModel, MessagePlanification, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
 import { Observable, Subject, firstValueFrom, takeUntil } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 import { PrevisualisationMessageContactComponent } from '../components/previsualisation-message-contact/previsualisation-message-contact.component';
 
 @Component({
@@ -21,7 +22,7 @@ export class NewMessageComponent implements OnInit{
   destinationContacts:ContactModel[] = []
   destinationGroups:GroupModel[]=[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File,title?:string}={}
+  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title?:string}={}
   planificationObj:{hasPlanification:boolean, planif:MessagePlanification[]}={hasPlanification:false,planif:[]};
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
@@ -32,7 +33,8 @@ export class NewMessageComponent implements OnInit{
     private _changeDetectorRef: ChangeDetectorRef,
     private _ngxsAction:Actions,
     private _store:Store,
-    private _matDialog: MatDialog, 
+    private _matDialog: MatDialog,
+    private _toastrService: ToastrService
 
 )
 {}
@@ -88,19 +90,37 @@ export class NewMessageComponent implements OnInit{
       this._changeDetectorRef.markForCheck();
     }
 
-    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file:File,title:string})
+    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title:string})
     {
       this.messageToSend=message;
     }
 
     sendMessage()
     {
+      const title = (this.messageToSend.title || '').trim();
+      if (!title) {
+        this._toastrService.error('Le titre du message est requis', 'Validation');
+        return;
+      }
+      if (!this.hasMessageContent()) {
+        this._toastrService.error('Ajoutez un texte, un template ou un fichier au message', 'Validation');
+        return;
+      }
+      if (this.destinationContacts.length === 0 && this.destinationGroups.length === 0) {
+        this._toastrService.error('Selectionnez au moins un destinataire', 'Validation');
+        return;
+      }
+      if (!this.messageSendToNow && !this.planificationObj.hasPlanification) {
+        this._toastrService.error('Definissez la planification du message', 'Validation');
+        return;
+      }
+
       this.submitted=true;
       let dataToSend:MessageModel={
         type:MessageType.TEXT,
         isSentToNow:this.messageSendToNow,
         contactsID:this.destinationContacts.map((contact)=>contact._id),
-        title:this.messageToSend.title,
+        title,
         groupsID:this.destinationGroups.map((group)=>group._id)
       }
 
@@ -113,8 +133,12 @@ export class NewMessageComponent implements OnInit{
 
     canPrevisualise(): boolean
     {
-      const hasContent = !!(this.messageToSend.messageTemplate || this.messageToSend.message || this.messageToSend.file);
-      return hasContent && (this.destinationContacts.length > 0 || this.destinationGroups.length > 0);
+      return this.hasMessageContent() && (this.destinationContacts.length > 0 || this.destinationGroups.length > 0);
+    }
+
+    private hasMessageContent(): boolean
+    {
+      return !!(this.messageToSend.messageTemplate || (this.messageToSend.message && this.messageToSend.message.trim()) || this.messageToSend.file);
     }
 
     setPlanification(planif)
@@ -136,7 +160,6 @@ export class NewMessageComponent implements OnInit{
       
       
 
-      console.log("Contact Group",contactGroup)
       // Open the dialog
       const dialogRef = this._matDialog.open(PrevisualisationMessageContactComponent,
         {

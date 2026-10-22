@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Select, Actions, Store, ofActionSuccessful } from '@ngxs/store';
 import { ContactModel, MessageAction, MessageModel, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
 import { Subject, Observable, takeUntil } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 import { NewMessageComponent } from '../../new-message/new-message.component';
 
 @Component({
@@ -16,7 +17,7 @@ export class NewMessageForSingleContactComponent {
   messageSendToNow:boolean=false;
   destinationContact:ContactModel=null
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File,title?:string}={}
+  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title?:string}={}
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
 
@@ -26,6 +27,7 @@ export class NewMessageForSingleContactComponent {
     private _changeDetectorRef: ChangeDetectorRef,
     private _ngxsAction:Actions,
     private _store:Store,
+    private _toastrService: ToastrService,
     @Inject(MAT_DIALOG_DATA) data: {contact: ContactModel}
 )
 {
@@ -55,7 +57,6 @@ export class NewMessageForSingleContactComponent {
     )
     .subscribe(
       (value:any)=>{
-        console.log("Save New Message");
         this.saveAndClose()
       }
     );
@@ -73,19 +74,33 @@ export class NewMessageForSingleContactComponent {
     }
 
 
-    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file:File,title:string})
+    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title:string})
     {
       this.messageToSend=message;
     }
 
     sendMessage()
     {
+      const title = (this.messageToSend.title || '').trim();
+      if (!title) {
+        this._toastrService.error('Le titre du message est requis', 'Validation');
+        return;
+      }
+      if (!this.hasMessageContent()) {
+        this._toastrService.error('Ajoutez un texte, un template ou un fichier au message', 'Validation');
+        return;
+      }
+      if (!this.destinationContact?._id) {
+        this._toastrService.error('Destinataire introuvable', 'Validation');
+        return;
+      }
+
       this.submitted=true;
       let dataToSend:MessageModel={
         type:MessageType.TEXT,
         isSentToNow:true,
         contactsID:[this.destinationContact._id],
-        title:this.messageToSend.title
+        title
         // groupsID:this.destinationGroups.map((group)=>group)
       }
       if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
@@ -93,6 +108,11 @@ export class NewMessageForSingleContactComponent {
       if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
       // console.log("MessageToSend",dataToSend)
       this._store.dispatch(new MessageAction.SendMessage(dataToSend));
+    }
+
+    private hasMessageContent(): boolean
+    {
+      return !!(this.messageToSend.messageTemplate || (this.messageToSend.message && this.messageToSend.message.trim()) || this.messageToSend.file);
     }
 
     /**
