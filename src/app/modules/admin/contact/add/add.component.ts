@@ -12,6 +12,7 @@ import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { ContactAction, ContactModel, GroupModel } from 'app/shared/store';
 import { Actions, Store, ofActionCompleted, ofActionSuccessful } from '@ngxs/store';
 import { FormUtils } from 'app/shared/utils/form-utils';
+import { PreferencesService } from 'app/shared/services/preferences/preferences.service';
 
 @Component({
   selector: 'app-contact-add',
@@ -33,7 +34,7 @@ export class AddComponent implements OnInit, OnDestroy {
     countries: CountryModel[]=[];
     private _tagsPanelOverlayRef: OverlayRef;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-    selectedGroup: GroupModel[];
+    selectedGroup: GroupModel[] = [];
     
 
     /**
@@ -51,7 +52,8 @@ export class AddComponent implements OnInit, OnDestroy {
         private _overlay: Overlay,
         private _viewContainerRef: ViewContainerRef,
         private _store:Store,
-        private _ngxsAction:Actions
+        private _ngxsAction:Actions,
+        private _preferencesService: PreferencesService
     )
     {
     }
@@ -103,12 +105,11 @@ export class AddComponent implements OnInit, OnDestroy {
         // Create an email form group
         emailFormGroups.push(
           this._formBuilder.group({
-              email: ['',[Validators.required]],
+              email: [''],
               label: [{value:'default',disabled:true}]
           })
         );
         // Add the email form groups to the emails form array
-        console.warn("Email Form Group ",emailFormGroups)
         emailFormGroups.forEach((emailFormGroup) => {
           (this.contactForm.get('emails') as UntypedFormArray).push(emailFormGroup);
         });
@@ -119,7 +120,7 @@ export class AddComponent implements OnInit, OnDestroy {
         // Create a phone number form group
         phoneNumbersFormGroups.push(
           this._formBuilder.group({
-              country    : ['cm'],
+              country    : [this._preferencesService.get().defaultCountry || 'cm'],
               phoneNumber: ['',Validators.required],
               label      : [{value:'whatsapp',disabled:true}]
           })
@@ -191,7 +192,7 @@ export class AddComponent implements OnInit, OnDestroy {
         contact.emails = contact.emails.filter(email => email.email);
 
         contact.phoneNumbers = contact.phoneNumbers.filter(phoneNumber => phoneNumber.phoneNumber);
-        if(this.selectedGroup.length>0) contact.groups= this.selectedGroup.map((contact)=>contact._id)
+        contact.groups = this.selectedGroup.map((contact)=>contact._id)
 
         this.submitted=true;
         this._store.dispatch(new ContactAction.AddContact(contact));
@@ -335,7 +336,7 @@ export class AddComponent implements OnInit, OnDestroy {
     {
         // Create an empty phone number form group
         const phoneNumberFormGroup = this._formBuilder.group({
-            country    : ['cm'],
+            country    : [this._preferencesService.get().defaultCountry || 'cm'],
             phoneNumber: [''],
             label      : ['']
         });

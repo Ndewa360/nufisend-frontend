@@ -3,6 +3,7 @@ import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { MatCalendar } from '@angular/material/datepicker';
 import moment, { Moment } from 'moment';
 import { NgxMaterialTimepickerTheme } from 'ngx-material-timepicker';
+import { PreferencesService } from 'app/shared/services/preferences/preferences.service';
 
 @Component({
   selector: 'app-planifier-date-envoi',
@@ -25,7 +26,7 @@ export class PlanifierDateEnvoiComponent implements OnInit, AfterViewInit {
 
   listOfDay=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"]
   listOfMonth=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Decembre"]
-  timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Douala"
+  timezone = "Africa/Douala"
 
   ngxMaterialTimePickerTheme:NgxMaterialTimepickerTheme = {
     container: {
@@ -41,8 +42,11 @@ export class PlanifierDateEnvoiComponent implements OnInit, AfterViewInit {
 
   constructor(
     private _formBuilder: UntypedFormBuilder,
-    private cdr: ChangeDetectorRef
-  ){}
+    private cdr: ChangeDetectorRef,
+    private _preferencesService: PreferencesService
+  ){
+    this.timezone = this._preferencesService.get().timezone;
+  }
 
   ngAfterViewInit(): void {
   }

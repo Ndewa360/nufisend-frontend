@@ -1,0 +1,128 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="text-3xl font-bold tracking-tight">Paramètres</div>
+                <div class="mt-1 text-secondary">Gérez votre profil, votre sécurité et votre connexion WhatsApp.</div>
+            </div>
+            <a mat-stroked-button color="primary" routerLink="/sync_whatsapp">
+                <mat-icon svgIcon="mat_outline:qr_code_scanner"></mat-icon>
+                <span class="ml-2">WhatsApp</span>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
+            <div class="xl:col-span-2 flex flex-col gap-6">
+                <form class="bg-card rounded-2xl shadow p-6" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-lg font-semibold">Profil</div>
+                            <div class="text-secondary text-sm">Ces informations apparaissent dans vos communications.</div>
+                        </div>
+                        <button mat-flat-button color="primary" type="submit" [disabled]="submitted || (loading$ | async)">
+                            Enregistrer
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Prénom</mat-label>
+                            <input matInput formControlName="firstName" autocomplete="given-name">
+                        </mat-form-field>
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Nom</mat-label>
+                            <input matInput formControlName="lastName" autocomplete="family-name">
+                        </mat-form-field>
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Pays</mat-label>
+                            <input matInput formControlName="country" autocomplete="country-name">
+                        </mat-form-field>
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Ville / localisation</mat-label>
+                            <input matInput formControlName="location" autocomplete="address-level2">
+                        </mat-form-field>
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Téléphone</mat-label>
+                            <input matInput formControlName="phoneNumber" autocomplete="tel">
+                        </mat-form-field>
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Photo de profil (URL)</mat-label>
+                            <input matInput formControlName="profilePicture" placeholder="https://...">
+                        </mat-form-field>
+                    </div>
+                </form>
+
+                <form class="bg-card rounded-2xl shadow p-6" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+                    <div class="text-lg font-semibold">Sécurité</div>
+                    <div class="text-secondary text-sm mt-1">Utilisez au moins 8 caractères avec majuscules, minuscules, chiffres et caractères spéciaux.</div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Mot de passe actuel</mat-label>
+                            <input matInput type="password" formControlName="currentPassword" autocomplete="current-password">
+                        </mat-form-field>
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Nouveau mot de passe</mat-label>
+                            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="newPassword" autocomplete="new-password">
+                            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" [attr.aria-label]="hidePassword ? 'Afficher' : 'Masquer'">
+                                <mat-icon [svgIcon]="hidePassword ? 'heroicons_outline:eye' : 'heroicons_outline:eye-off'"></mat-icon>
+                            </button>
+                        </mat-form-field>
+                        <mat-form-field class="w-full" appearance="outline">
+                            <mat-label>Confirmation</mat-label>
+                            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="confirmPassword" autocomplete="new-password">
+                            <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">Les mots de passe ne correspondent pas.</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button mat-flat-button color="primary" type="submit" [disabled]="changingPassword">
+                            Modifier le mot de passe
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="flex flex-col gap-6">
+                <div class="bg-card rounded-2xl shadow p-6">
+                    <div class="text-lg font-semibold">Compte</div>
+                    <div class="mt-4 flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                            <img *ngIf="profile?.profilePicture" class="w-full h-full object-cover" [src]="profile.profilePicture" alt="Photo de profil">
+                            <mat-icon *ngIf="!profile?.profilePicture" svgIcon="heroicons_outline:user-circle"></mat-icon>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-medium truncate">{{ profile?.firstName }} {{ profile?.lastName }}</div>
+                            <div class="text-secondary text-sm truncate">{{ user?.email }}</div>
+                        </div>
+                    </div>
+                    <mat-divider class="my-4"></mat-divider>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-secondary">Email</span>
+                        <span class="font-medium" [ngClass]="user?.emailConfirmed ? 'text-green-600' : 'text-amber-600'">
+                            {{ user?.emailConfirmed ? 'Confirmé' : 'Non confirmé' }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm mt-3">
+                        <span class="text-secondary">Compte créé</span>
+                        <span class="font-medium">{{ user?.createdAt | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                </div>
+
+                <div class="bg-card rounded-2xl shadow p-6">
+                    <div class="text-lg font-semibold">WhatsApp</div>
+                    <div class="flex items-center gap-3 mt-4">
+                        <span class="w-3 h-3 rounded-full" [ngClass]="profile?.hasSyncWhatsApp ? 'bg-green-500' : 'bg-amber-500'"></span>
+                        <span class="font-medium">{{ profile?.hasSyncWhatsApp ? 'Connecté' : 'Non connecté' }}</span>
+                    </div>
+                    <div class="text-secondary text-sm mt-2">
+                        La synchronisation est nécessaire pour envoyer des messages et importer vos contacts WhatsApp.
+                    </div>
+                    <button mat-stroked-button color="primary" class="mt-4 w-full" type="button" (click)="goToWhatsappSync()">
+                        Gérer la connexion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

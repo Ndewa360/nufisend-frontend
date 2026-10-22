@@ -36,8 +36,6 @@
         "crypto-js": "3.3.0",
         "file-saver": "^2.0.5",
         "highlight.js": "11.7.0",
-        "keycloak-angular": "^16.0.1",
-        "keycloak-js": "^25.0.1",
         "lodash-es": "4.17.21",
         "luxon": "^3.2.1",
         "moment": "^2.30.1",

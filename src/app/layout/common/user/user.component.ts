@@ -45,21 +45,23 @@ export class UserComponent implements OnInit, OnDestroy
         this._unsubscribeAll.complete();
     }
 
-    updateUserStatus(status: string): void
-    {
-        if ( !this.user )
-        {
-            return;
-        }
-    }
-
     signOut(): void
     {
         this._router.navigate(['/auth/sign-out']);
     }
 
-    goToUserProfil()
+    goToUserProfil(): void
     {
         this._router.navigate(['/settings']);
+    }
+
+    goToOrganisationSettings(): void
+    {
+        this._router.navigate(['/organisation/settings']);
+    }
+
+    goToOrganisationUsers(): void
+    {
+        this._router.navigate(['/organisation/users']);
     }
 }

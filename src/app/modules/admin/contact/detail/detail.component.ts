@@ -306,7 +306,7 @@ export class DetailComponent {
 
       contact.phoneNumbers = contact.phoneNumbers.filter(phoneNumber => phoneNumber.phoneNumber);
 
-      if(this.selectedGroup.length>0) contact.groups= this.selectedGroup.map((group)=>group._id)
+      contact.groups = this.selectedGroup.map((group)=>group._id)
 
       this.submitted=true;
       this._store.dispatch(new ContactAction.UpdateContact(contact,this.contact._id));

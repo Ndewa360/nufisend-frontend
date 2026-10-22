@@ -24,6 +24,14 @@ export class UserProfileService
     }
 
     /**
+     * Get the accounts available to the current user
+     */
+    getUsers(): Observable<ApiResultFormat<UserProfileModel[]>>
+    {
+        return this._httpClient.get<ApiResultFormat<UserProfileModel[]>>(`${environment.apiUrl}/user`)
+    }
+
+    /**
      * Update contact
      */
     updateUserProfile(contact:UserProfileModel,id:string): Observable<ApiResultFormat<UserProfileModel>>

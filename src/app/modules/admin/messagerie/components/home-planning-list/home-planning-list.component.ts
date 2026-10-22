@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild,ViewEncapsulation } from '@angu
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Actions, Select, Store, ofActionCompleted } from '@ngxs/store';
-import { ContactState, GroupState } from 'app/shared/store';
+import { ContactState, GroupState, MessageStatus } from 'app/shared/store';
 import { PlanificationAction, PlanificationModel, PlanificationState } from 'app/shared/store/planifcation';
 import { Observable, Subject, firstValueFrom, lastValueFrom } from 'rxjs';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
@@ -19,7 +19,7 @@ export class HomePlanningListComponent implements OnInit,OnDestroy {
 
   dataSource: MatTableDataSource<any> = new MatTableDataSource();
   dataBackLog=[]
-  dataTableColumns: string[] = ['titre', 'date', 'destinataires', 'groupes', 'action'];
+  dataTableColumns: string[] = ['titre', 'date', 'destinataires', 'groupes', 'statut', 'action'];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
   @Select(PlanificationState.selectStateData) planificationList$:Observable<PlanificationModel[]>;
   @ViewChild('dataTable', {read: MatSort}) dataTableMatSort: MatSort;
@@ -97,6 +97,36 @@ export class HomePlanningListComponent implements OnInit,OnDestroy {
   {
     this.groupList= await firstValueFrom(this._store.select(GroupState.selectStateByGroupsId(groups)))
     // this.groupListMenu.openMenu();
+  }
+
+  getStatusLabel(status: MessageStatus): string
+  {
+    switch (status) {
+      case MessageStatus.SENT:
+        return 'Envoyé';
+      case MessageStatus.PARTIAL:
+        return 'Partiel';
+      case MessageStatus.FAILED:
+        return 'Échec';
+      case MessageStatus.PENDING:
+        return 'En attente';
+      default:
+        return 'Planifié';
+    }
+  }
+
+  getStatusClass(status: MessageStatus): string
+  {
+    switch (status) {
+      case MessageStatus.SENT:
+        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+      case MessageStatus.PARTIAL:
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300';
+      case MessageStatus.FAILED:
+        return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300';
+      default:
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+    }
   }
 
   getContactDetail(contactID)

@@ -126,7 +126,7 @@ export const appRoutes: Route[] = [
         data: {
             layout: 'enterprise'
         },
-        loadChildren:() => import('app/modules/admin/example/example.module').then(m =>m.ExampleModule)
+        loadChildren:() => import('app/modules/admin/organisation/organisation.module').then(m =>m.OrganisationModule)
     },
     {
         path: 'settings',
@@ -139,7 +139,7 @@ export const appRoutes: Route[] = [
         data: {
             layout: 'enterprise'
         },
-        loadChildren:() => import('app/modules/admin/example/example.module').then(m =>m.ExampleModule)
+        loadChildren:() => import('app/modules/admin/settings/settings.module').then(m =>m.SettingsModule)
     },
 
     {path: '**', pathMatch : 'full', redirectTo: 'home'},

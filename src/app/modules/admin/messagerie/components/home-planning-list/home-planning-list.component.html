@@ -191,6 +191,24 @@
                 </td>
             </ng-container>
 
+            <!-- Statut -->
+            <ng-container matColumnDef="statut">
+                <th
+                    mat-header-cell
+                    mat-sort-header
+                    *matHeaderCellDef>
+                    Statut
+                </th>
+                <td
+                    mat-cell
+                    *matCellDef="let plan">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap"
+                          [ngClass]="getStatusClass(plan.message?.status)">
+                        {{ getStatusLabel(plan.message?.status) }}
+                    </span>
+                </td>
+            </ng-container>
+
             <!-- Action -->
             <ng-container matColumnDef="action">
                 <th

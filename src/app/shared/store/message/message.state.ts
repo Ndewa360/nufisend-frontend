@@ -46,13 +46,11 @@ export class MessageState{
                     ctx.patchState({
                         sendingMessage:false
                     })
-                    this._toastrService.success("Message envoyé avec success", 'WhatsApp Message');
-                    console.log("Result ",result)
+                    this._toastrService.success("Message envoyé avec succès", 'WhatsApp Message');
                     if(!message.isSentToNow) ctx.dispatch(new PlanificationAction.AddPlanification(result.data))
                 }
             ),
             catchError((error) => {
-                console.error("Error ",error)
                 this._toastrService.error(error?.error?.message, 'Erreur');
                 ctx.patchState({
                     sendingMessage: false

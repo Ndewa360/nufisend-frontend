@@ -198,7 +198,7 @@ export class DetailComponent {
       // Get the group object
       
       const group = FormUtils.removeNullAttribut(this.groupForm.getRawValue());
-      if(this.selectedContact.length>0) group.contacts= this.selectedContact.map((contact)=>contact._id)
+      group.contacts = this.selectedContact.map((contact)=>contact._id)
 
       this.submitted=true;
       this._store.dispatch(new GroupAction.UpdateGroup(group,this.groupModel._id));

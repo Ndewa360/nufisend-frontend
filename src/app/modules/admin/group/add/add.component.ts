@@ -158,7 +158,7 @@ export class AddComponent {
         const group = FormUtils.removeNullAttribut(this.groupForm.getRawValue());
 
         this.submitted=true;
-        if(this.selectedContact.length>0) group.contacts= this.selectedContact.map((contact)=>contact._id)
+        group.contacts = this.selectedContact.map((contact)=>contact._id)
 
         this._store.dispatch(new GroupAction.AddGroup(group));
                 

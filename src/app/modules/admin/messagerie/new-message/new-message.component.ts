@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEnca
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
-import { ContactModel, ContactState, GroupModel, MessageAction, MessageModel, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
+import { ContactModel, ContactState, GroupModel, MessageAction, MessageModel, MessagePlanification, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
 import { Observable, Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { PrevisualisationMessageContactComponent } from '../components/previsualisation-message-contact/previsualisation-message-contact.component';
 
@@ -22,7 +22,7 @@ export class NewMessageComponent implements OnInit{
   destinationGroups:GroupModel[]=[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
   messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File,title?:string}={}
-  planificationObj={hasPlanification:false,planif:{}};
+  planificationObj:{hasPlanification:boolean, planif:MessagePlanification[]}={hasPlanification:false,planif:[]};
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
 
@@ -111,9 +111,10 @@ export class NewMessageComponent implements OnInit{
       this._store.dispatch(new MessageAction.SendMessage(dataToSend));
     }
 
-    canPrevisualise()
+    canPrevisualise(): boolean
     {
-      return (this.messageToSend.messageTemplate || this.messageToSend.message) && (this.destinationContacts.length>0 || this.destinationGroups.length>0)
+      const hasContent = !!(this.messageToSend.messageTemplate || this.messageToSend.message || this.messageToSend.file);
+      return hasContent && (this.destinationContacts.length > 0 || this.destinationGroups.length > 0);
     }
 
     setPlanification(planif)

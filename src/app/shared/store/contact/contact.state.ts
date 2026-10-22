@@ -53,8 +53,9 @@ export class ContactState{
     static selectStateByContactsId(contactsId:string[])
     {
         return createSelector([ContactState],(state)=>{
-            console.log("Contact ", contactsId.map((contactId)=> state.contacts.find((contact)=>contact._id==contactId)))
-            return contactsId.map((contactId)=> state.contacts.find((contact)=>contact._id==contactId)).filter((contact)=> contact!=undefined && contact!=null)
+            return (contactsId || [])
+                .map((contactId)=> state.contacts.find((contact)=>String(contact._id)===String(contactId)))
+                .filter((contact)=> contact!=undefined && contact!=null)
         })        
     }
 

@@ -52,7 +52,7 @@ export class UserProfileState{
                 (result)=>{
                     ctx.patchState({
                         loadingUserProfile:false,
-                        userProfile
+                        userProfile: result.data
                     })
                     this._toastrService.success(`Profil utilisateur modifié avec success`, 'UserProfile');
                 }

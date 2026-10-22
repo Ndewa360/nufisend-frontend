@@ -74,10 +74,10 @@ export class SelectContactComponent {
     if(!this.isNewGroup)
     {
       this.contactLoading$.subscribe((loading)=>{
-        if(!loading) this._store.select(ContactState.selectStateByContactsId(this.selectedGroup.contacts)).subscribe((values)=>{
-          console.log("Value ",values)
+        if(!loading) this._store.select(ContactState.selectStateByContactsId(this.selectedGroup?.contacts || [])).subscribe((values)=>{
           this.selectedContactList=[...values];
           values.forEach((value)=>this.selectectContacts.set(value._id,true))
+          this.emitData();
           this._changeDetectorRef.markForCheck();
         })
       })

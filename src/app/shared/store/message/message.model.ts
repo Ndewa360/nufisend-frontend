@@ -8,6 +8,30 @@ export enum MessageType{
     CONTACT = "contact" 
 }
 
+export enum MessageStatus{
+    PENDING = "pending",
+    SCHEDULED = "scheduled",
+    SENT = "sent",
+    PARTIAL = "partial",
+    FAILED = "failed"
+}
+
+export interface MessagePlanification
+{
+    type: string;
+    time?: string;
+    timezone?: string;
+    startDate?: string;
+    endDate?: string;
+    every?: number;
+    recurency?: string;
+    dayOfWeek?: number;
+    monthOfYear?: number;
+    date?: string;
+    dates?: string[];
+    [key: string]: unknown;
+}
+
 export interface MessageModel
 {
     type:MessageType;
@@ -33,7 +57,11 @@ export interface MessageModel
     
     messageTemplateId?:string;
 
-    planification?:Record<string,any>;
+    planification?:MessagePlanification[];
+
+    status?:MessageStatus;
+    sentAt?:string|Date;
+    lastSendResult?:Record<string, unknown>;
     
     bodyText?:string;
     bodyFile?:File;

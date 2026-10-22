@@ -74,9 +74,10 @@ export class SelectGroupComponent {
     if(!this.isNewGroup)
     {
       this.groupLoading$.subscribe((loading)=>{
-        if(!loading) this._store.select(GroupState.selectStateByGroupsId(this.selectedContact.groups)).subscribe((values)=>{
+        if(!loading) this._store.select(GroupState.selectStateByGroupsId(this.selectedContact?.groups || [])).subscribe((values)=>{
           this.selectedGroupList=[...values];
           values.forEach((value)=>this.selectectGroups.set(value._id,true))
+          this.emitData();
           this._changeDetectorRef.markForCheck();
         })
       })

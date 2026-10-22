@@ -41,14 +41,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
         children: [
             {
                 id   : 'user',
-                title: 'Utilisateur',
+                title: 'Utilisateurs',
                 type : 'basic',
                 icon : 'heroicons_outline:users',
                 link : '/organisation/users',
             },
             {
                 id   : 'parameter',
-                title: 'Parametre',
+                title: 'Paramètres',
                 type : 'basic',
                 icon : 'heroicons_outline:cog',
                 link : '/organisation/settings',
