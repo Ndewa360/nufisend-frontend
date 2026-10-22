@@ -192,10 +192,15 @@ export class ContactState{
 
         return this._contactsService.importContacts(file).pipe(
             tap(
-                ()=>{
-                    this._toastrService.success("Contacts importés avec success", 'Contact');
+                (result)=>{
+                    const summary = result.data;
+                    const details = summary
+                        ? `${summary.created} créé(s), ${summary.updated} mis à jour, ${summary.skipped} ignoré(s)`
+                        : '';
+                    this._toastrService.success(details || "Contacts importés avec success", 'Import terminé');
                     ctx.patchState({
                         loadingContacts:false,
+                        contacts:[],
                         initLoadingState:"NO_LOADED"
                     })
                     ctx.dispatch(new ContactAction.FetchAllContact());

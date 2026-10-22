@@ -5,6 +5,7 @@ import { Actions, Store, ofActionCompleted } from '@ngxs/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { saveAs } from 'file-saver';
 import { ContactAction, ContactState } from 'app/shared/store';
+import { ContactImportPreview } from '../previsualize-data-file/previsualize-data-file.component';
 
 @Component({
   selector: 'app-upload-file',
@@ -18,6 +19,7 @@ export class UploadFileComponent implements OnInit{
   submitted:Observable<boolean>;
   importContactForm : UntypedFormGroup;
   file:File=null;
+  preview:ContactImportPreview={total:0,ready:0,ignored:0,hasReadyRows:false};
 
 
   constructor(
@@ -65,7 +67,7 @@ export class UploadFileComponent implements OnInit{
 
   importFile()
   {
-    if (!this.file) return;
+    if (!this.file || !this.preview.hasReadyRows) return;
     this._store.dispatch(new ContactAction.ImportContact(this.file));
   }
     /**
@@ -80,16 +82,26 @@ export class UploadFileComponent implements OnInit{
 
   generateCSVFile()
   {
-    const header = ["fullName","email_default","phoneNumber_default","profilePicture","address","jobTitle","company"]
-    let csvFile = header.join(",")
-    var blob = new Blob([csvFile], {type: 'text/csv' })
-    saveAs(blob, "myFile.csv");
+    const header = ["fullName","phoneNumber","email","country","profilePicture","address","jobTitle","organization","company"];
+    const example = ["Jean Dupont","+237690000000","jean.dupont@example.com","Cameroun","","Douala","Commercial","NufiSend","NufiSend"];
+    const csvFile = [header.join(","), example.join(",")].join("\n");
+    const blob = new Blob(["\uFEFF" + csvFile], {type: 'text/csv;charset=utf-8'});
+    saveAs(blob, "modele-import-contacts.csv");
   }
 
   setFiles(files:File[])
   {
-    if(files.length<0) return;
-    this.file = files[0];
+    this.file = files && files.length > 0 ? files[0] : null;
+    if (!this.file) {
+      this.preview = {total:0,ready:0,ignored:0,hasReadyRows:false};
+    }
+    this._changeDetectorRef.markForCheck();
+  }
+
+  setPreview(preview:ContactImportPreview)
+  {
+    this.preview = preview;
+    this._changeDetectorRef.markForCheck();
   }
 }
 

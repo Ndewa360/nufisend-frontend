@@ -1,1 +1,77 @@
-<p>previsualize-data-file works!</p>
+<div class="flex flex-col gap-5">
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex items-center justify-center gap-3 py-10 text-secondary">
+        <mat-progress-spinner [diameter]="28" [mode]="'indeterminate'"></mat-progress-spinner>
+        <span>Analyse du fichier en cours...</span>
+    </div>
+
+    <ng-container *ngIf="!loading">
+        <fuse-alert *ngIf="error" [type]="'warning'" [appearance]="'outline'" [showIcon]="true">
+            {{ error }}
+        </fuse-alert>
+
+        <ng-container *ngIf="total > 0">
+            <!-- Summary -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl border bg-card">
+                    <div class="text-sm text-secondary">Lignes détectées</div>
+                    <div class="mt-1 text-2xl font-semibold">{{ total }}</div>
+                </div>
+                <div class="p-4 rounded-xl border bg-card">
+                    <div class="text-sm text-secondary">Prêtes à importer</div>
+                    <div class="mt-1 text-2xl font-semibold text-green-600">{{ readyCount }}</div>
+                </div>
+                <div class="p-4 rounded-xl border bg-card">
+                    <div class="text-sm text-secondary">Ignorées</div>
+                    <div class="mt-1 text-2xl font-semibold" [ngClass]="ignoredCount > 0 ? 'text-amber-600' : ''">{{ ignoredCount }}</div>
+                </div>
+            </div>
+
+            <fuse-alert *ngIf="ignoredCount > 0" [type]="'info'" [appearance]="'outline'">
+                Les lignes ignorées ne seront pas importées. Les contacts existants seront mis à jour par le serveur.
+            </fuse-alert>
+
+            <!-- Preview table -->
+            <div class="border rounded-xl overflow-hidden">
+                <div class="max-h-80 overflow-auto">
+                    <table class="w-full text-sm">
+                        <thead class="sticky top-0 z-10 bg-card shadow-sm">
+                            <tr class="text-left text-secondary">
+                                <th class="px-3 py-2 font-medium">#</th>
+                                <th class="px-3 py-2 font-medium">Nom complet</th>
+                                <th class="px-3 py-2 font-medium">Téléphone</th>
+                                <th class="px-3 py-2 font-medium">Email</th>
+                                <th class="px-3 py-2 font-medium">Pays</th>
+                                <th class="px-3 py-2 font-medium">Entreprise</th>
+                                <th class="px-3 py-2 font-medium">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of previewRows; let i = index; trackBy: trackByIndex"
+                                class="border-t"
+                                [ngClass]="row.isValid ? '' : 'bg-amber-50 dark:bg-amber-900/10'">
+                                <td class="px-3 py-2 text-secondary">{{ i + 1 }}</td>
+                                <td class="px-3 py-2 font-medium">{{ row.fullName || '—' }}</td>
+                                <td class="px-3 py-2">{{ row.phoneNumber || '—' }}</td>
+                                <td class="px-3 py-2">{{ row.email || '—' }}</td>
+                                <td class="px-3 py-2">{{ row.country || '—' }}</td>
+                                <td class="px-3 py-2">{{ row.company || row.organization || '—' }}</td>
+                                <td class="px-3 py-2">
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
+                                        [ngClass]="row.isValid ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'">
+                                        {{ row.isValid ? 'Prêt' : 'Ignoré' }}
+                                    </span>
+                                    <div *ngIf="row.reason" class="mt-1 text-xs text-secondary">{{ row.reason }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div *ngIf="hiddenRows > 0" class="text-sm text-secondary">
+                {{ hiddenRows }} ligne(s) supplémentaire(s) non affichée(s) dans cet aperçu. Elles seront bien prises en compte lors de l'import.
+            </div>
+        </ng-container>
+    </ng-container>
+</div>

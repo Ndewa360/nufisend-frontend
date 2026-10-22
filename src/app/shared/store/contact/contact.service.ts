@@ -5,6 +5,13 @@ import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { ApiResultFormat } from "../global";
 
+export interface ContactImportResult {
+    total:number;
+    created:number;
+    updated:number;
+    skipped:number;
+}
+
 @Injectable({
     providedIn:'root'
 })
@@ -58,10 +65,10 @@ export class ContactService
     /**
      * Import contacts from a CSV file
      */
-    importContacts(file: File): Observable<ApiResultFormat<null>>
+    importContacts(file: File): Observable<ApiResultFormat<ContactImportResult>>
     {
         const formData = new FormData();
         formData.append('files', file, file.name);
-        return this._httpClient.post<ApiResultFormat<null>>(`${environment.apiUrl}/contacts/import`, formData)
+        return this._httpClient.post<ApiResultFormat<ContactImportResult>>(`${environment.apiUrl}/contacts/import`, formData)
     }
 }

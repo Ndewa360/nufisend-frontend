@@ -2,8 +2,9 @@ import { ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Select, Actions, Store, ofActionSuccessful } from '@ngxs/store';
-import { ContactModel, MessageAction, MessageModel, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
-import { Subject, Observable, takeUntil } from 'rxjs';
+import { ContactModel, GlobalState, MessageAction, MessageModel, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
+import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profile';
+import { Subject, Observable, combineLatest, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { NewMessageComponent } from '../../new-message/new-message.component';
 
@@ -20,6 +21,9 @@ export class NewMessageForSingleContactComponent {
   messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title?:string}={}
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
+  @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>;
+  @Select(GlobalState.selectStateConnectedWhatsApp) whatsappConnected$:Observable<boolean>;
+  isWhatsAppSynced:boolean=false;
 
   constructor(
     public matDialogRef: MatDialogRef<NewMessageForSingleContactComponent>,
@@ -47,6 +51,12 @@ export class NewMessageForSingleContactComponent {
         stepSelectContacts: this._formBuilder.group({}),
         stepSelectTypeMessage: this._formBuilder.group({}),
       });
+      combineLatest([this.userProfile$, this.whatsappConnected$])
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(([profile, connected]) => {
+          this.isWhatsAppSynced = !!profile?.hasSyncWhatsApp || !!connected;
+        });
+
       // Mark for check
       this._changeDetectorRef.markForCheck();
 
@@ -81,6 +91,10 @@ export class NewMessageForSingleContactComponent {
 
     sendMessage()
     {
+      if (!this.isWhatsAppSynced) {
+        this._toastrService.error("Synchronisez votre compte WhatsApp avant d'envoyer un message", 'WhatsApp non synchronisé');
+        return;
+      }
       const title = (this.messageToSend.title || '').trim();
       if (!title) {
         this._toastrService.error('Le titre du message est requis', 'Validation');

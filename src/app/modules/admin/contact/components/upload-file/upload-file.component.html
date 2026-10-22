@@ -4,7 +4,7 @@
     <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-primary text-on-primary shadow-lg">
         <div class="text-lg font-medium ">
             <mat-icon [svgIcon]="'mat_outline:upload'" class="text-yellow-500"></mat-icon>
-           <span class="align-middle">Uploadez vos contacts </span> 
+           <span class="align-middle">Importer vos contacts </span>
         </div>
         <button
             mat-icon-button
@@ -18,38 +18,38 @@
 
     <!-- Compose form -->
     <div class="flex flex-col flex-auto p-x-6 p-y-3 sm:p-8  md:h-full overflow-y-auto">
-        <form class="p-4 bg-card shadow"
+        <form class="p-4 bg-card shadow rounded"
                 [formGroup]="importContactForm">
-                <!--  -->
-                <mat-horizontal-stepper  [linear]="true" #horizontalStepper>
-                    <!-- [completed]="file" -->
-                    <mat-step    #horizontalStepperStep1>
-                        <ng-template matStepLabel>Choisir un fichier</ng-template>                        
+                <mat-horizontal-stepper [linear]="true" #horizontalStepper>
+                    <mat-step [completed]="!!file">
+                        <ng-template matStepLabel>Choisir un fichier</ng-template>
                         <div class="mt-2">
                             <div class="sm:col-span-3 mb-6">
                                 <fuse-alert
                                     [appearance]="'outline'"
                                     [type]="'info'">
-                                    Veuillez vous rassurer que votre fichier soit sous le format attentus par le template. Pour télécharger le template <span class="bg-primary text-white mr-2 ml-2 hover:underline cursor-pointer" (click)="generateCSVFile()">clique ici</span>
+                                    Utilisez un fichier CSV avec au minimum les colonnes <span class="font-semibold">fullName</span> et <span class="font-semibold">phoneNumber</span>. Pour télécharger le modèle <span class="bg-primary text-white mr-2 ml-2 hover:underline cursor-pointer" (click)="generateCSVFile()">cliquez ici</span>.
                                 </fuse-alert>
                             </div>
-                    
+
                             <div class="sm:col-span-3 mb-6">
                                 <app-file-upload class="mb-2" acceptedFile="CSV" acceptedFileType=".csv" (uploadFileEvent)="setFiles($event)"></app-file-upload>
                             </div>
                         </div>
-                        <div class="flex justify-end">                            
-                            <button class="px-8" mat-flat-button extended [color]="'primary'"  type="button" matStepperNext>
+                        <div class="flex justify-end">
+                            <button class="px-8" mat-flat-button extended [color]="'primary'" [disabled]="!file" type="button" matStepperNext>
                                 Suivant
-                                <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-right'" [title]="'Suivant'" aria-hidden="true" iconPositionEnd></mat-icon>    
+                                <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-right'" [title]="'Suivant'" aria-hidden="true" iconPositionEnd></mat-icon>
                             </button>
                         </div>
                     </mat-step>
 
-                    <mat-step  #horizontalStepperStep2>
+                    <mat-step [completed]="preview.hasReadyRows">
                         <ng-template matStepLabel>Prévisualisation</ng-template>
-                        <app-previsualize-data-file [file]="file"></app-previsualize-data-file>
-                        
+                        <div class="my-4">
+                            <app-previsualize-data-file [file]="file" (previewChange)="setPreview($event)"></app-previsualize-data-file>
+                        </div>
+
                         <div class="flex justify-end">
                             <button
                                 class="px-8 mr-2"
@@ -65,52 +65,56 @@
                                 mat-flat-button
                                 [color]="'primary'"
                                 type="button"
+                                [disabled]="!preview.hasReadyRows"
                                 matStepperNext>
-                                Suivant 
+                                Suivant
                                 <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-right'" [title]="'Suivant'" iconPositionEnd></mat-icon>
                             </button>
                         </div>
                     </mat-step>
 
                     <mat-step>
-                        <ng-template matStepLabel>Rediger & Soumettre</ng-template>
-                        <div>3</div>
-                        <!-- <ng-template #redigerMessagePlanifier><app-rediger-message-planifier></app-rediger-message-planifier></ng-template>  -->
-                        <div class="flex mt-8 justify-between">
-                            <div class="">
-                                <button
-                                    mat-button
-                                    [color]="'primary'"
-                                    [matTooltip]="'Prévisualiser le message'">
-                                    Prévisualiser
-                                </button>
+                        <ng-template matStepLabel>Confirmer l'import</ng-template>
+
+                        <div class="my-4 flex flex-col gap-4">
+                            <fuse-alert [type]="'success'" [appearance]="'outline'">
+                                {{ preview.ready }} contact(s) prêt(s) à être importé(s). Les contacts déjà existants seront mis à jour.
+                            </fuse-alert>
+
+                            <fuse-alert *ngIf="preview.ignored > 0" [type]="'warning'" [appearance]="'outline'">
+                                {{ preview.ignored }} ligne(s) seront ignorées car incomplètes, invalides ou en doublon.
+                            </fuse-alert>
+
+                            <div class="text-sm text-secondary">
+                                Fichier sélectionné : <span class="font-medium text-default">{{ file?.name }}</span>
                             </div>
-                            <div class="flex justify-end">
-                                <button
-                                    class="px-8 mr-2"
-                                    mat-flat-button
-                                    [color]="'accent'"
-                                    type="button"
-                                    matStepperPrevious>
-                                    <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-left'" [title]="'Précédent'"></mat-icon>
-                                    Précédent
-                                </button>
-                                <button
-                                    class="px-8"
-                                    mat-flat-button
-                                    [color]="'primary'"
-                                    (click)="importFile()">
-                                    <mat-progress-spinner *ngIf="(submitted | async); else endWordTermine" [diameter]="24" [mode]="'indeterminate'">
-                                    </mat-progress-spinner>
-                                    <ng-template #endWordTermine>Envoyer</ng-template>
-                                </button>
-                            </div>
+                        </div>
+
+                        <div class="flex mt-8 justify-end">
+                            <button
+                                class="px-8 mr-2"
+                                mat-flat-button
+                                [color]="'accent'"
+                                type="button"
+                                matStepperPrevious>
+                                <mat-icon mat-button class="icon-size-4 " [svgIcon]="'heroicons_outline:chevron-left'" [title]="'Précédent'"></mat-icon>
+                                Précédent
+                            </button>
+                            <button
+                                class="px-8"
+                                mat-flat-button
+                                [color]="'primary'"
+                                type="button"
+                                [disabled]="(submitted | async) || !preview.hasReadyRows"
+                                (click)="importFile()">
+                                <mat-progress-spinner *ngIf="(submitted | async); else endWordTermine" [diameter]="24" [mode]="'indeterminate'">
+                                </mat-progress-spinner>
+                                <ng-template #endWordTermine>Importer</ng-template>
+                            </button>
                         </div>
                     </mat-step>
                 </mat-horizontal-stepper>
             </form>
-
-
     </div>
 
 </div>

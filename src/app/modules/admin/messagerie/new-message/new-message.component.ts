@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEnca
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
-import { ContactModel, ContactState, GroupModel, MessageAction, MessageModel, MessagePlanification, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
-import { Observable, Subject, firstValueFrom, takeUntil } from 'rxjs';
+import { ContactModel, ContactState, GlobalState, GroupModel, MessageAction, MessageModel, MessagePlanification, MessageState, MessageTemplateModel, MessageType } from 'app/shared/store';
+import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profile';
+import { Observable, Subject, combineLatest, firstValueFrom, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { PrevisualisationMessageContactComponent } from '../components/previsualisation-message-contact/previsualisation-message-contact.component';
 
@@ -26,6 +27,9 @@ export class NewMessageComponent implements OnInit{
   planificationObj:{hasPlanification:boolean, planif:MessagePlanification[]}={hasPlanification:false,planif:[]};
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
+  @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>;
+  @Select(GlobalState.selectStateConnectedWhatsApp) whatsappConnected$:Observable<boolean>;
+  isWhatsAppSynced:boolean=false;
 
   constructor(
     public matDialogRef: MatDialogRef<NewMessageComponent>,
@@ -52,6 +56,13 @@ export class NewMessageComponent implements OnInit{
         stepSelectContacts: this._formBuilder.group({}),
         stepSelectTypeMessage: this._formBuilder.group({}),
       });
+      combineLatest([this.userProfile$, this.whatsappConnected$])
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(([profile, connected]) => {
+          this.isWhatsAppSynced = !!profile?.hasSyncWhatsApp || !!connected;
+          this._changeDetectorRef.markForCheck();
+        });
+
       // Mark for check
       this._changeDetectorRef.markForCheck();
 
@@ -97,6 +108,10 @@ export class NewMessageComponent implements OnInit{
 
     sendMessage()
     {
+      if (!this.isWhatsAppSynced) {
+        this._toastrService.error("Synchronisez votre compte WhatsApp avant d'envoyer un message", 'WhatsApp non synchronisé');
+        return;
+      }
       const title = (this.messageToSend.title || '').trim();
       if (!title) {
         this._toastrService.error('Le titre du message est requis', 'Validation');

@@ -71,14 +71,16 @@
                             <mat-icon [svgIcon]="'feather:user-plus'"></mat-icon>
                         </button>
 
-                        <!-- import contact button -->
-                        <!-- <button
-                            class="ml-4 text-yellow-500 hidden md:block"
+                        <!-- Import contacts button -->
+                        <button
+                            class="ml-4"
                             mat-stroked-button
-                            [matTooltip]="'Importer une liste de contacts'"
+                            [color]="'primary'"
+                            [matTooltip]="'Importer une liste de contacts depuis un fichier CSV'"
                             (click)="importContact()">
-                            <mat-icon [svgIcon]="'mat_outline:upload'" class="text-yellow-500"></mat-icon>
-                        </button> -->
+                            <mat-icon [svgIcon]="'mat_outline:upload'"></mat-icon>
+                            <span class="ml-2 hidden sm:inline">Importer</span>
+                        </button>
 
                         <!-- export contact button -->
                         <!-- <button
