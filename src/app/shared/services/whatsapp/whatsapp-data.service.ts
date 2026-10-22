@@ -37,6 +37,16 @@ export class WhatsappDataService {
 
     this.socket.on('info',(value)=>{
       log('<< RECEIVED info contacts=', value?.contacts?.length);
+      // Ignore duplicate 'info' events: if contacts are already loaded in the
+      // store, a second 'info' (from a reconnect or duplicate 'connexion') must
+      // not append to the existing list — SetAllWhatsappContactToLocal replaces,
+      // but two rapid dispatches can cause the component to render both updates
+      // before Angular's CD collapses them, making the list appear doubled.
+      const existing = this.store.selectSnapshot((s: any) => s?.whatsapp_contacts?.contacts);
+      if (existing && existing.length > 0 && value?.contacts?.length === existing.length) {
+        log('info: contacts already loaded (same count), skipping duplicate dispatch');
+        return;
+      }
       this.store.dispatch([
         new GlobalAction.ChangeWhatsAppConnectedStatus(true),
         new WhatsappContactAction.SetAllWhatsappContactToLocal(value.contacts),

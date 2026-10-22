@@ -65,9 +65,9 @@
                                 <ng-container *ngIf="contactsFiltered.length>0; else noContacts">
                                     <ng-container *ngFor="let contact of contactsFiltered; let i = index; trackBy: trackByFn">
                                         <!-- Group -->
-                                        <ng-container *ngIf="i === 0 || contact.name.charAt(0) !== contactsFiltered[i - 1].name.charAt(0)">
+                                        <ng-container *ngIf="i === 0 || (contact.name || contact.number || '').charAt(0).toUpperCase() !== (contactsFiltered[i - 1].name || contactsFiltered[i - 1].number || '').charAt(0).toUpperCase()">
                                             <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
-                                                {{contact.name.charAt(0)}}
+                                                {{(contact.name || contact.number || '#').charAt(0).toUpperCase()}}
                                             </div>
                                         </ng-container>
                                         <!-- Contact -->
@@ -86,7 +86,7 @@
                                                 </ng-container>
                                                 <ng-container *ngIf="!contact.avatar">
                                                     <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                                                        {{contact.name.charAt(0)}}
+                                                        {{(contact.name || contact.number || '?').charAt(0)}}
                                                     </div>
                                                 </ng-container>
                                             </div>

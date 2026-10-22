@@ -32,6 +32,7 @@ export class ContactComponent {
   contactsLoading=false;
   userProfile:UserProfileModel=null;
   percent=0;
+  private _autoSyncTriggered = false;
 
   @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
@@ -84,11 +85,14 @@ export class ContactComponent {
         this.userProfile$.pipe(takeUntil(this._unsubscribeAll)).subscribe((profile)=>{
             this.userProfile=profile;
             this.refreshLoadingState();
-            // If user is already synced but contacts store is empty (e.g. page reload),
-            // auto-trigger a re-sync to reload contacts from the live WhatsApp session.
-            if (profile?.hasSyncWhatsApp && !this.contactsLoading) {
+            // Auto-trigger sync only ONCE per component lifecycle.
+            // userProfile$ can emit multiple times (initial load, sync-connected patch, etc.)
+            // triggering startSync() more than once causes duplicate 'connexion' events
+            // which makes the backend emit 'info' twice -> contacts appear doubled in the UI.
+            if (profile?.hasSyncWhatsApp && !this._autoSyncTriggered) {
                 const currentContacts = this._store.selectSnapshot(WhatsappContactState.selectStateData);
                 if (!currentContacts || currentContacts.length === 0) {
+                    this._autoSyncTriggered = true;
                     this.contactsLoading = true;
                     this.refreshLoadingState();
                     this._syncQrcodeService.startSync();
@@ -104,8 +108,8 @@ export class ContactComponent {
         this.contactList$
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((data)=> {
-            this.contacts = data ? [...data] : [];
-            this.contactsFiltered = data ? [...data] : [];
+            this.contacts = this.sortAlpha(data ? [...data] : []);
+            this.contactsFiltered = [...this.contacts];
             this._changeDetectorRef.markForCheck();
         })
           
@@ -150,10 +154,10 @@ export class ContactComponent {
                         return;
                     }
                     // Search
-                    this.contactsFiltered=this.contacts.filter
+                    this.contactsFiltered=this.sortAlpha(this.contacts.filter
                         (
                             (contact)=> `${contact.name} ${contact.number}`.toLowerCase().includes(query.toLowerCase())
-                        )
+                        ))
                         this._changeDetectorRef.markForCheck();
                 }
             )
@@ -229,5 +233,21 @@ export class ContactComponent {
     trackByFn(index: number, item: any): any
     {
         return item.id || index;
+    }
+
+    /**
+     * Sort contacts alphabetically by name, pushing contacts whose name starts
+     * with a non-letter character (digits, ~, +, emoji…) to the end.
+     */
+    private sortAlpha(list: WhatsappContactModel[]): WhatsappContactModel[] {
+        return [...list].sort((a, b) => {
+            const nameA = (a.name || a.number || '').trim().toUpperCase();
+            const nameB = (b.name || b.number || '').trim().toUpperCase();
+            const aIsLetter = /^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]/.test(nameA);
+            const bIsLetter = /^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]/.test(nameB);
+            if (aIsLetter && !bIsLetter) return -1;
+            if (!aIsLetter && bIsLetter) return 1;
+            return nameA.localeCompare(nameB, 'fr', { sensitivity: 'base' });
+        });
     }
 }
