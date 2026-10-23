@@ -1,14 +1,10 @@
-<div class="max-w-xs w-full bg-white  dark:bg-gray-800 dark:border-gray-700" >
-    <div class="flex items-center ">
-      <!-- <div class="animate-spin  rounded-full" role="status" aria-label="loading">
-        <span class="sr-only">Loading...</span>
-      </div> -->
-
-      <mat-progress-spinner mode="indeterminate" *ngIf="percent==0" diameter="40"></mat-progress-spinner>
-      <mat-progress-spinner mode="determinate" *ngIf="percent>0" diameter="40" [value]="percent"></mat-progress-spinner>
-      <p class="ms-3 text-gray-700 dark:text-gray-400 ml-3">
-        Synchronization Whatsapp <span *ngIf="percent>0">({{percent}}%)</span> 
-      </p>
+<div class="w-full max-w-sm bg-white dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex items-center justify-between mb-1 text-sm text-gray-700 dark:text-gray-400">
+        <span>Synchronisation WhatsApp en cours...</span>
+        <span *ngIf="percent > 0">{{ percent }}%</span>
     </div>
-  </div>
-  
+    <mat-progress-bar
+        [mode]="percent > 0 ? 'determinate' : 'indeterminate'"
+        [value]="percent">
+    </mat-progress-bar>
+</div>

@@ -7,6 +7,7 @@ import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profil
 import { Observable, Subject, combineLatest, firstValueFrom, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { PrevisualisationMessageContactComponent } from '../components/previsualisation-message-contact/previsualisation-message-contact.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-message',
@@ -29,7 +30,9 @@ export class NewMessageComponent implements OnInit{
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
   @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>;
   @Select(GlobalState.selectStateConnectedWhatsApp) whatsappConnected$:Observable<boolean>;
+  @Select(GlobalState.isWhatsAppReady) isWhatsAppReady$: Observable<boolean>;
   isWhatsAppSynced:boolean=false;
+  isWhatsAppReady:boolean=false;
 
   constructor(
     public matDialogRef: MatDialogRef<NewMessageComponent>,
@@ -38,7 +41,8 @@ export class NewMessageComponent implements OnInit{
     private _ngxsAction:Actions,
     private _store:Store,
     private _matDialog: MatDialog,
-    private _toastrService: ToastrService
+    private _toastrService: ToastrService,
+    private _router: Router
 
 )
 {}
@@ -62,6 +66,12 @@ export class NewMessageComponent implements OnInit{
           this.isWhatsAppSynced = !!profile?.hasSyncWhatsApp || !!connected;
           this._changeDetectorRef.markForCheck();
         });
+
+      this.isWhatsAppReady$.pipe(takeUntil(this._unsubscribeAll)).subscribe((ready) => {
+        this.isWhatsAppReady = !!ready;
+        this.isWhatsAppSynced = this.isWhatsAppSynced || this.isWhatsAppReady;
+        this._changeDetectorRef.markForCheck();
+      });
 
       // Mark for check
       this._changeDetectorRef.markForCheck();
@@ -108,8 +118,14 @@ export class NewMessageComponent implements OnInit{
 
     sendMessage()
     {
-      if (!this.isWhatsAppSynced) {
+      if (!this.isWhatsAppReady && !this.isWhatsAppSynced) {
         this._toastrService.error("Synchronisez votre compte WhatsApp avant d'envoyer un message", 'WhatsApp non synchronisé');
+        this._router.navigate(['/sync_whatsapp']);
+        return;
+      }
+      if (!this.isWhatsAppReady) {
+        this._toastrService.error("La synchronisation WhatsApp n'est pas terminée. Veuillez patienter ou synchroniser votre compte.", 'WhatsApp indisponible');
+        this._router.navigate(['/sync_whatsapp']);
         return;
       }
       const title = (this.messageToSend.title || '').trim();
@@ -148,7 +164,7 @@ export class NewMessageComponent implements OnInit{
 
     canPrevisualise(): boolean
     {
-      return this.hasMessageContent() && (this.destinationContacts.length > 0 || this.destinationGroups.length > 0);
+      return this.isWhatsAppReady && this.hasMessageContent() && (this.destinationContacts.length > 0 || this.destinationGroups.length > 0);
     }
 
     private hasMessageContent(): boolean

@@ -132,12 +132,12 @@
                                     <div class=" w-6 h-6 mr-3 cursor-pointer float-right">
                                         <!--  -->
                                         <mat-icon
-                                        [disabled]="!hasWhatsAppConnected"
                                             (click)="openModelForMessageTo($event,contact)"
                                             mat-button
-                                            class="icon-size-6 text-emerald-600 dark:text-emerald-400"
+                                            class="icon-size-6"
+                                            [ngClass]="isWhatsAppReady ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 opacity-50 cursor-not-allowed'"
                                             [svgIcon]="'mat_outline:chat'"
-                                            [matTooltip]="'Envoyé un message à '+contact.fullName"></mat-icon>
+                                            [matTooltip]="isWhatsAppReady ? 'Envoyer un message à '+contact.fullName : (isWhatsAppSyncing ? 'Synchronisation WhatsApp en cours...' : 'Synchronisez votre compte WhatsApp pour envoyer un message')"></mat-icon>
                                     </div> 
                                 </a>
                             </ng-container>

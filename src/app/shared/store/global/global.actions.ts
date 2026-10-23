@@ -5,7 +5,7 @@ export namespace GlobalAction
     export class AddNotification
     {
         static readonly type = '[Global-Notification] Add Notification';
-        constructor(public notification:string){}
+        constructor(public notification:any){}
     }
 
     //Fetch All Global
@@ -19,5 +19,17 @@ export namespace GlobalAction
     {
         static readonly type = '[Global-WhatsApp-Status] Change WhatsApp Status';
         constructor(public status:boolean){}
+    }
+
+    export class SetWhatsAppSyncStatus
+    {
+        static readonly type = '[Global-WhatsApp-Sync] Set WhatsApp Sync Status';
+        constructor(public status: GlobalModel['whatsappSyncStatus'], public progress: number = 0, public message: string | null = null){}
+    }
+
+    export class ResetWhatsAppSync
+    {
+        static readonly type = '[Global-WhatsApp-Sync] Reset WhatsApp Sync';
+        constructor(){}
     }
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Select } from '@ngxs/store';
 import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
-import { WhatsappContactState, WhatsappQrCodeState } from 'app/shared/store';
+import { GlobalState, WhatsappContactState, WhatsappQrCodeState } from 'app/shared/store';
 import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profile';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
@@ -27,6 +27,8 @@ export class QrcodeSynchroStatutComponent implements OnInit, OnDestroy {
   @Select(WhatsappQrCodeState.selectStateLoading) whatsappHasLoadQrCode$: Observable<boolean>
   @Select(WhatsappContactState.selectStatePercent) syncPercent$:Observable<number>
   @Select(WhatsappContactState.selectStateSyncError) syncError$:Observable<string>
+  @Select(GlobalState.isWhatsAppReady) isWhatsAppReady$:Observable<boolean>
+  @Select(GlobalState.selectWhatsAppSyncStatus) whatsappSync$:Observable<{status:string, progress:number, message:string}>
 
   generatedQrCode:string=""
   isWaitingWhatsappSync:boolean = false;

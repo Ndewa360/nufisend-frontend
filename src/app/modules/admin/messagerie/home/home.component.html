@@ -26,7 +26,7 @@
                 <!-- Actions -->
                 <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
 
-                    <button (click)="newMessage()" [disabled]="!hasWhatsAppConnected" [matTooltip]="hasWhatsAppConnected?'':'Synchronisez votre compte WhatsApp pour envoyer un message'" mat-flat-button [color]="'primary'">
+                    <button (click)="newMessage()" [disabled]="!isWhatsAppReady" [matTooltip]="isWhatsAppReady?'':'La synchronisation WhatsApp doit être terminée pour envoyer un message'" mat-flat-button [color]="'primary'">
                         <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:mail'"></mat-icon>
                         <span class="ml-2">Nouveau message</span>
                     </button>
@@ -52,9 +52,16 @@
     <!-- Main -->
     <div class="flex-auto border-t -mt-px pt-4 sm:pt-6">
         <div class="w-full max-w-screen-xl mx-auto p-4">
-            <fuse-alert *ngIf="!hasWhatsAppConnected" class="mb-6" [type]="'warning'" [appearance]="'border'" [showIcon]="true">
+            <fuse-alert *ngIf="!isWhatsAppReady" class="mb-6" [type]="(whatsappSync$ | async)?.status === 'syncing' || (whatsappSync$ | async)?.status === 'connecting' ? 'info' : 'warning'" [appearance]="'border'" [showIcon]="true">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <span>Votre compte WhatsApp n'est pas synchronisé. Synchronisez-le pour pouvoir envoyer et planifier vos messages.</span>
+                    <ng-container *ngIf="(whatsappSync$ | async) as sync">
+                        <span *ngIf="sync.status === 'syncing' || sync.status === 'connecting'">
+                            Synchronisation WhatsApp en cours{{ sync.progress > 0 ? ' (' + sync.progress + '%)' : '' }}. L'envoi sera disponible dès qu'elle sera terminée.
+                        </span>
+                        <span *ngIf="sync.status !== 'syncing' && sync.status !== 'connecting'">
+                            Votre compte WhatsApp n'est pas synchronisé. Synchronisez-le pour pouvoir envoyer et planifier vos messages.
+                        </span>
+                    </ng-container>
                     <a mat-button color="primary" routerLink="/sync_whatsapp">Synchroniser maintenant</a>
                 </div>
             </fuse-alert>

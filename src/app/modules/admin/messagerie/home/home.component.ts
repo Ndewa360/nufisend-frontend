@@ -14,9 +14,10 @@ import { PlanificationAction, PlanificationModel, PlanificationState } from 'app
 })
 export class HomeComponent implements OnInit{
   user:UserProfileModel=null;
-  hasWhatsAppConnected:boolean=false;
+  isWhatsAppReady:boolean=false;
   @Select(UserProfileState.selectStateData) loadUserProfil$:Observable<UserProfileModel>
-  @Select(GlobalState.selectStateConnectedWhatsApp) hasWhatsAppConnected$:Observable<boolean>;
+  @Select(GlobalState.isWhatsAppReady) isWhatsAppReady$:Observable<boolean>;
+  @Select(GlobalState.selectWhatsAppSyncStatus) whatsappSync$:Observable<{status:string, progress:number, message:string}>;
   @Select(PlanificationState.selectStateData) planificationList$:Observable<PlanificationModel[]>;
   @Select(PlanificationState.selectStateLoading) loading$:Observable<boolean>;
   
@@ -31,7 +32,7 @@ export class HomeComponent implements OnInit{
 
   ngOnInit(): void {
     this.loadUserProfil$.subscribe((user)=>this.user=user)
-    this.hasWhatsAppConnected$.subscribe((value)=>this.hasWhatsAppConnected=value)
+    this.isWhatsAppReady$.subscribe((value)=>this.isWhatsAppReady=!!value)
 
     this.planificationList$.subscribe((value)=>{
       if(!value) return;

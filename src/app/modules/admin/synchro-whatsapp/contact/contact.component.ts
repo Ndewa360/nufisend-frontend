@@ -6,8 +6,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Actions, Select, Store, ofActionCompleted } from '@ngxs/store';
-import { WhatsappDataService } from 'app/shared/services/whatsapp/whatsapp-data.service';
-import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
 import { ContactState, ContactModel, ContactAction, WhatsappContactModel, WhatsappContactState } from 'app/shared/store';
 import { ContactService } from 'app/shared/store/contact/contact.service';
 import { UserProfileState, UserProfileModel } from 'app/shared/store/user-profile';
@@ -32,7 +30,6 @@ export class ContactComponent {
   contactsLoading=false;
   userProfile:UserProfileModel=null;
   percent=0;
-  private _autoSyncTriggered = false;
 
   @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
@@ -61,8 +58,6 @@ export class ContactComponent {
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseConfirmationService: FuseConfirmationService,
         private _toastrService:ToastrService,
-        private whatsappDataService: WhatsappDataService,
-        private _syncQrcodeService: SyncQrcodeService,
         private _ngxsAction:Actions
     )
     {
@@ -85,19 +80,6 @@ export class ContactComponent {
         this.userProfile$.pipe(takeUntil(this._unsubscribeAll)).subscribe((profile)=>{
             this.userProfile=profile;
             this.refreshLoadingState();
-            // Auto-trigger sync only ONCE per component lifecycle.
-            // userProfile$ can emit multiple times (initial load, sync-connected patch, etc.)
-            // triggering startSync() more than once causes duplicate 'connexion' events
-            // which makes the backend emit 'info' twice -> contacts appear doubled in the UI.
-            if (profile?.hasSyncWhatsApp && !this._autoSyncTriggered) {
-                const currentContacts = this._store.selectSnapshot(WhatsappContactState.selectStateData);
-                if (!currentContacts || currentContacts.length === 0) {
-                    this._autoSyncTriggered = true;
-                    this.contactsLoading = true;
-                    this.refreshLoadingState();
-                    this._syncQrcodeService.startSync();
-                }
-            }
         })
 
         this.loadingPercent$.pipe(takeUntil(this._unsubscribeAll)).subscribe((percent)=>{

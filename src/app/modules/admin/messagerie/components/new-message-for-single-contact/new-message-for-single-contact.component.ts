@@ -23,7 +23,9 @@ export class NewMessageForSingleContactComponent {
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
   @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>;
   @Select(GlobalState.selectStateConnectedWhatsApp) whatsappConnected$:Observable<boolean>;
+  @Select(GlobalState.isWhatsAppReady) isWhatsAppReady$:Observable<boolean>;
   isWhatsAppSynced:boolean=false;
+  isWhatsAppReady:boolean=false;
 
   constructor(
     public matDialogRef: MatDialogRef<NewMessageForSingleContactComponent>,
@@ -55,6 +57,13 @@ export class NewMessageForSingleContactComponent {
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe(([profile, connected]) => {
           this.isWhatsAppSynced = !!profile?.hasSyncWhatsApp || !!connected;
+        });
+
+      this.isWhatsAppReady$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((ready) => {
+          this.isWhatsAppReady = !!ready;
+          this._changeDetectorRef.markForCheck();
         });
 
       // Mark for check
@@ -91,8 +100,13 @@ export class NewMessageForSingleContactComponent {
 
     sendMessage()
     {
-      if (!this.isWhatsAppSynced) {
-        this._toastrService.error("Synchronisez votre compte WhatsApp avant d'envoyer un message", 'WhatsApp non synchronisé');
+      if (!this.isWhatsAppReady) {
+        this._toastrService.error(
+          this.isWhatsAppSynced
+            ? "La synchronisation WhatsApp est en cours. Veuillez patienter avant d'envoyer un message."
+            : "Synchronisez votre compte WhatsApp avant d'envoyer un message",
+          'WhatsApp indisponible'
+        );
         return;
       }
       const title = (this.messageToSend.title || '').trim();

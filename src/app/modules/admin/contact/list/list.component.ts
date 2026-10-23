@@ -25,6 +25,8 @@ export class ListComponent implements OnInit, OnDestroy{
   @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
     @Select(GlobalState.selectStateConnectedWhatsApp) hasWhatsAppConnected$:Observable<boolean>;
+    @Select(GlobalState.isWhatsAppReady) isWhatsAppReady$:Observable<boolean>;
+    @Select(GlobalState.isWhatsAppSyncing) isWhatsAppSyncing$:Observable<boolean>;
     
     @Select(ContactState.selectStateData) contacts$: Observable<ContactModel[]>;
     @Select(ContactState.selectStateLoading) loading$:Observable<boolean>
@@ -39,6 +41,8 @@ export class ListComponent implements OnInit, OnDestroy{
     searchInputControl: UntypedFormControl = new UntypedFormControl();
     selectedContact: ContactModel;
     hasWhatsAppConnected:boolean=false;
+    isWhatsAppReady:boolean=false;
+    isWhatsAppSyncing:boolean=false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -73,6 +77,12 @@ export class ListComponent implements OnInit, OnDestroy{
 
         this.hasWhatsAppConnected$
             .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>this.hasWhatsAppConnected=value)
+
+        this.isWhatsAppReady$
+            .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>this.isWhatsAppReady=!!value)
+
+        this.isWhatsAppSyncing$
+            .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>this.isWhatsAppSyncing=!!value)
 
         this.contacts$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -163,6 +173,15 @@ export class ListComponent implements OnInit, OnDestroy{
     openModelForMessageTo(event,contact)
     {
         event.stopPropagation();
+        if (!this.isWhatsAppReady) {
+            this._toastrService.warning(
+                this.isWhatsAppSyncing
+                    ? "La synchronisation WhatsApp est en cours. Veuillez patienter avant d'envoyer un message."
+                    : "Synchronisez votre compte WhatsApp avant d'envoyer un message.",
+                'WhatsApp indisponible'
+            );
+            return;
+        }
         const dialogRef = this._matDialog.open(NewMessageForSingleContactComponent,
             {
                 data: {contact}

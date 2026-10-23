@@ -9,6 +9,9 @@ import { of } from "rxjs";
     defaults:{
         isLoading:false,
         isConnectedToWhatsapp:false,
+        whatsappSyncStatus: 'unknown',
+        whatsappSyncProgress: 0,
+        whatsappSyncMessage: null,
         notifications:[]
     }
 })
@@ -26,6 +29,28 @@ export class GlobalState{
     static selectStateConnectedWhatsApp(state:GlobalModel)
     {
         return state.isConnectedToWhatsapp
+    }
+
+    @Selector()
+    static selectWhatsAppSyncStatus(state:GlobalModel)
+    {
+        return {
+            status: state.whatsappSyncStatus,
+            progress: state.whatsappSyncProgress,
+            message: state.whatsappSyncMessage
+        }
+    }
+
+    @Selector()
+    static isWhatsAppReady(state:GlobalModel)
+    {
+        return state.whatsappSyncStatus === 'ready' && state.isConnectedToWhatsapp
+    }
+
+    @Selector()
+    static isWhatsAppSyncing(state:GlobalModel)
+    {
+        return state.whatsappSyncStatus === 'syncing' || state.whatsappSyncStatus === 'connecting'
     }
 
 
@@ -46,6 +71,32 @@ export class GlobalState{
     updateWhatsConnectedAppStatus(ctx:StateContext<GlobalModel>,{status}:GlobalAction.ChangeWhatsAppConnectedStatus)
     {
         ctx.patchState({isConnectedToWhatsapp:status});
+        if (!status && ctx.getState().whatsappSyncStatus === 'ready') {
+            ctx.patchState({whatsappSyncStatus: 'connecting', whatsappSyncProgress: 0, whatsappSyncMessage: 'Reconnexion en cours...'});
+        }
+        return of(true);
+    }
+
+    @Action(GlobalAction.SetWhatsAppSyncStatus)
+    setWhatsAppSyncStatus(ctx:StateContext<GlobalModel>,{status, progress, message}:GlobalAction.SetWhatsAppSyncStatus)
+    {
+        ctx.patchState({
+            whatsappSyncStatus: status,
+            whatsappSyncProgress: Math.max(0, Math.min(100, progress || 0)),
+            whatsappSyncMessage: message || null
+        });
+        return of(true);
+    }
+
+    @Action(GlobalAction.ResetWhatsAppSync)
+    resetWhatsAppSync(ctx:StateContext<GlobalModel>)
+    {
+        ctx.patchState({
+            whatsappSyncStatus: 'unknown',
+            whatsappSyncProgress: 0,
+            whatsappSyncMessage: null,
+            isConnectedToWhatsapp: false
+        });
         return of(true);
     }
 }

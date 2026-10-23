@@ -18,16 +18,18 @@
                 </div>
 
                 <!-- Progression sync contacts -->
-                <ng-container *ngIf="(syncPercent$ | async) as percent">
-                    <ng-container *ngIf="percent > 0 && percent < 100">
-                        <div class="mt-6 w-64">
+                <ng-container *ngIf="!(isWhatsAppReady$ | async)">
+                    <div class="mt-6 w-64">
+                        <ng-container *ngIf="(whatsappSync$ | async) as sync">
                             <div class="flex justify-between text-sm text-secondary mb-1">
-                                <span>Chargement des contacts...</span>
-                                <span>{{ percent }}%</span>
+                                <span>{{ sync.message || 'Synchronisation des contacts...' }}</span>
+                                <span *ngIf="sync.progress > 0">{{ sync.progress }}%</span>
                             </div>
-                            <mat-progress-bar [mode]="'determinate'" [value]="percent"></mat-progress-bar>
-                        </div>
-                    </ng-container>
+                            <mat-progress-bar
+                                [mode]="sync.progress > 0 ? 'determinate' : 'indeterminate'"
+                                [value]="sync.progress"></mat-progress-bar>
+                        </ng-container>
+                    </div>
                 </ng-container>
 
                 <div class="flex items-center justify-center mt-8">
