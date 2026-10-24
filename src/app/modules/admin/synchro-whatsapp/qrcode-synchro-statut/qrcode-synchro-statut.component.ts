@@ -63,6 +63,8 @@ export class QrcodeSynchroStatutComponent implements OnInit, OnDestroy {
       if(value?.hasSyncWhatsApp){
         this.hasQrCodeIsGenerated=false;
         this.generatedQrCode="";
+        this.isWaitingWhatsappSync=true;
+      } else {
         this.isWaitingWhatsappSync=false;
       }
       this._changeDetectorRef.markForCheck();
@@ -70,7 +72,14 @@ export class QrcodeSynchroStatutComponent implements OnInit, OnDestroy {
 
     this.whatsappHasLoadQrCode$.pipe(takeUntil(this._unsubscribeAll)).subscribe((loading)=>{
       console.log('[QrStatut] loadingQrCode$ =', loading);
-      this.isWaitingWhatsappSync=loading;
+      if (this.userProfile?.hasSyncWhatsApp) {
+        this.isWaitingWhatsappSync = !!loading;
+      } else if (this.hasQrCodeIsGenerated) {
+        // Keep QR visible while waiting; don't override QR display with loader
+        this.isWaitingWhatsappSync = false;
+      } else {
+        this.isWaitingWhatsappSync = !!loading;
+      }
       this._changeDetectorRef.markForCheck();
     });
   }

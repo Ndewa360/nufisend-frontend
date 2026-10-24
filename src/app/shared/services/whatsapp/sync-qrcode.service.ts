@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { UserProfileAction } from 'app/shared/store/user-profile';
-import { WhatsappQrCodeAction, WhatsappContactAction } from 'app/shared/store';
+import { WhatsappQrCodeAction, WhatsappContactAction, GlobalAction } from 'app/shared/store';
 import { Socket } from 'ngx-socket-io';
 
 const log = (...args: any[]) => console.log('[SyncQR]', ...args);
@@ -35,6 +35,8 @@ export class SyncQrcodeService {
     this.handleSuccessfullyUnSync();
     this.subscribeToQrCode();
     this.handleSyncError();
+    this.handleAuthProgress();
+    this.handleLoadingProgress();
   }
 
   subscribeToQrCode(): void
@@ -43,7 +45,34 @@ export class SyncQrcodeService {
       log('<< RECEIVED qrcode (len=' + (data?.length ?? 0) + ')');
       this.store.dispatch([
         new WhatsappQrCodeAction.SetLoadingQrCode(false),
+        new WhatsappContactAction.SetSyncError(null),
         new WhatsappQrCodeAction.SetWhatsAppQrCode(data)
+      ]);
+    });
+  }
+
+  handleAuthProgress(): void
+  {
+    this.socket.on('sync-connected', () => {
+      log('<< RECEIVED sync-connected -> showing auth/loading state');
+      this.store.dispatch([
+        new WhatsappQrCodeAction.SetWhatsAppQrCode(null),
+        new WhatsappQrCodeAction.SetLoadingQrCode(true),
+        new WhatsappContactAction.SetSyncError(null),
+        new GlobalAction.SetWhatsAppSyncStatus('connecting', 0, 'Authentification en cours...'),
+        new GlobalAction.ChangeWhatsAppConnectedStatus(true)
+      ]);
+    });
+  }
+
+  handleLoadingProgress(): void
+  {
+    this.socket.on('info-loading-percent', (value: any) => {
+      log('<< RECEIVED info-loading-percent', value);
+      // Keep UI in loading state while WhatsApp initializes
+      this.store.dispatch([
+        new WhatsappQrCodeAction.SetWhatsAppQrCode(null),
+        new WhatsappQrCodeAction.SetLoadingQrCode(true)
       ]);
     });
   }
@@ -108,14 +137,25 @@ export class SyncQrcodeService {
 
   handleSuccessfullySync(): void
   {
-    this.socket.on('sync-connected', () => {
-      log('<< RECEIVED sync-connected -> patching profile hasSyncWhatsApp=true');
+    this.socket.on('ready', () => {
+      log('<< RECEIVED ready -> patching profile hasSyncWhatsApp=true');
       this.store.dispatch([
         new UserProfileAction.UpdateUserWhatsappSyncProfile(true),
         new UserProfileAction.updateLoadingUserProfileState(false),
+        new WhatsappQrCodeAction.SetLoadingQrCode(true),
+        new WhatsappQrCodeAction.SetWhatsAppQrCode(null),
+        new GlobalAction.ChangeWhatsAppConnectedStatus(true),
+        new GlobalAction.SetWhatsAppSyncStatus('syncing', 10, 'Synchronisation des contacts...')
+      ]).subscribe(() => log('ready dispatched OK'));
+    });
+
+    this.socket.on('info', () => {
+      log('<< RECEIVED info -> WhatsApp contacts loaded');
+      this.store.dispatch([
         new WhatsappQrCodeAction.SetLoadingQrCode(false),
-        new WhatsappQrCodeAction.SetWhatsAppQrCode(null)
-      ]).subscribe(() => log('sync-connected dispatched OK'));
+        new GlobalAction.ChangeWhatsAppConnectedStatus(true),
+        new GlobalAction.SetWhatsAppSyncStatus('ready', 100, 'Synchronisation terminée')
+      ]).subscribe(() => log('info dispatched OK'));
     });
   }
 

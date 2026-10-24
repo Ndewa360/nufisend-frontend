@@ -14,21 +14,21 @@
                     Votre WhatsApp est connecté
                 </div>
                 <div class="mt-2 text-secondary text-sm text-center max-w-xs">
-                    Votre compte WhatsApp est synchronisé avec NufiSend.
+                    <ng-container *ngIf="!(isWhatsAppReady$ | async)">
+                        Authentification réussie. Finalisation de la synchronisation...
+                    </ng-container>
+                    <ng-container *ngIf="(isWhatsAppReady$ | async)">
+                        Votre compte WhatsApp est synchronisé avec NufiSend.
+                    </ng-container>
                 </div>
 
                 <!-- Progression sync contacts -->
                 <ng-container *ngIf="!(isWhatsAppReady$ | async)">
                     <div class="mt-6 w-64">
-                        <ng-container *ngIf="(whatsappSync$ | async) as sync">
-                            <div class="flex justify-between text-sm text-secondary mb-1">
-                                <span>{{ sync.message || 'Synchronisation des contacts...' }}</span>
-                                <span *ngIf="sync.progress > 0">{{ sync.progress }}%</span>
-                            </div>
-                            <mat-progress-bar
-                                [mode]="sync.progress > 0 ? 'determinate' : 'indeterminate'"
-                                [value]="sync.progress"></mat-progress-bar>
-                        </ng-container>
+                        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                        <div class="mt-2 text-center text-xs text-secondary">
+                            Chargement des contacts et finalisation...
+                        </div>
                     </div>
                 </ng-container>
 
@@ -48,9 +48,12 @@
                     <div class="mb-4">
                         <mat-progress-spinner [diameter]="80" [mode]="'indeterminate'"></mat-progress-spinner>
                     </div>
-                    <div class="text-lg font-medium">Génération du QR Code...</div>
+                    <div class="text-lg font-medium">Initialisation de WhatsApp...</div>
                     <div class="mt-2 text-secondary text-sm text-center max-w-xs">
-                        Veuillez patienter, connexion au serveur WhatsApp en cours.
+                        Démarrage du navigateur et préparation de la session. Cela peut prendre quelques secondes.
+                    </div>
+                    <div class="mt-3 text-xs text-amber-600 text-center max-w-xs">
+                        Le QR Code apparaîtra dès qu'il sera prêt.
                     </div>
                 </ng-container>
 
