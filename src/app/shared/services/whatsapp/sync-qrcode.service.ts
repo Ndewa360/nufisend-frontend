@@ -60,7 +60,8 @@ export class SyncQrcodeService {
         new WhatsappQrCodeAction.SetLoadingQrCode(true),
         new WhatsappContactAction.SetSyncError(null),
         new GlobalAction.SetWhatsAppSyncStatus('connecting', 0, 'Authentification en cours...'),
-        new GlobalAction.ChangeWhatsAppConnectedStatus(true)
+        new GlobalAction.ChangeWhatsAppConnectedStatus(true),
+        new UserProfileAction.UpdateUserWhatsappSyncProfile(true)
       ]);
     });
   }
@@ -166,7 +167,10 @@ export class SyncQrcodeService {
       this.store.dispatch([
         new UserProfileAction.UpdateUserWhatsappSyncProfile(false),
         new UserProfileAction.updateLoadingUserProfileState(false),
-        new WhatsappQrCodeAction.SetLoadingQrCode(false)
+        new WhatsappQrCodeAction.SetLoadingQrCode(false),
+        new WhatsappQrCodeAction.SetWhatsAppQrCode(null),
+        new GlobalAction.ChangeWhatsAppConnectedStatus(false),
+        new GlobalAction.ResetWhatsAppSync()
       ]);
     });
   }
