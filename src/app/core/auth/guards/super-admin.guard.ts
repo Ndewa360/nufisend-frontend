@@ -18,10 +18,7 @@ export class SuperAdminGuard implements CanActivate, CanActivateChild, CanLoad
     private isSuperAdmin(): boolean
     {
         const user = this._authService.user;
-        if (!user) return false;
-        return user['role'] === 'ADMIN' || 
-               user['permissions'] === 'ADMIN' || 
-               user['email'] === 'admin@nufisend.ndewa-360.com';
+        return !!(user && user['role'] === 'ADMIN');
     }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean

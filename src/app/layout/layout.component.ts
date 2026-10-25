@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { combineLatest, filter, map, Subject, takeUntil } from 'rxjs';
+import { combineLatest, filter, map, Subject, take, takeUntil } from 'rxjs';
 import { FuseConfigService } from '@fuse/services/config';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FusePlatformService } from '@fuse/services/platform';
@@ -81,17 +81,13 @@ export class LayoutComponent implements OnInit, OnDestroy
             this._updateLayout();
         });
 
-        // Filter navigation items based on user role (once, not on every navigation event)
+        // Filter navigation items based on user role — take(1) prevents infinite loop
         this._navigationService.navigation$
-            .pipe(takeUntil(this._unsubscribeAll))
+            .pipe(take(1))
             .subscribe((nav: any) => {
                 if (nav && nav.default) {
                     const user = this._authService.user;
-                    const isSuperAdmin = user && (
-                        user['role'] === 'ADMIN' ||
-                        user['permissions'] === 'ADMIN' ||
-                        user['email'] === 'admin@nufisend.ndewa-360.com'
-                    );
+                    const isSuperAdmin = !!(user && user['role'] === 'ADMIN');
                     if (!isSuperAdmin) {
                         nav.default = nav.default.filter((item: any) => item.id !== 'super_admin');
                         this._navigationService.setNavigation(nav);

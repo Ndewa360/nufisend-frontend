@@ -18,7 +18,7 @@ export class AdminGuard implements CanActivate, CanActivateChild, CanLoad
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean
     {
         const user = this._authService.user;
-        if (user && (user['role'] === 'ADMIN' || user['permissions'] === 'ADMIN' || user['email'] === 'admin@nufisend.ndewa-360.com')) {
+        if (user && user['role'] === 'ADMIN') {
             return true;
         }
         this._router.navigate(['/dashboard']);
@@ -33,9 +33,6 @@ export class AdminGuard implements CanActivate, CanActivateChild, CanLoad
     canLoad(route: Route, segments: UrlSegment[]): Observable<boolean> | Promise<boolean> | boolean
     {
         const user = this._authService.user;
-        if (user && (user['role'] === 'ADMIN' || user['permissions'] === 'ADMIN' || user['email'] === 'admin@nufisend.ndewa-360.com')) {
-            return true;
-        }
-        return false;
+        return !!(user && user['role'] === 'ADMIN');
     }
 }
