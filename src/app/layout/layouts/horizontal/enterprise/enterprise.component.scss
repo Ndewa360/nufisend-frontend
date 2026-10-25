@@ -1,7 +1,11 @@
 /* ─── Menu latéral mobile : scroll natif ────────────────────────────────── */
-fuse-vertical-navigation {
+fuse-vertical-navigation.fuse-vertical-navigation-mode-over {
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+
     .fuse-vertical-navigation-content {
         overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: touch !important;
     }
 }

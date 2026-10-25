@@ -40,6 +40,9 @@ fuse-vertical-navigation {
         position: fixed;
         top: 0;
         bottom: 0;
+        height: 100%;
+        min-height: 100%;
+        max-height: 100%;
     }
 
     /* Left position */
@@ -145,6 +148,7 @@ fuse-vertical-navigation {
             flex: 1 1 auto;
             overflow-x: hidden;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
 
             /* Divider */
