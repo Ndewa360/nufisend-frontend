@@ -7,6 +7,7 @@ import { UserService } from 'app/core/user/user.service';
 
 export interface User {
     _id?: string;
+    id?: string;
     email: string;
     firstName?: string;
     lastName?: string;
@@ -16,6 +17,9 @@ export interface User {
     phoneNumber?: string;
     hasSyncWhatsApp?: boolean;
     emailConfirmed?: boolean;
+    role?: string;
+    permissions?: string;
+    isBlocked?: boolean;
     createdAt?: Date;
 }
 

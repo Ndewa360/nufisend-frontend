@@ -1,6 +1,8 @@
 import { Route } from '@angular/router';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
+import { AdminGuard } from 'app/core/auth/guards/admin.guard';
+import { SuperAdminGuard } from 'app/core/auth/guards/super-admin.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 import { InitialDataResolver } from 'app/app.resolvers';
 import { InitialLoadingDataResolver } from './shared/services/loading-data';
@@ -140,6 +142,32 @@ export const appRoutes: Route[] = [
             layout: 'enterprise'
         },
         loadChildren:() => import('app/modules/admin/settings/settings.module').then(m =>m.SettingsModule)
+    },
+    {
+        path: 'super-admin',
+        canActivate: [AuthGuard, SuperAdminGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+            initialLoadingData: InitialLoadingDataResolver
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/admin/super-admin/super-admin.module').then(m =>m.SuperAdminModule)
+    },
+    {
+        path: 'api-keys',
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+            initialLoadingData: InitialLoadingDataResolver
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/api/api-keys.module').then(m =>m.ApiKeysModule)
     },
 
     {path: '**', pathMatch : 'full', redirectTo: 'home'},

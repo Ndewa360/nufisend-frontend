@@ -1,13 +1,14 @@
 import { Component, Inject, OnDestroy, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { DOCUMENT } from '@angular/common';
 import { combineLatest, filter, map, Subject, takeUntil } from 'rxjs';
 import { FuseConfigService } from '@fuse/services/config';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FusePlatformService } from '@fuse/services/platform';
-import { FUSE_VERSION } from '@fuse/version';
 import { Layout } from 'app/layout/layout.types';
 import { AppConfig } from 'app/core/config/app.config';
+import { AuthService } from 'app/core/auth/auth.service';
+import { NavigationService } from 'app/core/navigation/navigation.service';
 
 @Component({
     selector     : 'layout',
@@ -23,9 +24,6 @@ export class LayoutComponent implements OnInit, OnDestroy
     theme: string;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    /**
-     * Constructor
-     */
     constructor(
         private _activatedRoute: ActivatedRoute,
         @Inject(DOCUMENT) private _document: any,
@@ -33,181 +31,137 @@ export class LayoutComponent implements OnInit, OnDestroy
         private _router: Router,
         private _fuseConfigService: FuseConfigService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _fusePlatformService: FusePlatformService
+        private _fusePlatformService: FusePlatformService,
+        private _authService: AuthService,
+        private _navigationService: NavigationService
     )
     {
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * On init
-     */
     ngOnInit(): void
     {
-        // Set the theme and scheme based on the configuration
-        combineLatest([
-            this._fuseConfigService.config$,
-            this._fuseMediaWatcherService.onMediaQueryChange$(['(prefers-color-scheme: dark)', '(prefers-color-scheme: light)'])
-        ]).pipe(
-            takeUntil(this._unsubscribeAll),
-            map(([config, mql]) => {
-
-                const options = {
-                    scheme: config.scheme,
-                    theme : config.theme
-                };
-
-                // If the scheme is set to 'auto'...
-                if ( config.scheme === 'auto' )
-                {
-                    // Decide the scheme using the media query
-                    options.scheme = mql.breakpoints['(prefers-color-scheme: dark)'] ? 'dark' : 'light';
-                }
-
-                return options;
-            })
-        ).subscribe((options) => {
-
-            // Store the options
-            this.scheme = options.scheme;
-            this.theme = options.theme;
-
-            // Update the scheme and theme
-            this._updateScheme();
-            this._updateTheme();
-        });
-
-        // Subscribe to config changes
         this._fuseConfigService.config$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((config: AppConfig) => {
-
-                // Store the config
-                this.config = config;
-
-                // Update the layout
-                this._updateLayout();
+                if (config) {
+                    this.config = config;
+                }
             });
 
-        // Subscribe to NavigationEnd event
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                map(({matchingAliases}: any) => {
+                    const config = this._fuseConfigService.config;
+                    if (!config) {
+                        return 'classy';
+                    }
+                    if ( matchingAliases && matchingAliases.includes('xl') )
+                    {
+                        if ( config.layout === 'empty' || config.layout === 'classic' )
+                        {
+                            return 'classy';
+                        }
+                    }
+                    if ( matchingAliases && matchingAliases.includes('lg') )
+                    {
+                        if ( config.layout === 'empty' || config.layout === 'classic' )
+                        {
+                            return 'classy';
+                        }
+                    }
+                    return config.layout;
+                })
+            )
+            .subscribe((layout: any) => {
+                if (layout) {
+                    this.layout = layout;
+                    this._fuseConfigService.config = {layout};
+                }
+            });
+
+        combineLatest([
+            this._fuseConfigService.config$,
+        ]).pipe(
+            takeUntil(this._unsubscribeAll),
+            map(([config]) => {
+                if (!config) {
+                    return 'light';
+                }
+                const scheme = config.scheme;
+                if ( scheme === 'auto' )
+                {
+                    return 'light';
+                }
+                return scheme;
+            })
+        ).subscribe((scheme: any) => {
+            this.scheme = scheme;
+            this._updateScheme();
+        });
+
+        this.filterNavigationForUser();
         this._router.events.pipe(
             filter(event => event instanceof NavigationEnd),
             takeUntil(this._unsubscribeAll)
         ).subscribe(() => {
-
-            // Update the layout
+            this.filterNavigationForUser();
             this._updateLayout();
         });
 
-        // Set the app version
-        this._renderer2.setAttribute(this._document.querySelector('[ng-version]'), 'fuse-version', FUSE_VERSION);
+        if ( (this._fusePlatformService as any).os === 'ios' )
+        {
+            this._document.body.classList.add('os-ios');
+        }
 
-        // Set the OS name
-        this._renderer2.addClass(this._document.body, this._fusePlatformService.osName);
+        this._document.body.classList.add('fuse');
     }
 
-    /**
-     * On destroy
-     */
+    private filterNavigationForUser(): void
+    {
+        const user = this._authService.user;
+        const isSuperAdmin = user && (user['role'] === 'ADMIN' || user['permissions'] === 'ADMIN' || user['email'] === 'admin@nufisend.ndewa-360.com');
+        this._navigationService.navigation$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((nav: any) => {
+                if (nav && nav.default) {
+                    if (!isSuperAdmin) {
+                        nav.default = nav.default.filter((item: any) => item.id !== 'super_admin');
+                    }
+                    this._navigationService.setNavigation(nav);
+                }
+            });
+    }
+
     ngOnDestroy(): void
     {
-        // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Private methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Update the selected layout
-     */
-    private _updateLayout(): void
+    switchLayout(layout: string): void
     {
-        // Get the current activated route
-        let route = this._activatedRoute;
-        while ( route.firstChild )
-        {
-            route = route.firstChild;
-        }
-
-        // 1. Set the layout from the config
-        this.layout = this.config.layout;
-
-        // 2. Get the query parameter from the current route and
-        // set the layout and save the layout to the config
-        const layoutFromQueryParam = (route.snapshot.queryParamMap.get('layout') as Layout);
-        if ( layoutFromQueryParam )
-        {
-            this.layout = layoutFromQueryParam;
-            if ( this.config )
-            {
-                this.config.layout = layoutFromQueryParam;
-            }
-        }
-
-        // 3. Iterate through the paths and change the layout as we find
-        // a config for it.
-        //
-        // The reason we do this is that there might be empty grouping
-        // paths or componentless routes along the path. Because of that,
-        // we cannot just assume that the layout configuration will be
-        // in the last path's config or in the first path's config.
-        //
-        // So, we get all the paths that matched starting from root all
-        // the way to the current activated route, walk through them one
-        // by one and change the layout as we find the layout config. This
-        // way, layout configuration can live anywhere within the path and
-        // we won't miss it.
-        //
-        // Also, this will allow overriding the layout in any time so we
-        // can have different layouts for different routes.
-        const paths = route.pathFromRoot;
-        paths.forEach((path) => {
-
-            // Check if there is a 'layout' data
-            if ( path.routeConfig && path.routeConfig.data && path.routeConfig.data.layout )
-            {
-                // Set the layout
-                this.layout = path.routeConfig.data.layout;
-            }
-        });
+        this.layout = layout as Layout;
+        this._fuseConfigService.config = {layout};
     }
 
-    /**
-     * Update the selected scheme
-     *
-     * @private
-     */
     private _updateScheme(): void
     {
-        // Remove class names for all schemes
-        this._document.body.classList.remove('light', 'dark');
-
-        // Add class name for the currently selected scheme
+        this._document.body.classList.remove(this.scheme === 'dark' ? 'light' : 'dark');
         this._document.body.classList.add(this.scheme);
     }
 
-    /**
-     * Update the selected theme
-     *
-     * @private
-     */
-    private _updateTheme(): void
+    private _updateLayout(): void
     {
-        // Find the class name for the previously selected theme and remove it
+        if (!this.layout) {
+            return;
+        }
         this._document.body.classList.forEach((className: string) => {
-            if ( className.startsWith('theme-') )
+            if ( className.startsWith('fuse-layout-') )
             {
-                this._document.body.classList.remove(className, className.split('-')[1]);
+                this._document.body.classList.remove(className);
             }
         });
-
-        // Add class name for the currently selected theme
-        this._document.body.classList.add(this.theme);
+        this._document.body.classList.add('fuse-layout-' + this.layout);
     }
 }

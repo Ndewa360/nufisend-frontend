@@ -78,7 +78,9 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
         this._navigationService.navigation$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((navigation: Navigation) => {
-                this.navigation = navigation;
+                if (navigation) {
+                    this.navigation = navigation;
+                }
             });
 
         // Subscribe to media changes

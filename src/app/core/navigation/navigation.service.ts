@@ -29,6 +29,14 @@ export class NavigationService
         return this._navigation.asObservable();
     }
 
+    /**
+     * Setter for navigation
+     */
+    setNavigation(navigation: Navigation): void
+    {
+        this._navigation.next(navigation);
+    }
+
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------

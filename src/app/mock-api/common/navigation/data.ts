@@ -89,9 +89,32 @@ export const defaultNavigation: FuseNavigationItem[] = [
     {
         id   : 'settings',
         title: 'Paramètres',
-        type : 'basic',
+        type : 'group',
         icon : 'heroicons_outline:view-list',
-        link : '/settings'
+        link : '/settings',
+        children: [
+            {
+                id   : 'general_settings',
+                title: 'Paramètres généraux',
+                type : 'basic',
+                icon : 'heroicons_outline:cog',
+                link : '/settings',
+            },
+            {
+                id   : 'api_keys',
+                title: 'API & Intégration',
+                type : 'basic',
+                icon : 'heroicons_outline:code',
+                link : '/api-keys',
+            },
+        ]
+    },
+    {
+        id   : 'super_admin',
+        title: 'Administration',
+        type : 'basic',
+        icon : 'heroicons_outline:shield-check',
+        link : '/super-admin/dashboard'
     }
 ];
 export const compactNavigation: FuseNavigationItem[] = [...defaultNavigation];
