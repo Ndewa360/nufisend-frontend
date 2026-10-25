@@ -146,7 +146,9 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
     }
 
     ngAfterViewInit(){
-        this.menuPosition = this.menuElement.nativeElement.offsetTop
+        if (this.menuElement) {
+            this.menuPosition = this.menuElement.nativeElement.offsetTop;
+        }
     }
 
     /**
