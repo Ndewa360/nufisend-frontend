@@ -16,6 +16,7 @@ import { GlobalState } from 'app/shared/store';
 @Component({
     selector     : 'enterprise-layout',
     templateUrl  : './enterprise.component.html',
+    styleUrls    : ['./enterprise.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
 export class EnterpriseLayoutComponent implements OnInit, OnDestroy

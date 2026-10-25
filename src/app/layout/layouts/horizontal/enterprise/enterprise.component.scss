@@ -1,0 +1,7 @@
+/* ─── Menu latéral mobile : scroll natif ────────────────────────────────── */
+fuse-vertical-navigation {
+    .fuse-vertical-navigation-content {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+}
