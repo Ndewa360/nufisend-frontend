@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component,OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Select } from '@ngxs/store';
 import { PlanificationState, PlanificationModel, CRON_JOB_TYPE } from 'app/shared/store/planifcation';
@@ -6,20 +6,20 @@ import { CronJobString } from 'app/shared/utils';
 import { DateUtil } from 'app/shared/utils/date-util';
 import {parseExpression} from "cron-parser"
 import { ApexOptions, ChartComponent } from 'ng-apexcharts';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-schedule',
   templateUrl: './schedule.component.html',
   styleUrls: ['./schedule.component.scss']
 })
-export class ScheduleComponent implements OnInit,AfterViewInit{
+export class ScheduleComponent implements OnInit, AfterViewInit, OnDestroy {
  
   planificationsChartOption: ApexOptions = {};
   @Select(PlanificationState.selectStateData) planification$:Observable<PlanificationModel[]>;
   @ViewChild('planifChart',{ static: false }) planificationChart: ChartComponent;
 
-  private _unsubscribeAll: Subject<any> = new Subject<any>();
+  private _unsubscribeAll = new Subject<void>();
   planificationFirstDateChart:Date=new Date();
   planificationEndDateChart:Date=new Date();
   listOfPlanActive:any[]=[];
@@ -71,7 +71,14 @@ export class ScheduleComponent implements OnInit,AfterViewInit{
     DateUtil.setToLastDayOfWeek(this.planificationEndDateChart);
 
     this._prepareChartData();
-    this.planification$.subscribe((data)=>this._prepairData(data))    
+    this.planification$
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((data) => this._prepairData(data));
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next(undefined);
+    this._unsubscribeAll.complete();
   }
 
   // -----------------------------------------------------------------------------------------------------
@@ -164,7 +171,8 @@ export class ScheduleComponent implements OnInit,AfterViewInit{
               }
           },
           stroke     : {
-              width: [3, 0]
+              width: [3, 2],
+              dashArray: [0, 6]
           },
           tooltip    : {
               followCursor: true,
@@ -279,7 +287,7 @@ export class ScheduleComponent implements OnInit,AfterViewInit{
             },
             {
             name:"Planifications Inactives",
-            type: 'dashed',
+            type: 'line',
             data:this.getDataFromStartTo(this.planificationFirstDateChart,this.planificationEndDateChart,this.listOfPlanInActive)
             }
         ]

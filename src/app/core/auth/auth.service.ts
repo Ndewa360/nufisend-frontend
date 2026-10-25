@@ -128,13 +128,14 @@ export class AuthService
         this._userService.user = null;
         // Reset all NGXS states so no data leaks to the next user session
         this._store.reset({
-            contacts:     { contacts: [], loadingContacts: false, initLoadingState: 'NO_LOADED' },
-            groups:       { groups: [], loadingGroups: false, initLoadingState: 'NO_LOADED' },
-            userprofile:  { userProfile: null, loadingUserProfile: false },
-            globals:      { isLoading: false, isConnectedToWhatsapp: false, whatsappSyncStatus: 'unknown', whatsappSyncProgress: 0, whatsappSyncMessage: null, notifications: [] },
-            whatsapp_contacts: { contacts: [], initLoadingState: 'NO_LOADED' },
-            message_templates: { messageTemplates: [], loadingMessageTemplates: false, initLoadingState: 'NO_LOADED' },
-            messages:     { messages: [], loadingMessages: false, initLoadingState: 'NO_LOADED' },
+            contacts:         { contacts: [], loadingContacts: false, initLoadingState: 'NO_LOADED' },
+            groups:           { groups: [], loadingGroups: false, initLoadingState: 'NO_LOADED' },
+            userprofile:      { userProfile: null, loadingUserProfile: false },
+            globals:          { isLoading: false, isConnectedToWhatsapp: false, whatsappSyncStatus: 'unknown', whatsappSyncProgress: 0, whatsappSyncMessage: null, notifications: [] },
+            whatsapp_contacts:{ contacts: [], startLoading: false, percentLoading: 0, syncError: null },
+            messageTemplates: { messageTemplates: [], loadingMessageTemplates: false, initLoadingState: 'NO_LOADED' },
+            message:          { sendingMessage: false },
+            planifications:   { planifications: [], loadingPlanifications: false, initLoadingState: 'NO_LOADED' },
         });
         return of(true);
     }
