@@ -4,6 +4,7 @@ import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
 import { environment } from 'environments/environment';
 import { ApiResultFormat } from 'app/shared/store/global';
 import { UserService } from 'app/core/user/user.service';
+import { Store } from '@ngxs/store';
 
 export interface User {
     _id?: string;
@@ -39,7 +40,8 @@ export class AuthService
 
     constructor(
         private _httpClient: HttpClient,
-        private _userService: UserService
+        private _userService: UserService,
+        private _store: Store
     )
     {
         this.check();
@@ -123,6 +125,17 @@ export class AuthService
         localStorage.removeItem('accessToken');
         this._authenticated = false;
         this._user = null;
+        this._userService.user = null;
+        // Reset all NGXS states so no data leaks to the next user session
+        this._store.reset({
+            contacts:     { contacts: [], loadingContacts: false, initLoadingState: 'NO_LOADED' },
+            groups:       { groups: [], loadingGroups: false, initLoadingState: 'NO_LOADED' },
+            userprofile:  { userProfile: null, loadingUserProfile: false },
+            globals:      { isLoading: false, isConnectedToWhatsapp: false, whatsappSyncStatus: 'unknown', whatsappSyncProgress: 0, whatsappSyncMessage: null, notifications: [] },
+            whatsapp_contacts: { contacts: [], initLoadingState: 'NO_LOADED' },
+            message_templates: { messageTemplates: [], loadingMessageTemplates: false, initLoadingState: 'NO_LOADED' },
+            messages:     { messages: [], loadingMessages: false, initLoadingState: 'NO_LOADED' },
+        });
         return of(true);
     }
 
