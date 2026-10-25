@@ -1,38 +1,28 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { BlockScrollStrategy, Overlay } from '@angular/cdk/overlay';
-import { MAT_AUTOCOMPLETE_SCROLL_STRATEGY, MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { SharedModule } from 'app/shared/shared.module';
-import { SearchComponent } from 'app/layout/common/search/search.component';
+import { MatOptionModule } from '@angular/material/core';
+import { FuseAnimationsModule } from '@fuse/animations';
+import { SearchComponent } from './search.component';
 
 @NgModule({
-    declarations: [
-        SearchComponent
-    ],
-    imports     : [
-        RouterModule.forChild([]),
+    declarations: [SearchComponent],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        RouterModule,
         MatAutocompleteModule,
         MatButtonModule,
-        MatFormFieldModule,
         MatIconModule,
         MatInputModule,
-        SharedModule
+        MatOptionModule,
+        FuseAnimationsModule,
     ],
-    exports     : [
-        SearchComponent
-    ],
-    providers   : [
-        {
-            provide   : MAT_AUTOCOMPLETE_SCROLL_STRATEGY,
-            useFactory: (overlay: Overlay) => (): BlockScrollStrategy => overlay.scrollStrategies.block(),
-            deps      : [Overlay]
-        }
-    ]
+    exports: [SearchComponent]
 })
-export class SearchModule
-{
-}
+export class SearchModule {}
