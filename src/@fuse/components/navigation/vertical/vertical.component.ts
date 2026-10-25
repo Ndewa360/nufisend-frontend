@@ -55,7 +55,7 @@ export class FuseVerticalNavigationComponent implements OnChanges, OnInit, After
     private _mutationObserver: MutationObserver;
     private _overlay: HTMLElement;
     private _player: AnimationPlayer;
-    private _scrollStrategy: ScrollStrategy = this._scrollStrategyOptions.block();
+    private _scrollStrategy: ScrollStrategy = this._scrollStrategyOptions.noop();
     private _fuseScrollbarDirectives!: QueryList<FuseScrollbarDirective>;
     private _fuseScrollbarDirectivesSubscription: Subscription;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
