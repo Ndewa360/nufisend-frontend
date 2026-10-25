@@ -100,9 +100,9 @@
                         <ng-container *ngIf="contactsFiltered.length; else noContacts">
                             <ng-container *ngFor="let contact of contactsFiltered; let i = index; trackBy: trackByFn">
                                 <!-- Group -->
-                                <ng-container *ngIf="i === 0 || contact.fullName.charAt(0) !== contactsFiltered[i - 1].fullName.charAt(0)">
+                                <ng-container *ngIf="i === 0 || contact.fullName.charAt(0).toUpperCase() !== contactsFiltered[i - 1].fullName.charAt(0).toUpperCase()">
                                     <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
-                                        {{contact.fullName.charAt(0)}}
+                                        {{contact.fullName.charAt(0).toUpperCase()}}
                                     </div>
                                 </ng-container>
                                 <!-- Contact -->

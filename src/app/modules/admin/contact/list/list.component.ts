@@ -87,14 +87,11 @@ export class ListComponent implements OnInit, OnDestroy{
         this.contacts$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((conts: ContactModel[]) => {
-                
-                // Update the counts
                 this.contactsCount = conts.length;
-                this.contactsFiltered=[...conts]
-                this.contacts=[...conts]
-                this._changeDetectorRef.markForCheck()
-                // Mark for check
-                
+                const sorted = this._sortAlpha([...conts]);
+                this.contactsFiltered = sorted;
+                this.contacts = sorted;
+                this._changeDetectorRef.markForCheck();
             });
 
 
@@ -284,11 +281,11 @@ export class ListComponent implements OnInit, OnDestroy{
 
         if ( !normalizedQuery )
         {
-            this.contactsFiltered = [...this.contacts];
+            this.contactsFiltered = this._sortAlpha([...this.contacts]);
         }
         else
         {
-            this.contactsFiltered = this.contacts.filter((contact) => {
+            this.contactsFiltered = this._sortAlpha(this.contacts.filter((contact) => {
                 const emails = (contact.emails || []).map((email) => email.email).join(' ');
                 const phones = (contact.phoneNumbers || []).map((phone) => phone.phoneNumber).join(' ');
 
@@ -301,10 +298,17 @@ export class ListComponent implements OnInit, OnDestroy{
                     emails,
                     phones
                 ].filter(Boolean).join(' ')).includes(normalizedQuery);
-            });
+            }));
         }
 
         this._changeDetectorRef.markForCheck();
+    }
+
+    private _sortAlpha(contacts: ContactModel[]): ContactModel[]
+    {
+        return contacts.sort((a, b) =>
+            (a.fullName || '').localeCompare(b.fullName || '', 'fr', { sensitivity: 'base' })
+        );
     }
 
     private _normalize(value: string | undefined | null): string
