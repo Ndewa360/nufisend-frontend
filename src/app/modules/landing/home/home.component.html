@@ -1,4 +1,4 @@
-<div class="nufisend-landing w-full min-w-0 font-sans">
+﻿<div class="nufisend-landing w-full min-w-0 font-sans">
     <app-navbar></app-navbar>
 
     <main>
@@ -570,6 +570,7 @@
         </section>
 
         <!-- Pricing -->
+        <!-- Pricing -->
         <section id="pricing" class="scroll-mt-24 bg-white py-20 sm:py-24">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl text-center" data-reveal>
@@ -578,15 +579,16 @@
                         Des tarifs simples, sans surprise.
                     </h2>
                     <p class="mt-4 text-[16px] leading-7 text-slate-500">
-                        Commencez gratuitement. Passez à une offre supérieure lorsque votre volume de messages augmente.
+                        Commencez gratuitement. Payez uniquement ce que vous utilisez.
                     </p>
                 </div>
 
                 <div class="mt-14 grid items-stretch gap-5 lg:grid-cols-3">
+                    <!-- DÃ©couverte -->
                     <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-7" data-reveal>
                         <div>
-                            <div class="text-[15px] font-bold text-nufi-900">Découverte</div>
-                            <p class="mt-1 text-[13px] text-slate-500">Pour tester NufiSend à votre rythme.</p>
+                            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Découverte</div>
+                            <div class="mt-1 text-[15px] font-bold text-nufi-900">Gratuit</div>
                             <div class="mt-6 flex items-end gap-1">
                                 <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">0</span>
                                 <span class="pb-1 text-[14px] font-semibold text-slate-500">FCFA</span>
@@ -596,99 +598,103 @@
                         <ul class="mt-6 flex-1 space-y-3">
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                10 messages programmés
+                                Accès aux fonctionnalités essentielles
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Contacts illimités
+                                Connexion WhatsApp par QR code
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Synchronisation WhatsApp
+                                Synchronisation des contacts
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Groupes de diffusion
+                                5 messages de test offerts / mois
                             </li>
                         </ul>
-                        <a routerLink="/auth/sign-up" class="mt-7 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
+                        <p class="mt-5 text-[11px] italic text-slate-400">Testez le service avant de payer.</p>
+                        <a routerLink="/auth/sign-up" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
                             Commencer gratuitement
                         </a>
                     </article>
 
+                    <!-- À la consommation -->
                     <article class="nufi-card relative flex flex-col rounded-3xl bg-nufi-900 p-7 text-white shadow-[0_30px_70px_-30px_rgba(3,37,46,0.55)] ring-1 ring-nufi-700" data-reveal style="transition-delay: 80ms">
                         <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-nufi-accent px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-nufi-900 shadow-lg">
-                            Recommandé
+                            Offre principale
                         </span>
                         <div>
-                            <div class="text-[15px] font-bold text-white">Essentiel</div>
-                            <p class="mt-1 text-[13px] text-slate-400">Pour communiquer régulièrement.</p>
+                            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">À la consommation</div>
+                            <div class="mt-1 text-[15px] font-bold text-white">Dès 10 FCFA / message</div>
                             <div class="mt-6 flex items-end gap-1">
-                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-white">500</span>
-                                <span class="pb-1 text-[14px] font-semibold text-slate-300">FCFA</span>
+                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-white">10</span>
+                                <span class="pb-1 text-[14px] font-semibold text-slate-300">FCFA / msg</span>
                             </div>
-                            <div class="mt-1 text-[12px] text-slate-400">par mois</div>
+                            <div class="mt-1 text-[12px] text-slate-400">Aucun abonnement obligatoire</div>
                         </div>
                         <ul class="mt-6 flex-1 space-y-3">
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
-                                100 messages programmés / mois
+                                Recharge du portefeuille selon les besoins
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
-                                Tout ce que propose Découverte
+                                Tarifs dégressifs selon le volume
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
-                                Modèles de messages
+                                Campagnes immédiates et programmées
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
-                                Support prioritaire
+                                Historique détaillé de la consommation
                             </li>
                         </ul>
-                        <a routerLink="/auth/sign-up" class="mt-7 inline-flex items-center justify-center gap-2 rounded-xl bg-nufi-accent px-5 py-3 text-[13px] font-bold text-nufi-900 transition duration-300 hover:bg-white">
-                            Choisir Essentiel
+                        <p class="mt-5 text-[11px] italic text-slate-400">Le coût évolue avec votre utilisation.</p>
+                        <a routerLink="/auth/sign-up" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-nufi-accent px-5 py-3 text-[13px] font-bold text-nufi-900 transition duration-300 hover:bg-white">
+                            Se lancer
                         </a>
                     </article>
 
+                    <!-- Organisation / Entreprise -->
                     <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-7" data-reveal style="transition-delay: 160ms">
                         <div>
-                            <div class="text-[15px] font-bold text-nufi-900">Pro</div>
-                            <p class="mt-1 text-[13px] text-slate-500">Pour les équipes qui communiquent beaucoup.</p>
+                            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Organisation / Entreprise</div>
+                            <div class="mt-1 text-[15px] font-bold text-nufi-900">Sur devis</div>
                             <div class="mt-6 flex items-end gap-1">
-                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">2 000</span>
-                                <span class="pb-1 text-[14px] font-semibold text-slate-500">FCFA</span>
+                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">&#8212;</span>
                             </div>
-                            <div class="mt-1 text-[12px] text-slate-400">par mois</div>
+                            <div class="mt-1 text-[12px] text-slate-400">Conditions adaptées au volume</div>
                         </div>
                         <ul class="mt-6 flex-1 space-y-3">
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Messages programmés illimités
+                                Gestion de plusieurs utilisateurs
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Tout ce que propose Essentiel
+                                Annuaire partagé et rôles d'accès
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Annuaire partagé entre plusieurs comptes
+                                Accompagnement et support dédie
                             </li>
                             <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Support dédié
+                                Conditions commerciales adaptées
                             </li>
                         </ul>
-                        <a routerLink="/auth/sign-up" class="mt-7 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
-                            Choisir Pro
+                        <p class="mt-5 text-[11px] italic text-slate-400">Pour les structures qui utilisent NufiSend en équipe.</p>
+                        <a href="mailto:contact@ndewa-360.com" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
+                            Nous contacter
                         </a>
                     </article>
                 </div>
 
                 <p class="mt-8 text-center text-[12px] text-slate-400">
-                    Besoin d’une offre adaptée à votre organisation ?
-                    <a href="mailto:contact@ndewa-360.com" class="font-semibold text-nufi-700 hover:underline">Parlons-en.</a>
+                    Une question sur les tarifs ?
+                    <a href="mailto:contact@ndewa-360.com" class="font-semibold text-nufi-700 hover:underline">écrivez-nous.</a>
                 </p>
             </div>
         </section>
