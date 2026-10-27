@@ -41,7 +41,7 @@ interface AdminUser {
           <mat-card-content>
             <div class="flex flex-col sm:flex-row gap-4 mt-4">
               <mat-form-field class="flex-auto fuse-mat-dense" subscriptSizing="dynamic">
-                <mat-icon matPrefix [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                <mat-icon matPrefix [svgIcon]="'heroicons_outline:search'"></mat-icon>
                 <input matInput placeholder="Rechercher (email, nom)" [ngModel]="search" (ngModelChange)="onSearch($event)">
               </mat-form-field>
               <mat-form-field class="sm:w-48 fuse-mat-dense" subscriptSizing="dynamic">

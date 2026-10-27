@@ -1,5 +1,6 @@
-import { Translation, TRANSLOCO_CONFIG, TRANSLOCO_LOADER, translocoConfig, TranslocoModule, TranslocoService } from '@ngneat/transloco';
+import { provideTransloco, Translation, TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { TranslocoHttpLoader } from 'app/core/transloco/transloco.http-loader';
 
 @NgModule({
@@ -7,10 +8,10 @@ import { TranslocoHttpLoader } from 'app/core/transloco/transloco.http-loader';
         TranslocoModule
     ],
     providers: [
-        {
-            // Provide the default Transloco configuration
-            provide : TRANSLOCO_CONFIG,
-            useValue: translocoConfig({
+        // Transloco 6 : provideTransloco enregistre la configuration, le loader et
+        // les services internes (transpiler, missing handler...).
+        provideTransloco({
+            config: {
                 availableLangs      : [
                     {
                         id   : 'fr',
@@ -21,13 +22,9 @@ import { TranslocoHttpLoader } from 'app/core/transloco/transloco.http-loader';
                 fallbackLang        : 'fr',
                 reRenderOnLangChange: true,
                 prodMode            : true
-            })
-        },
-        {
-            // Provide the default Transloco loader
-            provide : TRANSLOCO_LOADER,
-            useClass: TranslocoHttpLoader
-        },
+            },
+            loader: TranslocoHttpLoader
+        }),
         {
             // Preload the default language before the app starts to prevent empty/jumping content
             provide   : APP_INITIALIZER,
@@ -35,7 +32,7 @@ import { TranslocoHttpLoader } from 'app/core/transloco/transloco.http-loader';
             useFactory: (translocoService: TranslocoService): any => (): Promise<Translation> => {
                 const defaultLang = translocoService.getDefaultLang();
                 translocoService.setActiveLang(defaultLang);
-                return translocoService.load(defaultLang).toPromise();
+                return firstValueFrom(translocoService.load(defaultLang));
             },
             multi     : true
         }

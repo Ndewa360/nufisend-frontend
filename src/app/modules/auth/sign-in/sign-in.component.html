@@ -36,7 +36,7 @@
                     <!-- Email -->
                     <mat-form-field class="w-full">
                         <mat-label>Adresse email</mat-label>
-                        <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
+                        <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:mail'"></mat-icon>
                         <input
                             id="email"
                             matInput
@@ -62,7 +62,7 @@
                             [attr.aria-label]="hidePassword ? 'Afficher le mot de passe' : 'Masquer le mot de passe'"
                             (click)="hidePassword = !hidePassword">
                             <mat-icon class="icon-size-5"
-                                [svgIcon]="hidePassword ? 'heroicons_solid:eye' : 'heroicons_solid:eye-slash'">
+                                [svgIcon]="hidePassword ? 'heroicons_solid:eye' : 'heroicons_solid:eye-off'">
                             </mat-icon>
                         </button>
                         <mat-error *ngIf="signInForm.get('password').hasError('required')">Le mot de passe est obligatoire</mat-error>
@@ -96,7 +96,7 @@
                         [disabled]="signInForm.disabled"
                         type="submit">
                         <ng-container *ngIf="!signInForm.disabled">
-                            <mat-icon class="icon-size-5 mr-2" [svgIcon]="'heroicons_solid:arrow-right-on-rectangle'"></mat-icon>
+                            <mat-icon class="icon-size-5 mr-2" [svgIcon]="'heroicons_solid:login'"></mat-icon>
                             Se connecter
                         </ng-container>
                         <mat-progress-spinner

@@ -124,7 +124,7 @@ export class WhatsAppAutoSyncService implements OnDestroy {
     }
     try {
       this._notifications.create({
-        icon: 'heroicons_outline:exclamation-triangle',
+        icon: 'heroicons_outline:exclamation',
         title: 'WhatsApp non synchronisé',
         description: 'Vous devez synchroniser votre compte WhatsApp pour envoyer des messages.',
         link: '/sync_whatsapp',

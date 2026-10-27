@@ -72,11 +72,16 @@ export class CustomQuillEditorComponent implements ControlValueAccessor{
   {
     this.quillEditorRef = quillEditor;
 
-    const templateVarsPickerItems = this.quillEditor.elementRef.nativeElement.querySelectorAll('.ql-templatevars .ql-picker-item');
+    // Barre d'outils fournie par l'API publique de Quill (elementRef est prive
+    // depuis ngx-quill 24).
+    const toolbar: HTMLElement = quillEditor.getModule('toolbar')?.container;
+    if (!toolbar) return;
 
+    const templateVarsPickerItems = toolbar.querySelectorAll('.ql-templatevars .ql-picker-item');
     templateVarsPickerItems.forEach((item:any) => item.textContent = item.dataset.value);
 
-    this.quillEditor.elementRef.nativeElement.querySelector('.ql-templatevars .ql-picker-label').innerHTML = ' Var Template ' + this.quillEditor.elementRef.nativeElement.querySelector('.ql-templatevars .ql-picker-label').innerHTML;
+    const pickerLabel = toolbar.querySelector('.ql-templatevars .ql-picker-label');
+    if (pickerLabel) pickerLabel.innerHTML = ' Var Template ' + pickerLabel.innerHTML;
 
   }
 

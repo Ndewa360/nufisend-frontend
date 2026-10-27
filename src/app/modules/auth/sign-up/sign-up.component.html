@@ -51,7 +51,7 @@
                     <!-- Email -->
                     <mat-form-field class="w-full mt-4">
                         <mat-label>Adresse email</mat-label>
-                        <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
+                        <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:mail'"></mat-icon>
                         <input matInput formControlName="email" type="email"
                             autocomplete="email"
                             [placeholder]="'exemple@email.com'" />
@@ -70,7 +70,7 @@
                             [attr.aria-label]="hidePassword ? 'Afficher le mot de passe' : 'Masquer le mot de passe'"
                             (click)="hidePassword = !hidePassword">
                             <mat-icon class="icon-size-5"
-                                [svgIcon]="hidePassword ? 'heroicons_solid:eye' : 'heroicons_solid:eye-slash'">
+                                [svgIcon]="hidePassword ? 'heroicons_solid:eye' : 'heroicons_solid:eye-off'">
                             </mat-icon>
                         </button>
                         <mat-hint>Minimum 8 caractères</mat-hint>
@@ -89,7 +89,7 @@
                             [attr.aria-label]="hideConfirmPassword ? 'Afficher' : 'Masquer'"
                             (click)="hideConfirmPassword = !hideConfirmPassword">
                             <mat-icon class="icon-size-5"
-                                [svgIcon]="hideConfirmPassword ? 'heroicons_solid:eye' : 'heroicons_solid:eye-slash'">
+                                [svgIcon]="hideConfirmPassword ? 'heroicons_solid:eye' : 'heroicons_solid:eye-off'">
                             </mat-icon>
                         </button>
                         <mat-error *ngIf="signUpForm.get('confirmPassword').hasError('required')">La confirmation est obligatoire</mat-error>
@@ -103,7 +103,7 @@
                         [disabled]="signUpForm.disabled"
                         type="submit">
                         <ng-container *ngIf="!signUpForm.disabled">
-                            <mat-icon class="icon-size-5 mr-2" [svgIcon]="'heroicons_solid:user-plus'"></mat-icon>
+                            <mat-icon class="icon-size-5 mr-2" [svgIcon]="'heroicons_solid:user-add'"></mat-icon>
                             Créer mon compte
                         </ng-container>
                         <mat-progress-spinner
