@@ -1,27 +1,25 @@
-# Fuse - Admin template and Starter project for Angular
+# NufiSend Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli)
+Interface web de NufiSend (Angular 17, Angular Material, Tailwind, NGXS), basée sur le template Fuse.
 
-## Development server
+## Démarrage
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm install
+npm start                # http://localhost:4200, API attendue sur http://localhost:3200
+npm run start:mobile     # accès depuis le réseau local (adresse IP dans environment.mobile.ts)
+```
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+npm run build            # build de production dans dist/fuse (environment.prod.ts)
+```
 
-## Running unit tests
+## Organisation
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice.  To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- `src/app/core` : authentification (service, intercepteur, gardes), navigation, synchronisation WhatsApp automatique.
+- `src/app/modules` : pages (landing, auth, contacts, groupes, messagerie, templates, synchro WhatsApp, super-admin, clés API).
+- `src/app/shared` : store NGXS, services, composants partagés.
+  - `shared/modules/date-picker.module.ts` et `rich-text-editor.module.ts` : à importer uniquement dans les modules qui utilisent des sélecteurs de date ou l'éditeur Quill (ils ne doivent pas revenir dans `SharedModule`, chargé au démarrage).
+- Icônes : le jeu Heroicons embarqué est en **v1** (`mail`, `eye-off`, `login`...), les noms v2 (`envelope`, `eye-slash`...) n'existent pas.
