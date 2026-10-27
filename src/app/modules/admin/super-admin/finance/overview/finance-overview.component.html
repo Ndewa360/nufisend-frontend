@@ -38,7 +38,7 @@
                     Attendu {{ overview.platformWallet.expectedProviderBalance | xaf }}
                     <span *ngIf="providerGap !== null" [class.text-red-600]="providerGap !== 0"> · écart {{ providerGap | xaf }}</span>
                 </div>
-                <div class="text-xs text-secondary">Reversements enregistrés : {{ overview.platformWallet.settlements | xaf }}</div>
+                <div class="text-xs text-secondary">Retraits : {{ overview.platformWallet.withdrawals | xaf }}<span *ngIf="overview.platformWallet.pendingWithdrawals"> (+{{ overview.platformWallet.pendingWithdrawals | xaf }} en attente)</span> · reversements : {{ overview.platformWallet.settlements | xaf }}</div>
             </div>
         </div>
     </div>

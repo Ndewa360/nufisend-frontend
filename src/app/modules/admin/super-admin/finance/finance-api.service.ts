@@ -25,6 +25,9 @@ export interface FinanceOverview
         customerAvailable: number;
         customerReserved: number;
         settlements: number;
+        withdrawals: number;
+        withdrawalFees: number;
+        pendingWithdrawals: number;
         expectedProviderBalance: number;
         lastReconciliation: ReconciliationReport | null;
     };
@@ -103,6 +106,10 @@ export interface BillingSettings
     minTopup: number;
     maxTopup: number;
     providerFeePercent: number;
+    minWithdrawal: number;
+    maxWithdrawal: number;
+    withdrawalDailyLimit: number;
+    withdrawalAllowedPhones: string;
     lowBalanceThreshold: number;
     reconciliationTolerance: number;
     alertEmails: string;
@@ -112,6 +119,44 @@ export interface BillingSettings
     companyRegistry: string;
     vatRate: number;
     updatedAt?: string;
+}
+
+export interface Withdrawal
+{
+    _id: string;
+    reference: string;
+    operator: 'MTN' | 'ORANGE';
+    phone: string;
+    beneficiaryName: string;
+    amount: number;
+    fee: number;
+    feeFromProvider: boolean;
+    status: 'pending' | 'success' | 'failed';
+    providerRef?: string;
+    providerStatus?: string;
+    failureReason?: string;
+    note?: string;
+    usedCustomerFunds: boolean;
+    providerBalanceBefore?: number;
+    requestedBy?: { email: string };
+    createdAt: string;
+    completedAt?: string;
+}
+
+export interface WithdrawalSummary
+{
+    currency: string;
+    configured: { MTN: boolean; ORANGE: boolean };
+    providerBalance: number | null;
+    providerError: string | null;
+    expectedProviderBalance: number;
+    customerFunds: number;
+    pendingWithdrawals: number;
+    withdrawable: number;
+    withdrawableWithoutCustomerFunds: number;
+    totalWithdrawn: number;
+    withdrawalFees: number;
+    limits: { min: number; max: number; daily: number; allowedPhones: string[] };
 }
 
 const toParams = (query: Record<string, any> = {}): HttpParams =>
@@ -223,6 +268,39 @@ export class FinanceApiService
     reconcile(): Observable<ReconciliationReport>
     {
         return this._http.post<ApiResponse<ReconciliationReport>>(`${this._base}/reconciliations`, {}).pipe(map((res) => res.data));
+    }
+
+    withdrawalSummary(): Observable<WithdrawalSummary>
+    {
+        return this.get('/withdrawals/summary');
+    }
+
+    withdrawals(query: Record<string, any>): Observable<Paginated<Withdrawal>>
+    {
+        return this.get('/withdrawals', query);
+    }
+
+    createWithdrawal(body: {
+        amount: number;
+        operator: 'MTN' | 'ORANGE';
+        phone: string;
+        beneficiaryName?: string;
+        note?: string;
+        password: string;
+        allowCustomerFunds?: boolean;
+    }): Observable<Withdrawal>
+    {
+        return this._http.post<ApiResponse<Withdrawal>>(`${this._base}/withdrawals`, body).pipe(map((res) => res.data));
+    }
+
+    recheckWithdrawal(id: string): Observable<Withdrawal>
+    {
+        return this._http.post<ApiResponse<Withdrawal>>(`${this._base}/withdrawals/${id}/recheck`, {}).pipe(map((res) => res.data));
+    }
+
+    resolveWithdrawal(id: string, body: { status: 'success' | 'failed'; reason: string; password: string }): Observable<Withdrawal>
+    {
+        return this._http.post<ApiResponse<Withdrawal>>(`${this._base}/withdrawals/${id}/resolve`, body).pipe(map((res) => res.data));
     }
 
     audit(query: Record<string, any>): Observable<Paginated<any>>

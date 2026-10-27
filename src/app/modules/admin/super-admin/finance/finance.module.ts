@@ -11,6 +11,7 @@ import { FinancePaymentsComponent, PaymentDetailDialogComponent } from './paymen
 import { FinanceReconciliationComponent } from './reconciliation/finance-reconciliation.component';
 import { FinanceSettingsComponent } from './settings/finance-settings.component';
 import { FinanceWalletsComponent, WalletDetailDialogComponent } from './wallets/finance-wallets.component';
+import { FinanceWithdrawalsComponent, ResolveWithdrawalDialogComponent } from './withdrawals/finance-withdrawals.component';
 
 const routes: Routes = [{ path: '', component: FinanceComponent }];
 
@@ -26,6 +27,8 @@ const routes: Routes = [{ path: '', component: FinanceComponent }];
         FinanceReconciliationComponent,
         FinanceSettingsComponent,
         FinanceAuditComponent,
+        FinanceWithdrawalsComponent,
+        ResolveWithdrawalDialogComponent,
     ],
     imports     : [SharedModule, XafPipe, NgApexchartsModule, MatSnackBarModule, RouterModule.forChild(routes)],
 })

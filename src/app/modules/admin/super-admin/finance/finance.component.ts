@@ -24,6 +24,7 @@ import { FinanceApiService } from './finance-api.service';
                     <mat-tab label="Paiements"><ng-template matTabContent><div class="pt-6"><app-finance-payments></app-finance-payments></div></ng-template></mat-tab>
                     <mat-tab label="Portefeuilles"><ng-template matTabContent><div class="pt-6"><app-finance-wallets></app-finance-wallets></div></ng-template></mat-tab>
                     <mat-tab label="Grand livre"><ng-template matTabContent><div class="pt-6"><app-finance-ledger></app-finance-ledger></div></ng-template></mat-tab>
+                    <mat-tab label="Retraits"><ng-template matTabContent><div class="pt-6"><app-finance-withdrawals></app-finance-withdrawals></div></ng-template></mat-tab>
                     <mat-tab label="Rapprochement"><ng-template matTabContent><div class="pt-6"><app-finance-reconciliation></app-finance-reconciliation></div></ng-template></mat-tab>
                     <mat-tab label="Tarifs & paramètres"><ng-template matTabContent><div class="pt-6"><app-finance-settings></app-finance-settings></div></ng-template></mat-tab>
                     <mat-tab label="Audit"><ng-template matTabContent><div class="pt-6"><app-finance-audit></app-finance-audit></div></ng-template></mat-tab>
@@ -34,7 +35,7 @@ import { FinanceApiService } from './finance-api.service';
 })
 export class FinanceComponent
 {
-    private static readonly TABS = ['overview', 'payments', 'wallets', 'ledger', 'reconciliation', 'settings', 'audit'];
+    private static readonly TABS = ['overview', 'payments', 'wallets', 'ledger', 'withdrawals', 'reconciliation', 'settings', 'audit'];
     tab = 0;
 
     constructor(route: ActivatedRoute)
@@ -81,6 +82,8 @@ export class FinanceAuditComponent implements OnInit
         'payment.recheck'        : 'Revérification de paiement',
         'platform.settlement'    : 'Reversement enregistré',
         'platform.reconciliation': 'Rapprochement manuel',
+        'platform.withdrawal'    : 'Retrait',
+        'platform.withdrawal.recheck': 'Vérification / clôture de retrait',
     };
     logs: any[] = [];
     total = 0;

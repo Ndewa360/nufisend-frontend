@@ -44,6 +44,21 @@ import { FinanceApiService } from '../finance-api.service';
             </div>
 
             <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-lg font-semibold">Retraits</div>
+                <div class="text-sm text-secondary">Garde-fous des retraits vers Mobile Money (super-admin).</div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                    <mat-form-field><mat-label>Retrait minimal (FCFA)</mat-label><input matInput type="number" min="1" formControlName="minWithdrawal"></mat-form-field>
+                    <mat-form-field><mat-label>Retrait maximal (FCFA)</mat-label><input matInput type="number" min="1" formControlName="maxWithdrawal"></mat-form-field>
+                    <mat-form-field><mat-label>Plafond sur 24 h (FCFA)</mat-label><input matInput type="number" min="0" formControlName="withdrawalDailyLimit"><mat-hint>0 = sans plafond</mat-hint></mat-form-field>
+                    <mat-form-field class="sm:col-span-3">
+                        <mat-label>Numéros autorisés</mat-label>
+                        <input matInput formControlName="withdrawalAllowedPhones" placeholder="677123456, 699112233">
+                        <mat-hint>Vide = tout numéro camerounais. Recommandé : limiter aux numéros de l'entreprise.</mat-hint>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="bg-card rounded-2xl shadow p-6">
                 <div class="text-lg font-semibold">Mentions des reçus</div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <mat-form-field><mat-label>Raison sociale</mat-label><input matInput formControlName="companyName"></mat-form-field>
@@ -75,6 +90,10 @@ export class FinanceSettingsComponent implements OnInit
         minTopup               : [500, [Validators.required, Validators.min(1)]],
         maxTopup               : [500000, [Validators.required, Validators.min(1)]],
         providerFeePercent     : [1, [Validators.required, Validators.min(0)]],
+        minWithdrawal          : [500, [Validators.required, Validators.min(1)]],
+        maxWithdrawal          : [500000, [Validators.required, Validators.min(1)]],
+        withdrawalDailyLimit   : [0, [Validators.required, Validators.min(0)]],
+        withdrawalAllowedPhones: [''],
         lowBalanceThreshold    : [200, [Validators.required, Validators.min(0)]],
         reconciliationTolerance: [1000, [Validators.required, Validators.min(0)]],
         alertEmails            : [''],
@@ -122,7 +141,7 @@ export class FinanceSettingsComponent implements OnInit
     {
         const value: any = this.form.getRawValue();
         for (const key of Object.keys(value))
-            if (typeof value[key] === 'string' && value[key] !== '' && !isNaN(Number(value[key])) && !['alertEmails', 'companyName', 'companyAddress', 'companyTaxId', 'companyRegistry'].includes(key))
+            if (typeof value[key] === 'string' && value[key] !== '' && !isNaN(Number(value[key])) && !['alertEmails', 'withdrawalAllowedPhones', 'companyName', 'companyAddress', 'companyTaxId', 'companyRegistry'].includes(key))
                 value[key] = Number(value[key]);
         value.tiers = (value.tiers || []).map((tier: any) => ({
             minRecipients  : Number(tier.minRecipients),
