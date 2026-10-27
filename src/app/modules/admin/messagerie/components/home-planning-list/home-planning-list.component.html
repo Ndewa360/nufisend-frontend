@@ -206,6 +206,12 @@
                           [ngClass]="getStatusClass(plan.message?.status)">
                         {{ getStatusLabel(plan.message?.status) }}
                     </span>
+                    <div *ngIf="plan.isActive && plan.billingStatus === 'suspended_insufficient_funds'" class="mt-1 text-xs text-amber-600">
+                        En pause : solde insuffisant
+                    </div>
+                    <div *ngIf="plan.message?.billing?.amountCharged" class="mt-1 text-xs text-secondary">
+                        Facturé : {{ plan.message.billing.amountCharged | xaf }}
+                    </div>
                 </td>
             </ng-container>
 

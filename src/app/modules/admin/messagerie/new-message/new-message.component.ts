@@ -33,6 +33,10 @@ export class NewMessageComponent implements OnInit{
   @Select(GlobalState.isWhatsAppReady) isWhatsAppReady$: Observable<boolean>;
   isWhatsAppSynced:boolean=false;
   isWhatsAppReady:boolean=false;
+  /** Destinataires uniques (contacts + membres des groupes) pour l'estimation du cout. */
+  recipientsCount:number=0;
+  hasAttachment:boolean=false;
+  costSufficient:boolean=true;
 
   constructor(
     public matDialogRef: MatDialogRef<NewMessageComponent>,
@@ -102,6 +106,10 @@ export class NewMessageComponent implements OnInit{
     {
       this.destinationContacts=[...data.contacts];
       this.destinationGroups=[...data.groups]
+      const recipientIds = new Set<string>(this.destinationContacts.map((contact)=>String(contact._id)));
+      for (const group of this.destinationGroups)
+        for (const contact of (group.contacts || []) as any[]) recipientIds.add(String(contact?._id ?? contact));
+      this.recipientsCount = recipientIds.size;
       // Mark for check
       this._changeDetectorRef.markForCheck();
     }
@@ -114,6 +122,14 @@ export class NewMessageComponent implements OnInit{
     setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title:string})
     {
       this.messageToSend=message;
+      this.hasAttachment=!!message?.file;
+      this._changeDetectorRef.markForCheck();
+    }
+
+    setCostSufficient(sufficient:boolean)
+    {
+      this.costSufficient=sufficient;
+      this._changeDetectorRef.markForCheck();
     }
 
     sendMessage()
@@ -143,6 +159,10 @@ export class NewMessageComponent implements OnInit{
       }
       if (!this.messageSendToNow && !this.planificationObj.hasPlanification) {
         this._toastrService.error('Definissez la planification du message', 'Validation');
+        return;
+      }
+      if (!this.costSufficient) {
+        this._toastrService.warning('Rechargez votre portefeuille pour couvrir le coût de cet envoi', 'Solde insuffisant');
         return;
       }
 
@@ -175,6 +195,7 @@ export class NewMessageComponent implements OnInit{
     setPlanification(planif)
     {
       this.planificationObj = planif;
+      this._changeDetectorRef.markForCheck();
     }
 
     async privisualiserMessage()

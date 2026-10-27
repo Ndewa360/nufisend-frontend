@@ -86,6 +86,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
         ]
     },
     {
+        id   : 'wallet',
+        title: 'Portefeuille',
+        type : 'basic',
+        icon : 'heroicons_outline:credit-card',
+        link : '/wallet',
+    },
+    {
         id   : 'sync_whatsapp',
         title: 'Synchro Whatsapp',
         type : 'basic',

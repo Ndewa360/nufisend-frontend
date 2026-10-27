@@ -1,0 +1,124 @@
+<div class="flex flex-col gap-6">
+    <!-- Portefeuille global -->
+    <div *ngIf="overview" class="bg-card rounded-2xl shadow p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+                <div class="text-xl font-semibold">Portefeuille de la plateforme</div>
+                <div class="text-secondary text-sm">Depuis le lancement. Le chiffre d'affaires ne compte que les messages livrés et facturés.</div>
+            </div>
+            <div *ngIf="overview.platformWallet.lastReconciliation as last" class="text-sm">
+                Dernier rapprochement :
+                <span class="font-semibold" [class.text-green-600]="last.ok" [class.text-red-600]="!last.ok">{{ last.ok ? 'conforme' : 'anomalie' }}</span>
+                <span class="text-secondary"> ({{ last.createdAt | date:'dd/MM HH:mm' }})</span>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-6">
+            <div class="rounded-xl bg-green-50 dark:bg-transparent dark:border p-4">
+                <div class="text-sm text-secondary">Chiffre d'affaires réalisé</div>
+                <div class="text-3xl font-bold text-green-700 dark:text-green-500">{{ overview.platformWallet.revenue | xaf }}</div>
+                <div class="text-xs text-secondary mt-1">Marge après frais : {{ overview.platformWallet.margin | xaf }}</div>
+            </div>
+            <div class="rounded-xl bg-blue-50 dark:bg-transparent dark:border p-4">
+                <div class="text-sm text-secondary">Encaissements nets</div>
+                <div class="text-3xl font-bold text-blue-700 dark:text-blue-500">{{ overview.platformWallet.netCollected | xaf }}</div>
+                <div class="text-xs text-secondary mt-1">Brut {{ overview.platformWallet.grossCollected | xaf }} − frais {{ overview.platformWallet.providerFees | xaf }}</div>
+            </div>
+            <div class="rounded-xl bg-amber-50 dark:bg-transparent dark:border p-4">
+                <div class="text-sm text-secondary">Fonds clients (dus en service)</div>
+                <div class="text-3xl font-bold text-amber-700 dark:text-amber-500">{{ overview.platformWallet.customerFunds | xaf }}</div>
+                <div class="text-xs text-secondary mt-1">Disponible {{ overview.platformWallet.customerAvailable | xaf }} · réservé {{ overview.platformWallet.customerReserved | xaf }}</div>
+            </div>
+            <div class="rounded-xl bg-gray-50 dark:bg-transparent dark:border p-4">
+                <div class="text-sm text-secondary">Compte Easy-Transact</div>
+                <div class="text-3xl font-bold">
+                    <ng-container *ngIf="provider?.configured && provider?.balance !== null; else noBalance">{{ provider.balance | xaf }}</ng-container>
+                    <ng-template #noBalance><span class="text-base font-medium text-secondary">{{ provider?.error || 'Chargement…' }}</span></ng-template>
+                </div>
+                <div class="text-xs text-secondary mt-1">
+                    Attendu {{ overview.platformWallet.expectedProviderBalance | xaf }}
+                    <span *ngIf="providerGap !== null" [class.text-red-600]="providerGap !== 0"> · écart {{ providerGap | xaf }}</span>
+                </div>
+                <div class="text-xs text-secondary">Reversements enregistrés : {{ overview.platformWallet.settlements | xaf }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Periode -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <mat-button-toggle-group [value]="period" (change)="setPeriod($event.value)">
+            <mat-button-toggle *ngFor="let p of periods" [value]="p.id">{{ p.label }}</mat-button-toggle>
+        </mat-button-toggle-group>
+        <mat-progress-spinner *ngIf="loading" [diameter]="24" mode="indeterminate"></mat-progress-spinner>
+    </div>
+
+    <div *ngIf="overview" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-card rounded-2xl shadow p-4">
+            <div class="text-sm text-secondary">Encaissements bruts</div>
+            <div class="text-2xl font-bold">{{ overview.periodStats.grossCollected | xaf }}</div>
+            <div class="text-xs text-secondary">{{ overview.periodStats.topupCount }} recharge(s) · moy. {{ overview.periodStats.averageTopup | xaf }}</div>
+        </div>
+        <div class="bg-card rounded-2xl shadow p-4">
+            <div class="text-sm text-secondary">Chiffre d'affaires</div>
+            <div class="text-2xl font-bold">{{ overview.periodStats.revenue | xaf }}</div>
+            <div class="text-xs text-secondary">{{ overview.periodStats.billedMessages | number }} message(s) facturé(s)</div>
+        </div>
+        <div class="bg-card rounded-2xl shadow p-4">
+            <div class="text-sm text-secondary">Frais Easy-Transact</div>
+            <div class="text-2xl font-bold">{{ overview.periodStats.providerFees | xaf }}</div>
+            <div class="text-xs text-secondary">Marge {{ overview.periodStats.margin | xaf }}</div>
+        </div>
+        <div class="bg-card rounded-2xl shadow p-4">
+            <div class="text-sm text-secondary">Clients payants</div>
+            <div class="text-2xl font-bold">{{ overview.periodStats.payingUsers }}</div>
+            <div class="text-xs text-secondary">{{ overview.wallets.fundedWallets }} wallet(s) approvisionné(s)</div>
+        </div>
+        <div class="bg-card rounded-2xl shadow p-4">
+            <div class="text-sm text-secondary">Messages offerts</div>
+            <div class="text-2xl font-bold">{{ overview.periodStats.offeredMessages | number }}</div>
+            <div class="text-xs text-secondary">Valeur {{ overview.periodStats.offeredValue | xaf }}</div>
+        </div>
+        <div class="bg-card rounded-2xl shadow p-4">
+            <div class="text-sm text-secondary">Ajustements</div>
+            <div class="text-2xl font-bold">+{{ overview.periodStats.adjustmentsCredit | xaf }}</div>
+            <div class="text-xs text-secondary">Débits −{{ overview.periodStats.adjustmentsDebit | xaf }}</div>
+        </div>
+        <div class="bg-card rounded-2xl shadow p-4">
+            <div class="text-sm text-secondary">Recharges échouées</div>
+            <div class="text-2xl font-bold" [class.text-red-600]="overview.periodStats.failedPayments > 0">{{ overview.periodStats.failedPayments }}</div>
+            <div class="text-xs text-secondary">{{ overview.wallets.pendingPayments }} en attente actuellement</div>
+        </div>
+        <div class="bg-card rounded-2xl shadow p-4">
+            <div class="text-sm text-secondary">Non encaissé</div>
+            <div class="text-2xl font-bold">{{ overview.periodStats.writtenOffValue | xaf }}</div>
+            <div class="text-xs text-secondary">Messages livrés sans solde</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="xl:col-span-2 bg-card rounded-2xl shadow p-6">
+            <div class="text-lg font-semibold">Évolution</div>
+            <apx-chart *ngIf="chart"
+                       [chart]="chart.chart" [series]="chart.series" [xaxis]="chart.xaxis" [yaxis]="chart.yaxis"
+                       [dataLabels]="chart.dataLabels" [stroke]="chart.stroke" [colors]="chart.colors" [fill]="chart.fill"
+                       [tooltip]="chart.tooltip" [legend]="chart.legend" [noData]="chart.noData"></apx-chart>
+        </div>
+        <div class="flex flex-col gap-6">
+            <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-lg font-semibold">Par opérateur</div>
+                <div *ngFor="let op of overview?.periodStats.operators" class="flex justify-between mt-3">
+                    <span>{{ op.operator === 'MTN' ? 'MTN Mobile Money' : 'Orange Money' }} <span class="text-secondary">({{ op.count }})</span></span>
+                    <span class="font-semibold">{{ op.amount | xaf }}</span>
+                </div>
+                <div *ngIf="!overview?.periodStats.operators.length" class="text-secondary mt-3">Aucune recharge sur la période</div>
+            </div>
+            <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-lg font-semibold">Meilleurs clients</div>
+                <div *ngFor="let customer of topCustomers; let i = index" class="flex justify-between gap-2 mt-3">
+                    <span class="truncate">{{ i + 1 }}. {{ customer.name || customer.email }}</span>
+                    <span class="font-semibold whitespace-nowrap">{{ customer.revenue | xaf }}</span>
+                </div>
+                <div *ngIf="!topCustomers.length" class="text-secondary mt-3">Aucune consommation sur la période</div>
+            </div>
+        </div>
+    </div>
+</div>

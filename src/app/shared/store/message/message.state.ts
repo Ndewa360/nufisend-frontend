@@ -60,7 +60,10 @@ export class MessageState{
                 }
             ),
             catchError((error) => {
-                this._toastrService.error(error?.error?.message, 'Erreur');
+                const message = error?.error?.message;
+                const text = Array.isArray(message) ? message.join(' ') : message;
+                if (error?.status === 402) this._toastrService.warning(text, 'Solde insuffisant');
+                else this._toastrService.error(text, 'Erreur');
                 ctx.patchState({
                     sendingMessage: false
                 })

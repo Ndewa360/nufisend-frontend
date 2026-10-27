@@ -143,6 +143,19 @@ export const appRoutes: Route[] = [
         loadChildren:() => import('app/modules/admin/settings/settings.module').then(m =>m.SettingsModule)
     },
     {
+        path: 'wallet',
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+            initialLoadingData: InitialLoadingDataResolver
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/admin/wallet/wallet.module').then(m =>m.WalletModule)
+    },
+    {
         path: 'super-admin',
         canActivate: [AuthGuard, SuperAdminGuard],
         component: LayoutComponent,

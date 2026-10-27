@@ -18,6 +18,10 @@ import { environment } from 'environments/environment';
               </div>
             </div>
             <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
+              <button mat-flat-button [color]="'accent'" [routerLink]="['/super-admin/finance']">
+                <mat-icon [svgIcon]="'heroicons_outline:currency-dollar'"></mat-icon>
+                <span class="ml-2">Finance</span>
+              </button>
               <button mat-flat-button [color]="'primary'" [routerLink]="['/super-admin/users']">
                 <mat-icon [svgIcon]="'heroicons_outline:users'"></mat-icon>
                 <span class="ml-2">Gérer les utilisateurs</span>

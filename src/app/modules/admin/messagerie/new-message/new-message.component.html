@@ -101,6 +101,13 @@
                     <mat-step [completed]="isSendingMessage | async">
                         <ng-template matStepLabel>Rediger & Soumettre</ng-template>
                         <app-rediger-message-direct (sendMessageData)="setMessage($event)"></app-rediger-message-direct>
+                        <app-message-cost-estimate
+                            [recipients]="recipientsCount"
+                            [hasAttachment]="hasAttachment"
+                            [isScheduled]="!messageSendToNow"
+                            [planification]="planificationObj.hasPlanification ? planificationObj.planif : null"
+                            (sufficientChange)="setCostSufficient($event)"
+                            (navigate)="saveAndClose()"></app-message-cost-estimate>
                         <!-- <ng-template #redigerMessagePlanifier><app-rediger-message-planifier></app-rediger-message-planifier></ng-template>  -->
                         <div class="flex mt-8 justify-between">
                             <div class="">
@@ -127,8 +134,8 @@
                                     class="px-8"
                                     mat-flat-button
                                     [color]="'primary'"
-                                    [disabled]="(isSendingMessage | async) || !isWhatsAppReady"
-                                    [matTooltip]="isWhatsAppReady ? '' : 'La synchronisation WhatsApp doit être terminée pour envoyer'"
+                                    [disabled]="(isSendingMessage | async) || !isWhatsAppReady || !costSufficient"
+                                    [matTooltip]="!isWhatsAppReady ? 'La synchronisation WhatsApp doit être terminée pour envoyer' : !costSufficient ? 'Solde insuffisant : rechargez votre portefeuille' : ''"
                                     (click)="sendMessage()">
                                     <mat-progress-spinner *ngIf="(isSendingMessage | async); else endWordTermine" [diameter]="24" [mode]="'indeterminate'">
                                     </mat-progress-spinner>

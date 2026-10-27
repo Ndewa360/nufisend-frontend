@@ -1,0 +1,92 @@
+<div class="flex flex-col -m-6">
+    <div class="flex items-center justify-between h-16 pl-6 pr-3 bg-primary text-on-primary">
+        <div class="text-lg font-medium">Recharger mon portefeuille</div>
+        <button mat-icon-button (click)="close()" [tabIndex]="-1">
+            <mat-icon class="text-current" svgIcon="heroicons_outline:x"></mat-icon>
+        </button>
+    </div>
+
+    <!-- Saisie -->
+    <form *ngIf="step === 'form'" class="flex flex-col gap-4 p-6" [formGroup]="form" (ngSubmit)="submit()">
+        <div>
+            <div class="font-medium mb-2">Montant</div>
+            <div class="flex flex-wrap gap-2">
+                <button *ngFor="let preset of presets" type="button" mat-stroked-button
+                        [color]="amount === preset ? 'primary' : undefined"
+                        [class.bg-primary-50]="amount === preset"
+                        (click)="setAmount(preset)">
+                    {{ preset | xaf }}
+                </button>
+            </div>
+            <mat-form-field class="w-full mt-3" appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Autre montant (FCFA)</mat-label>
+                <input matInput type="number" formControlName="amount" [min]="data.summary.minTopup" [max]="data.summary.maxTopup">
+                <mat-hint>Entre {{ data.summary.minTopup | xaf }} et {{ data.summary.maxTopup | xaf }}</mat-hint>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <div class="font-medium mb-2">Moyen de paiement</div>
+            <mat-button-toggle-group formControlName="operator" class="w-full">
+                <mat-button-toggle value="MTN" class="flex-1">MTN Mobile Money</mat-button-toggle>
+                <mat-button-toggle value="ORANGE" class="flex-1">Orange Money</mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
+
+        <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Numéro Mobile Money</mat-label>
+            <span matTextPrefix>+237&nbsp;</span>
+            <input matInput formControlName="phone" placeholder="6XX XX XX XX" autocomplete="tel" (blur)="detectOperator()">
+            <mat-error>Saisissez un numéro camerounais valide (9 chiffres commençant par 6).</mat-error>
+        </mat-form-field>
+
+        <fuse-alert *ngIf="error" type="error" appearance="outline">{{ error }}</fuse-alert>
+
+        <div class="text-sm text-secondary">
+            Vous recevrez une demande de confirmation sur votre téléphone. Le montant est crédité dès la validation,
+            sans frais pour vous. Le crédit n'est ni remboursable ni retirable.
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <button mat-button type="button" (click)="close()">Annuler</button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="submitting || form.invalid">
+                <mat-progress-spinner *ngIf="submitting; else payLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                <ng-template #payLabel>Payer {{ amount | xaf }}</ng-template>
+            </button>
+        </div>
+    </form>
+
+    <!-- En attente de validation -->
+    <div *ngIf="step === 'waiting'" class="flex flex-col items-center text-center gap-4 p-8">
+        <mat-progress-spinner *ngIf="!pollingStopped" [diameter]="48" mode="indeterminate"></mat-progress-spinner>
+        <mat-icon *ngIf="pollingStopped" class="icon-size-12 text-amber-500" svgIcon="heroicons_outline:clock"></mat-icon>
+        <div class="text-xl font-semibold">Validez le paiement sur votre téléphone</div>
+        <div class="text-secondary">
+            Une demande de {{ payment?.amount | xaf }} a été envoyée au {{ payment?.phone }}
+            ({{ payment?.operator === 'MTN' ? 'MTN Mobile Money' : 'Orange Money' }}).
+            Composez votre code secret pour confirmer.
+        </div>
+        <div *ngIf="pollingStopped" class="text-sm text-secondary">
+            Nous n'avons pas encore reçu la confirmation. Votre portefeuille sera crédité automatiquement dès qu'elle arrivera :
+            vous pouvez fermer cette fenêtre.
+        </div>
+        <div class="text-xs text-hint">Référence : {{ payment?.reference }}</div>
+        <button mat-button (click)="close()">Fermer</button>
+    </div>
+
+    <!-- Resultat -->
+    <div *ngIf="step === 'done'" class="flex flex-col items-center text-center gap-4 p-8">
+        <ng-container *ngIf="payment?.status === 'success'; else failed">
+            <mat-icon class="icon-size-12 text-green-500" svgIcon="heroicons_outline:check-circle"></mat-icon>
+            <div class="text-xl font-semibold">Recharge confirmée</div>
+            <div class="text-secondary">{{ payment?.amount | xaf }} ont été ajoutés à votre portefeuille.</div>
+        </ng-container>
+        <ng-template #failed>
+            <mat-icon class="icon-size-12 text-red-500" svgIcon="heroicons_outline:x-circle"></mat-icon>
+            <div class="text-xl font-semibold">Recharge non aboutie</div>
+            <div class="text-secondary">{{ payment?.failureReason || 'Le paiement n’a pas été validé.' }} Aucun montant n’a été débité de votre portefeuille.</div>
+        </ng-template>
+        <div class="text-xs text-hint">Référence : {{ payment?.reference }}</div>
+        <button mat-flat-button color="primary" (click)="close()">Terminer</button>
+    </div>
+</div>

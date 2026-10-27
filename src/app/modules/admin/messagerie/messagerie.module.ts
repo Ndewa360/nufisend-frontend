@@ -19,6 +19,8 @@ import { RichTextEditorModule } from 'app/shared/modules/rich-text-editor.module
 import { NewMessageForSingleContactComponent } from './components/new-message-for-single-contact/new-message-for-single-contact.component';
 import { PrevisualisationMessageContactComponent } from './components/previsualisation-message-contact/previsualisation-message-contact.component';
 import { HomePlanningListComponent } from './components/home-planning-list/home-planning-list.component';
+import { MessageCostEstimateComponent } from './components/message-cost-estimate/message-cost-estimate.component';
+import { XafPipe } from 'app/shared/pipes/xaf.pipe';
 
 
 @NgModule({
@@ -34,7 +36,8 @@ import { HomePlanningListComponent } from './components/home-planning-list/home-
     RedigerMessagePlanifierComponent,
     NewMessageForSingleContactComponent,
     PrevisualisationMessageContactComponent,
-    HomePlanningListComponent
+    HomePlanningListComponent,
+    MessageCostEstimateComponent
   ],
   imports: [
     CommonModule,
@@ -44,6 +47,7 @@ import { HomePlanningListComponent } from './components/home-planning-list/home-
     SharedModule,
     DatePickerModule,
     RichTextEditorModule,
+    XafPipe,
   ],
   exports:[
     NewMessageForSingleContactComponent

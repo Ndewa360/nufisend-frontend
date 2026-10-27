@@ -11,7 +11,11 @@ import { environment } from 'environments/environment';
         <div class="flex-1 min-w-0">
           <div class="text-2xl md:text-3xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Détails de l'utilisateur</div>
         </div>
-        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+        <div class="flex shrink-0 items-center gap-2 mt-6 sm:mt-0 sm:ml-4">
+          <a mat-stroked-button *ngIf="user?._id" [routerLink]="['/super-admin/finance']" [queryParams]="{ tab: 'wallets', user: user._id }">
+            <mat-icon [svgIcon]="'heroicons_outline:credit-card'"></mat-icon>
+            <span class="ml-2">Portefeuille</span>
+          </a>
           <button mat-flat-button [color]="'primary'" [routerLink]="['/super-admin/users']">
             <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
             <span class="ml-2">Retour à la liste</span>

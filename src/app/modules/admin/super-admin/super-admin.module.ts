@@ -30,6 +30,7 @@ const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'users', component: UsersListComponent },
       { path: 'users/:id', component: UserDetailsComponent },
+      { path: 'finance', loadChildren: () => import('./finance/finance.module').then((m) => m.FinanceModule) },
     ]
   }
 ];

@@ -1,0 +1,188 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="p-6 sm:p-8">
+        <!-- En-tete -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="text-3xl font-bold tracking-tight">Mon portefeuille</div>
+                <div class="mt-1 text-secondary">Rechargez par Mobile Money et suivez votre consommation. Seuls les messages livrés sont facturés.</div>
+            </div>
+            <button mat-flat-button color="primary" (click)="openTopup()" [disabled]="!summary || !summary.paymentAvailable"
+                    [matTooltip]="summary && !summary.paymentAvailable ? 'Le paiement Mobile Money sera bientôt disponible' : ''">
+                <mat-icon svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                <span class="ml-2">Recharger</span>
+            </button>
+        </div>
+
+        <mat-progress-bar *ngIf="loadingSummary && !summary" class="mt-6" mode="indeterminate"></mat-progress-bar>
+
+        <fuse-alert *ngIf="isLow" class="mt-6" type="warning" appearance="border">
+            Votre solde est bas. Rechargez votre portefeuille pour ne pas interrompre vos envois et vos campagnes programmées.
+        </fuse-alert>
+
+        <!-- Soldes -->
+        <div *ngIf="summary" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mt-6">
+            <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-secondary font-medium">Solde disponible</div>
+                <div class="mt-2 text-4xl font-bold tracking-tight" [class.text-amber-600]="isLow">{{ summary.available | xaf }}</div>
+                <div class="mt-1 text-sm text-secondary">Utilisable pour vos prochains envois</div>
+            </div>
+            <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-secondary font-medium">Montant réservé</div>
+                <div class="mt-2 text-4xl font-bold tracking-tight">{{ summary.reserved | xaf }}</div>
+                <div class="mt-1 text-sm text-secondary">Bloqué pour vos envois en cours et programmés</div>
+            </div>
+            <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-secondary font-medium">Messages offerts ce mois</div>
+                <div class="mt-2 text-4xl font-bold tracking-tight">{{ summary.freeRemaining }} <span class="text-xl text-secondary">/ {{ summary.freeMonthlyQuota }}</span></div>
+                <div class="mt-1 text-sm text-secondary">Utilisés avant votre solde</div>
+            </div>
+            <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-secondary font-medium">Tarif par destinataire <span *ngIf="summary.prices.custom" class="text-primary">(négocié)</span></div>
+                <div class="mt-2 flex flex-col gap-1">
+                    <div class="flex justify-between"><span>Texte</span><span class="font-semibold">{{ summary.prices.text | xaf }}</span></div>
+                    <div class="flex justify-between"><span>Avec pièce jointe</span><span class="font-semibold">{{ summary.prices.attachment | xaf }}</span></div>
+                </div>
+                <div *ngIf="summary.tiersEnabled && summary.tiers.length" class="mt-2 text-xs text-secondary">
+                    Remises :
+                    <span *ngFor="let tier of summary.tiers; let last = last">-{{ tier.discountPercent }} % dès {{ tier.minRecipients }} destinataires{{ last ? '' : ', ' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historique -->
+        <div class="bg-card rounded-2xl shadow mt-8 overflow-hidden">
+            <mat-tab-group animationDuration="0ms" [mat-stretch-tabs]="false">
+                <mat-tab label="Historique">
+                    <div class="p-4 flex flex-wrap gap-2">
+                        <mat-button-toggle-group [value]="transactionsFilter" (change)="onTransactionsFilter($event.value)">
+                            <mat-button-toggle value="">Tout</mat-button-toggle>
+                            <mat-button-toggle value="topup,adjustment_credit">Crédits</mat-button-toggle>
+                            <mat-button-toggle value="capture,debit">Consommation</mat-button-toggle>
+                            <mat-button-toggle value="hold,release">Réservations</mat-button-toggle>
+                            <mat-button-toggle value="free">Offerts</mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 dark:bg-black dark:bg-opacity-5 text-secondary text-sm">
+                                <tr>
+                                    <th class="px-4 py-3">Date</th>
+                                    <th class="px-4 py-3">Opération</th>
+                                    <th class="px-4 py-3">Détail</th>
+                                    <th class="px-4 py-3 text-right">Montant</th>
+                                    <th class="px-4 py-3 text-right">Disponible après</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let entry of transactions; trackBy: trackById" class="border-t">
+                                    <td class="px-4 py-3 whitespace-nowrap">{{ entry.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">{{ ledgerLabels[entry.type] || entry.type }}</td>
+                                    <td class="px-4 py-3 text-secondary">
+                                        {{ entry.description }}
+                                        <span *ngIf="entry.type === 'free'"> ({{ entry.value | xaf }})</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-right whitespace-nowrap font-medium"
+                                        [class.text-green-600]="ledgerSign(entry.type) > 0"
+                                        [class.text-red-600]="ledgerSign(entry.type) < 0">
+                                        <ng-container *ngIf="entry.type !== 'free'; else freeUnits">
+                                            {{ ledgerSign(entry.type) > 0 ? '+' : ledgerSign(entry.type) < 0 ? '−' : '' }}{{ entry.amount | xaf }}
+                                        </ng-container>
+                                        <ng-template #freeUnits>{{ entry.units }} msg</ng-template>
+                                    </td>
+                                    <td class="px-4 py-3 text-right whitespace-nowrap">{{ entry.availableAfter | xaf }}</td>
+                                </tr>
+                                <tr *ngIf="transactions.length === 0">
+                                    <td colspan="5" class="px-4 py-8 text-center text-secondary">Aucun mouvement</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator [length]="transactionsTotal" [pageIndex]="transactionsPage" [pageSize]="pageSize" [hidePageSize]="true"
+                                   (page)="onTransactionsPage($event)"></mat-paginator>
+                </mat-tab>
+
+                <mat-tab label="Recharges">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 dark:bg-black dark:bg-opacity-5 text-secondary text-sm">
+                                <tr>
+                                    <th class="px-4 py-3">Date</th>
+                                    <th class="px-4 py-3">Référence</th>
+                                    <th class="px-4 py-3">Moyen</th>
+                                    <th class="px-4 py-3 text-right">Montant</th>
+                                    <th class="px-4 py-3">Statut</th>
+                                    <th class="px-4 py-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let payment of payments; trackBy: trackById" class="border-t">
+                                    <td class="px-4 py-3 whitespace-nowrap">{{ payment.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                                    <td class="px-4 py-3 font-mono text-sm">{{ payment.reference }}</td>
+                                    <td class="px-4 py-3">{{ payment.operator === 'MTN' ? 'MTN MoMo' : 'Orange Money' }} · {{ payment.phone }}</td>
+                                    <td class="px-4 py-3 text-right font-medium">{{ payment.amount | xaf }}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-1 rounded-full text-xs font-semibold"
+                                              [ngClass]="{
+                                                'bg-green-100 text-green-800': payment.status === 'success',
+                                                'bg-amber-100 text-amber-800': payment.status === 'pending',
+                                                'bg-red-100 text-red-800': payment.status === 'failed',
+                                                'bg-gray-200 text-gray-700': payment.status === 'expired'
+                                              }">{{ paymentLabels[payment.status] }}</span>
+                                        <div *ngIf="payment.failureReason" class="text-xs text-secondary mt-1">{{ payment.failureReason }}</div>
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <a *ngIf="payment.status === 'success'" mat-button color="primary" [routerLink]="['/wallet/receipt', payment.reference]">Reçu</a>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="payments.length === 0">
+                                    <td colspan="6" class="px-4 py-8 text-center text-secondary">Aucune recharge</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator [length]="paymentsTotal" [pageIndex]="paymentsPage" [pageSize]="pageSize" [hidePageSize]="true"
+                                   (page)="onPaymentsPage($event)"></mat-paginator>
+                </mat-tab>
+
+                <mat-tab label="Montants réservés">
+                    <div class="p-4 text-sm text-secondary">
+                        Les envois programmés réservent leur coût à l'avance (toutes les occurrences, ou la semaine en cours pour une récurrence).
+                        Chaque envoi est payé depuis cette réserve ; les messages non livrés et les montants non utilisés vous sont rendus.
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 dark:bg-black dark:bg-opacity-5 text-secondary text-sm">
+                                <tr>
+                                    <th class="px-4 py-3">Campagne</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-3">Couverture</th>
+                                    <th class="px-4 py-3 text-right">Réservé</th>
+                                    <th class="px-4 py-3 text-right">Restant</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let hold of reservations; trackBy: trackById" class="border-t">
+                                    <td class="px-4 py-3">
+                                        {{ holdLabel(hold) }}
+                                        <span *ngIf="hold.planification?.billingStatus === 'suspended_insufficient_funds'"
+                                              class="ml-2 px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800">En pause : solde insuffisant</span>
+                                    </td>
+                                    <td class="px-4 py-3">{{ holdKind(hold) }}</td>
+                                    <td class="px-4 py-3 text-secondary">
+                                        {{ hold.occurrences }} envoi(s) × {{ hold.recipients }} destinataire(s)
+                                        <span *ngIf="hold.periodEnd"> · jusqu'au {{ hold.periodEnd | date:'dd/MM/yyyy' }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-right">{{ hold.amount | xaf }}</td>
+                                    <td class="px-4 py-3 text-right font-medium">{{ hold.remaining | xaf }}</td>
+                                </tr>
+                                <tr *ngIf="reservations.length === 0">
+                                    <td colspan="5" class="px-4 py-8 text-center text-secondary">Aucun montant réservé</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+</div>
