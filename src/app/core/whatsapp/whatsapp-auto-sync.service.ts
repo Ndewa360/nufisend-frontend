@@ -9,6 +9,7 @@ import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.serv
 import { WebsocketManagerService } from 'app/shared/services/websocket-manager/websocket-manager.service';
 import { NotificationsService } from 'app/layout/common/notifications/notifications.service';
 import { Socket } from 'ngx-socket-io';
+import { WalletService } from 'app/core/wallet/wallet.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,8 @@ export class WhatsAppAutoSyncService implements OnDestroy {
     private _syncQr: SyncQrcodeService,
     private _wsManager: WebsocketManagerService,
     private _notifications: NotificationsService,
-    private _socket: Socket
+    private _socket: Socket,
+    private _walletService: WalletService
   ) {
     this.init();
   }
@@ -69,6 +71,25 @@ export class WhatsAppAutoSyncService implements OnDestroy {
         this.clearSyncProgress();
         this._store.dispatch(new GlobalAction.ChangeWhatsAppConnectedStatus(false));
         this._store.dispatch(new GlobalAction.SetWhatsAppSyncStatus('not_synced', 0, 'WhatsApp déconnecté'));
+      });
+
+      // Fin d'un envoi immediat poursuivi en arriere-plan.
+      (this._socket.ioSocket as any)?.on('message-status', (event: any) => {
+        const sent = event?.result?.sent ?? 0;
+        const total = event?.result?.total ?? 0;
+        const charged = event?.amountCharged ? ` · ${event.amountCharged} FCFA facturés` : '';
+        const description = `${sent}/${total} message(s) livré(s)${charged}`;
+        if (event?.status === 'failed') this._toastr.error(`« ${event?.title || 'Message'} » : aucun message n'a été livré`, 'Envoi terminé');
+        else if (event?.status === 'partial') this._toastr.warning(`« ${event?.title || 'Message'} » : ${description}`, 'Envoi terminé');
+        else this._toastr.success(`« ${event?.title || 'Message'} » : ${description}`, 'Envoi terminé');
+        this._notifications.create({
+          icon       : 'feather:send',
+          title      : 'Envoi terminé',
+          description: `${event?.title || 'Message'} : ${description}`,
+          link       : '/messagerie',
+          useRouter  : true,
+        }).subscribe();
+        this._walletService.refresh().subscribe({ error: () => undefined });
       });
 
       (this._socket.ioSocket as any)?.on('sync-error', (err: any) => {

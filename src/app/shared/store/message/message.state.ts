@@ -48,7 +48,13 @@ export class MessageState{
                     ctx.patchState({
                         sendingMessage:false
                     })
-                    this._toastrService.success("Message envoyé avec succès", 'WhatsApp Message');
+                    const status = result?.data?.status;
+                    if (message.isSentToNow && status === 'pending')
+                        this._toastrService.info("L'envoi se poursuit en arrière-plan : vous serez notifié à la fin.", 'Envoi en cours');
+                    else if (message.isSentToNow && status === 'partial')
+                        this._toastrService.warning(`${result?.data?.lastSendResult?.sent ?? 0}/${result?.data?.lastSendResult?.total ?? 0} message(s) livré(s)`, 'Envoi partiel');
+                    else
+                        this._toastrService.success(message.isSentToNow ? "Message envoyé avec succès" : 'Message programmé avec succès', 'WhatsApp Message');
                     this._notificationsService.create({
                         icon: 'feather:send',
                         title: message.isSentToNow ? 'Message envoyé' : 'Message planifié',
