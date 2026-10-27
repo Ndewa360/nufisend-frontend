@@ -1,11 +1,11 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
+// Configuration de developpement. `ng build --configuration=production`
+// remplace ce fichier par environment.prod.ts (cf. fileReplacements dans angular.json).
+// Pour tester depuis un autre appareil du reseau local, utiliser environment.mobile.ts
+// (`ng serve --configuration=mobile`) plutot que de modifier ce fichier.
 
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:3200',
   url: 'http://localhost:4200',
   urlToSendMessage: 'http://localhost:3200',
-  
 };

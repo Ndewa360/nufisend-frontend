@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, finalize, Observable, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { environment } from 'environments/environment';
 import { ApiResultFormat } from 'app/shared/store/global';
 import { UserService } from 'app/core/user/user.service';
@@ -37,6 +37,8 @@ export class AuthService
 {
     private _authenticated: boolean = false;
     private _user: User | null = null;
+    // Verification du jeton en cours, partagee entre les gardes appeles en parallele.
+    private _pendingCheck: Observable<boolean> | null = null;
 
     constructor(
         private _httpClient: HttpClient,
@@ -44,7 +46,6 @@ export class AuthService
         private _store: Store
     )
     {
-        this.check();
     }
 
     set accessToken(token: string)
@@ -105,9 +106,20 @@ export class AuthService
         return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/reset-password`, payload);
     }
 
-    changePassword(payload: { currentPassword: string; newPassword: string }): Observable<ApiResultFormat<{ message: string }>>
+    /**
+     * Change le mot de passe. Le serveur revoque les sessions existantes et
+     * renvoie un nouveau jeton pour la session courante.
+     */
+    changePassword(payload: { currentPassword: string; newPassword: string }): Observable<ApiResultFormat<{ message: string; accessToken?: string }>>
     {
-        return this._httpClient.post<ApiResultFormat<{ message: string }>>(`${environment.apiUrl}/auth/change-password`, payload);
+        return this._httpClient.post<ApiResultFormat<{ message: string; accessToken?: string }>>(`${environment.apiUrl}/auth/change-password`, payload).pipe(
+            tap((response) => {
+                if ( response?.data?.accessToken )
+                {
+                    this.accessToken = response.data.accessToken;
+                }
+            })
+        );
     }
 
     confirmEmail(token: string): Observable<ApiResultFormat<{ message: string }>>
@@ -173,6 +185,13 @@ export class AuthService
             return of(false);
         }
 
-        return this.signInUsingToken();
+        if ( !this._pendingCheck )
+        {
+            this._pendingCheck = this.signInUsingToken().pipe(
+                finalize(() => this._pendingCheck = null),
+                shareReplay(1)
+            );
+        }
+        return this._pendingCheck;
     }
 }

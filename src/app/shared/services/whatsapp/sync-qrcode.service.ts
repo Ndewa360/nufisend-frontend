@@ -3,8 +3,9 @@ import { Store } from '@ngxs/store';
 import { UserProfileAction } from 'app/shared/store/user-profile';
 import { WhatsappQrCodeAction, WhatsappContactAction, GlobalAction } from 'app/shared/store';
 import { Socket } from 'ngx-socket-io';
+import { debugLog } from 'app/shared/utils/debug-log';
 
-const log = (...args: any[]) => console.log('[SyncQR]', ...args);
+const log = (...args: any[]) => debugLog('[SyncQR]', ...args);
 
 @Injectable({
   providedIn: 'root'
@@ -81,8 +82,11 @@ export class SyncQrcodeService {
   /**
    * Ask the backend to (re)start a WhatsApp sync session.
    * Waits for the socket to be connected before emitting.
+   *
+   * @param withContacts charger la liste des contacts WhatsApp (page de
+   * synchronisation). Les reconnexions automatiques n'en ont pas besoin.
    */
-  startSync(): void
+  startSync(withContacts = true): void
   {
     log('startSync() called, socket connected=', this.socket.ioSocket?.connected);
 
@@ -94,14 +98,14 @@ export class SyncQrcodeService {
 
     if (this.socket.ioSocket?.connected) {
       log('startSync() -> socket already connected, emitting connexion');
-      this.socket.emit('connexion', {});
+      this.socket.emit('connexion', { withContacts });
       return;
     }
 
     log('startSync() -> socket not connected, waiting for connect event');
     const onConnect = () => {
       log('startSync() -> socket connected, emitting connexion');
-      this.socket.emit('connexion', {});
+      this.socket.emit('connexion', { withContacts });
     };
     (this.socket.ioSocket as any).once('connect', onConnect);
 

@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { NewMessageComponent } from '../../new-message/new-message.component';
 import { MessageProcessing } from 'app/shared/utils';
 import { UserService } from 'app/core/user/user.service';
+import { debugLog } from 'app/shared/utils/debug-log';
 
 @Component({
   selector: 'app-previsualisation-message-contact',
@@ -39,7 +40,7 @@ export class PrevisualisationMessageContactComponent {
     this.filteredContacts = [...data.destinationContact]
     this.messageToSend = data.message;
     this.initMessage = data.message.message?data.message.message:data.message.messageTemplate.content;
-    console.log(data.message)
+    debugLog(data.message)
   }
 
   // -----------------------------------------------------------------------------------------------------

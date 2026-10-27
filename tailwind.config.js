@@ -36,30 +36,9 @@ const themes = {
         'on-warn': {
             500: colors.red['50']
         }
-    },
-    // Rest of the themes will use the 'default' as the base
-    // theme and will extend it with their given configuration.
-    'brand' : {
-        primary: customPalettes.brand
-    },
-    'teal'  : {
-        primary: {
-            ...colors.teal,
-            DEFAULT: colors.teal[600]
-        }
-    },
-    'rose'  : {
-        primary: colors.rose
-    },
-    'purple': {
-        primary: {
-            ...colors.purple,
-            DEFAULT: colors.purple[600]
-        }
-    },
-    'amber' : {
-        primary: colors.amber
     }
+    // Un seul theme : le selecteur de theme Fuse n'est pas expose et chaque theme
+    // supplementaire genere l'ensemble des styles Angular Material (CSS mort).
 };
 
 /**

@@ -10,7 +10,8 @@ import { ContactState, ContactModel, ContactAction, WhatsappContactModel, Whatsa
 import { ContactService } from 'app/shared/store/contact/contact.service';
 import { UserProfileState, UserProfileModel } from 'app/shared/store/user-profile';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, take, takeUntil, tap } from 'rxjs';
+import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
 
 @Component({
   selector: 'app-whatsapp-contact',
@@ -58,7 +59,8 @@ export class ContactComponent {
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseConfirmationService: FuseConfirmationService,
         private _toastrService:ToastrService,
-        private _ngxsAction:Actions
+        private _ngxsAction:Actions,
+        private _syncQrcodeService:SyncQrcodeService
     )
     {
     }
@@ -72,6 +74,16 @@ export class ContactComponent {
      */
     ngOnInit(): void
     {
+        // Les contacts WhatsApp ne sont plus charges a la connexion : on les
+        // demande a l'ouverture de cette page si le compte est synchronise.
+        this.userProfile$.pipe(take(1)).subscribe((profile) => {
+            const contacts = this._store.selectSnapshot(WhatsappContactState.selectStateData);
+            if ( profile?.hasSyncWhatsApp && !(contacts?.length) )
+            {
+                this._syncQrcodeService.startSync(true);
+            }
+        });
+
         this.loadingContactStart$.pipe(takeUntil(this._unsubscribeAll)).subscribe((loading)=>{
             this.contactsLoading=loading;
             this.refreshLoadingState();

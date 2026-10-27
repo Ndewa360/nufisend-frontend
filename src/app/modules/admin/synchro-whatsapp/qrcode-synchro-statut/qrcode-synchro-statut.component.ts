@@ -4,6 +4,7 @@ import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.serv
 import { GlobalState, WhatsappContactState, WhatsappQrCodeState } from 'app/shared/store';
 import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profile';
 import { Observable, Subject, takeUntil } from 'rxjs';
+import { debugLog } from 'app/shared/utils/debug-log';
 
 @Component({
   selector: 'app-qrcode-synchro-statut',
@@ -39,7 +40,7 @@ export class QrcodeSynchroStatutComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.whatsappQrCode$.pipe(takeUntil(this._unsubscribeAll)).subscribe((data)=>{
-      console.log('[QrStatut] qrCode$ =', data ? 'QR(' + data.length + ')' : data);
+      debugLog('[QrStatut] qrCode$ =', data ? 'QR(' + data.length + ')' : data);
       if(!data){
         // A null QR means the flow restarted or the session connected: drop any
         // previously displayed code so it never stays frozen on screen.
@@ -55,7 +56,7 @@ export class QrcodeSynchroStatutComponent implements OnInit, OnDestroy {
       this._changeDetectorRef.markForCheck();
     })
     this.userProfile$.pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=> {
-      console.log('[QrStatut] userProfile$ hasSyncWhatsApp=', value?.hasSyncWhatsApp);
+      debugLog('[QrStatut] userProfile$ hasSyncWhatsApp=', value?.hasSyncWhatsApp);
       this.userProfile= value
       // Once the profile reports the session as connected, hide the QR code
       // regardless of the local QR flags (auth can succeed before the profile
@@ -71,7 +72,7 @@ export class QrcodeSynchroStatutComponent implements OnInit, OnDestroy {
     })
 
     this.whatsappHasLoadQrCode$.pipe(takeUntil(this._unsubscribeAll)).subscribe((loading)=>{
-      console.log('[QrStatut] loadingQrCode$ =', loading);
+      debugLog('[QrStatut] loadingQrCode$ =', loading);
       if (this.userProfile?.hasSyncWhatsApp) {
         this.isWaitingWhatsappSync = !!loading;
       } else if (this.hasQrCodeIsGenerated) {

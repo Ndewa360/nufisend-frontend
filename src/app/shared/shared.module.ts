@@ -18,18 +18,15 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatExpansionModule } from '@angular/material/expansion';
 import {MatDialogModule} from '@angular/material/dialog'; 
 import { FuseLoadingBarModule } from '@fuse/components/loading-bar';
-import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FuseFindByKeyPipeModule } from '@fuse/pipes/find-by-key';
 import { TranslocoModule } from '@ngneat/transloco';
-import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatTabsModule } from '@angular/material/tabs';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 
@@ -37,11 +34,7 @@ import { FileUploadComponent } from './components/file-upload/file-upload.compon
 import { WhatsappAskSyncToatrComponent } from './components/whatsapp-ask-sync-toatr/whatsapp-ask-sync-toatr.component'; 
 import { SyncQrcodeService } from './services/whatsapp/sync-qrcode.service';
 import { WebsocketManagerService } from './services/websocket-manager/websocket-manager.service';
-import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import {MatCardModule} from '@angular/material/card';
-import { MatMomentDateModule } from '@angular/material-moment-adapter';
-import { CustomQuillEditorComponent } from './components/custom-quill-editor/custom-quill-editor.component';
-import { QuillModule } from 'ngx-quill';
 // import { CalendarModule } from 'primeng/calendar';
 // import { DropzoneModule } from 'ngx-dropzone-wrapper';
 // import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
@@ -60,7 +53,6 @@ const moduleList = [
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
-    MatDatepickerModule,
     MatDialogModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -83,18 +75,14 @@ const moduleList = [
     FuseLoadingBarModule,
     MatButtonModule,
     MatDividerModule,
-    MatLuxonDateModule,
     MatRadioModule,
     MatSidenavModule,
     FuseFindByKeyPipeModule,
     MatButtonToggleModule,
     MatTabsModule,
-    NgApexchartsModule,
     TranslocoModule,
     MatAutocompleteModule,
-    NgxMaterialTimepickerModule,
     MatCardModule,
-    MatMomentDateModule,
     MatButtonToggleModule,
 
     // CalendarModule
@@ -103,20 +91,15 @@ const moduleList = [
 @NgModule({
     imports: [
         ...moduleList,
-      QuillModule.forRoot(),
-      
     ],
     exports: [
         ...moduleList,
         FileUploadComponent,
-      WhatsappAskSyncToatrComponent,
-      CustomQuillEditorComponent
-      
+      WhatsappAskSyncToatrComponent
     ],
     declarations: [
       FileUploadComponent,
-      WhatsappAskSyncToatrComponent,
-      CustomQuillEditorComponent
+      WhatsappAskSyncToatrComponent
     ],
     providers: [
         // WebsocketManagerService,

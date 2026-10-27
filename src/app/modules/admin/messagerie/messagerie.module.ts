@@ -14,7 +14,8 @@ import { PlanifierDateEnvoiComponent } from './components/planifier-date-envoi/p
 import { RedigerMessageComponent } from './components/rediger-message/rediger-message.component';
 import { RedigerMessageDirectComponent } from './components/rediger-message-direct/rediger-message-direct.component';
 import { RedigerMessagePlanifierComponent } from './components/rediger-message-planifier/rediger-message-planifier.component';
-import { QuillModule } from 'ngx-quill';
+import { DatePickerModule } from 'app/shared/modules/date-picker.module';
+import { RichTextEditorModule } from 'app/shared/modules/rich-text-editor.module';
 import { NewMessageForSingleContactComponent } from './components/new-message-for-single-contact/new-message-for-single-contact.component';
 import { PrevisualisationMessageContactComponent } from './components/previsualisation-message-contact/previsualisation-message-contact.component';
 import { HomePlanningListComponent } from './components/home-planning-list/home-planning-list.component';
@@ -41,6 +42,8 @@ import { HomePlanningListComponent } from './components/home-planning-list/home-
     FuseCardModule,
     MatStepperModule,
     SharedModule,
+    DatePickerModule,
+    RichTextEditorModule,
   ],
   exports:[
     NewMessageForSingleContactComponent

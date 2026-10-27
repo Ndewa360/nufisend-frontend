@@ -4,6 +4,7 @@ import { Socket } from 'ngx-socket-io';
 import { Subject } from 'rxjs';
 import { SyncQrcodeService } from '../whatsapp/sync-qrcode.service';
 import { WhatsappDataService } from '../whatsapp/whatsapp-data.service';
+import { debugLog } from 'app/shared/utils/debug-log';
 
 @Injectable({
   providedIn: 'root'
@@ -26,19 +27,19 @@ export class WebsocketManagerService {
    */
   customConnexion(value: any): void {
     const token = localStorage.getItem('accessToken') ?? '';
-    console.log('[WSMan] customConnexion email=', value?.email, 'token present=', !!token);
+    debugLog('[WSMan] customConnexion email=', value?.email, 'token present=', !!token);
 
     try {
       (this.socket.ioSocket as any).auth = { token };
 
       if (!this.socket.ioSocket.connected) {
-        console.log('[WSMan] socket not connected, connecting...');
+        debugLog('[WSMan] socket not connected, connecting...');
         this.socket.ioSocket.connect();
       } else {
-        console.log('[WSMan] socket already connected');
+        debugLog('[WSMan] socket already connected');
       }
     } catch (e) {
-      console.log('[WSMan] Socket connection error', e);
+      debugLog('[WSMan] Socket connection error', e);
     }
 
     this.webSocketConnectedEvent.next(true);

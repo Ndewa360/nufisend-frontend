@@ -1,12 +1,19 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import { CanActivate, CanActivateChild, Router, UrlTree } from '@angular/router';
+import { Observable, map } from 'rxjs';
 import { AuthService } from 'app/core/auth/auth.service';
 
+/**
+ * Restreint l'acces a l'administration aux comptes ADMIN.
+ *
+ * L'utilisateur est charge via `check()` avant l'evaluation du role : apres un
+ * rechargement de page, le profil n'est pas encore en memoire et un test
+ * synchrone renverrait l'administrateur vers le tableau de bord.
+ */
 @Injectable({
     providedIn: 'root'
 })
-export class SuperAdminGuard implements CanActivate, CanActivateChild, CanLoad
+export class SuperAdminGuard implements CanActivate, CanActivateChild
 {
     constructor(
         private _authService: AuthService,
@@ -15,28 +22,21 @@ export class SuperAdminGuard implements CanActivate, CanActivateChild, CanLoad
     {
     }
 
-    private isSuperAdmin(): boolean
+    canActivate(): Observable<boolean | UrlTree>
     {
-        const user = this._authService.user;
-        return !!(user && user['role'] === 'ADMIN');
+        return this._authService.check().pipe(
+            map((authenticated) => {
+                if ( authenticated && this._authService.user?.role === 'ADMIN' )
+                {
+                    return true;
+                }
+                return this._router.parseUrl(authenticated ? '/dashboard' : '/auth/sign-in');
+            })
+        );
     }
 
-    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean
+    canActivateChild(): Observable<boolean | UrlTree>
     {
-        if (this.isSuperAdmin()) {
-            return true;
-        }
-        this._router.navigate(['/dashboard']);
-        return false;
-    }
-
-    canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean
-    {
-        return this.canActivate(childRoute, state);
-    }
-
-    canLoad(route: Route, segments: UrlSegment[]): Observable<boolean> | Promise<boolean> | boolean
-    {
-        return this.isSuperAdmin();
+        return this.canActivate();
     }
 }

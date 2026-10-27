@@ -1,7 +1,6 @@
 import { Route } from '@angular/router';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
-import { AdminGuard } from 'app/core/auth/guards/admin.guard';
 import { SuperAdminGuard } from 'app/core/auth/guards/super-admin.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 import { InitialDataResolver } from 'app/app.resolvers';

@@ -1,6 +1,12 @@
-/* tslint:disable:max-line-length */
+/* eslint-disable */
 import { FuseNavigationItem } from '@fuse/components/navigation';
+import { cloneDeep } from 'lodash-es';
+import { Navigation } from 'app/core/navigation/navigation.types';
 
+/**
+ * Menu principal de l'application. L'entree `super_admin` est masquee pour les
+ * comptes non administrateurs (cf. LayoutComponent).
+ */
 export const defaultNavigation: FuseNavigationItem[] = [
     {
         id   : 'dashboard',
@@ -117,6 +123,11 @@ export const defaultNavigation: FuseNavigationItem[] = [
         link : '/super-admin/dashboard'
     }
 ];
-export const compactNavigation: FuseNavigationItem[] = [...defaultNavigation];
-export const futuristicNavigation: FuseNavigationItem[] = [...defaultNavigation];
-export const horizontalNavigation: FuseNavigationItem[] = [...defaultNavigation];
+
+/** Toutes les dispositions Fuse partagent le meme menu. */
+export const buildNavigation = (): Navigation => ({
+    compact   : cloneDeep(defaultNavigation),
+    default   : cloneDeep(defaultNavigation),
+    futuristic: cloneDeep(defaultNavigation),
+    horizontal: cloneDeep(defaultNavigation),
+});

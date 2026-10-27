@@ -1,9 +1,8 @@
 {
-    "name": "fuse-angular",
-    "version": "17.2.0",
-    "description": "Fuse - Angular Admin Template and Starter Project",
-    "author": "https://themeforest.net/user/srcn",
-    "license": "https://themeforest.net/licenses/standard",
+    "name": "nufisend-frontend",
+    "version": "1.0.0",
+    "description": "NufiSend - interface web (Angular)",
+    "author": "Ndewa360",
     "private": true,
     "scripts": {
         "ng": "ng",
@@ -11,7 +10,8 @@
         "build": "ng build --optimization --configuration=production",
         "build-prod": "ng build  --optimization --configuration=production",
         "watch": "ng build --watch --configuration development",
-        "test": "ng test"
+        "test": "ng test",
+        "start:mobile": "ng serve --host 0.0.0.0 --configuration=mobile"
     },
     "dependencies": {
         "@angular/animations": "^15.1.1",

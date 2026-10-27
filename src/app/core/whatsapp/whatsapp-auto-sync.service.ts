@@ -52,10 +52,10 @@ export class WhatsAppAutoSyncService implements OnDestroy {
         this.showSyncProgress('Synchronisation WhatsApp', percent);
       });
 
-      (this._socket.ioSocket as any)?.on('info', () => {
+      (this._socket.ioSocket as any)?.on('info', (value: any) => {
         this._store.dispatch(new GlobalAction.SetWhatsAppSyncStatus('ready', 100, null));
         this._store.dispatch(new GlobalAction.ChangeWhatsAppConnectedStatus(true));
-        this.hideSyncProgress('Synchronisation WhatsApp terminée');
+        this.hideSyncProgress(value?.contacts ? 'Synchronisation WhatsApp terminée' : 'WhatsApp connecté');
         this.clearNotSyncedNotification();
       });
 
@@ -108,7 +108,9 @@ export class WhatsAppAutoSyncService implements OnDestroy {
     }
     setTimeout(() => {
       try {
-        this._syncQr.startSync();
+        // Reconnexion silencieuse : la liste des contacts n'est chargee que sur
+        // la page de synchronisation WhatsApp.
+        this._syncQr.startSync(false);
       } catch (e) {
         // ignore
       }
@@ -158,18 +160,30 @@ export class WhatsAppAutoSyncService implements OnDestroy {
     }
   }
 
+  /**
+   * Affiche (ou met a jour) une notification unique de progression : la
+   * recreer a chaque pourcentage la faisait clignoter.
+   */
   private showSyncProgress(title: string, percent: number): void {
     const rounded = Math.max(0, Math.min(100, Math.round(percent)));
     if (this._syncProgressToast && rounded === this._lastProgressPercent) {
       return;
     }
-    this.clearSyncProgress();
+    const message = `Synchronisation : ${rounded}%`;
+    const instance = this._syncProgressToast?.toastRef?.componentInstance;
+    if (instance) {
+      instance.title = title;
+      instance.message = message;
+      this._lastProgressPercent = rounded;
+      return;
+    }
     try {
-      this._syncProgressToast = this._toastr.info(`Synchronisation : ${rounded}%`, title, {
+      this._syncProgressToast = this._toastr.info(message, title, {
         timeOut: 0,
         extendedTimeOut: 0,
-        progressBar: true,
-        closeButton: true
+        progressBar: false,
+        closeButton: true,
+        tapToDismiss: false
       });
       this._lastProgressPercent = rounded;
     } catch (e) {

@@ -9,7 +9,6 @@ import { FuseLoadingBarModule } from '@fuse/components/loading-bar';
 import { FuseNavigationModule } from '@fuse/components/navigation';
 import { NotificationsModule } from 'app/layout/common/notifications/notifications.module';
 import { SearchModule } from 'app/layout/common/search/search.module';
-import { ShortcutsModule } from 'app/layout/common/shortcuts/shortcuts.module';
 import { UserModule } from 'app/layout/common/user/user.module';
 import { SharedModule } from 'app/shared/shared.module';
 import { EnterpriseLayoutComponent } from 'app/layout/layouts/horizontal/enterprise/enterprise.component';
@@ -29,7 +28,6 @@ import { EnterpriseLayoutComponent } from 'app/layout/layouts/horizontal/enterpr
         FuseNavigationModule,
         NotificationsModule,
         SearchModule,
-        ShortcutsModule,
         UserModule,
         SharedModule
     ],

@@ -67,10 +67,10 @@
                         "production": {
                             "fileReplacements": [
                                 {
-                                  "replace": "src/environments/environment.ts",
-                                  "with": "src/environments/environment.prod.ts"
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.prod.ts"
                                 }
-                              ],
+                            ],
                             "budgets": [
                                 {
                                     "type": "initial",
@@ -92,6 +92,20 @@
                             "extractLicenses": false,
                             "sourceMap": true,
                             "namedChunks": true
+                        },
+                        "mobile": {
+                            "buildOptimizer": false,
+                            "optimization": false,
+                            "vendorChunk": true,
+                            "extractLicenses": false,
+                            "sourceMap": true,
+                            "namedChunks": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.mobile.ts"
+                                }
+                            ]
                         }
                     },
                     "defaultConfiguration": "development"
@@ -104,6 +118,9 @@
                         },
                         "development": {
                             "browserTarget": "fuse:build:development"
+                        },
+                        "mobile": {
+                            "browserTarget": "fuse:build:mobile"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -138,6 +155,6 @@
         }
     },
     "cli": {
-      "analytics": false
+        "analytics": false
     }
 }

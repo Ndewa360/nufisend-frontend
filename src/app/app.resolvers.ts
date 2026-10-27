@@ -1,32 +1,20 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { catchError, forkJoin, Observable, of, timeout } from 'rxjs';
-import { MessagesService } from 'app/layout/common/messages/messages.service';
+import { Resolve } from '@angular/router';
+import { Observable } from 'rxjs';
 import { NavigationService } from 'app/core/navigation/navigation.service';
-import { ShortcutsService } from 'app/layout/common/shortcuts/shortcuts.service';
+import { Navigation } from 'app/core/navigation/navigation.types';
 
 @Injectable({
     providedIn: 'root'
 })
-export class InitialDataResolver implements Resolve<any>
+export class InitialDataResolver implements Resolve<Navigation>
 {
-    constructor(
-        private _messagesService: MessagesService,
-        private _navigationService: NavigationService,
-        private _shortcutsService: ShortcutsService,
-    )
+    constructor(private _navigationService: NavigationService)
     {
     }
 
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
+    resolve(): Observable<Navigation>
     {
-        return forkJoin([
-            this._navigationService.get(),
-            this._messagesService.getAll(),
-            this._shortcutsService.getAll(),
-        ]).pipe(
-            timeout(20000),
-            catchError(() => of(null))
-        );
+        return this._navigationService.get();
     }
 }

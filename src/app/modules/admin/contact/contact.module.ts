@@ -6,7 +6,7 @@ import { ListComponent } from './list/list.component';
 import { SharedModule } from 'app/shared/shared.module';
 import { DetailComponent } from './detail/detail.component';
 import { AddComponent } from './add/add.component';
-import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { DatePickerModule } from 'app/shared/modules/date-picker.module';
 import { ImportComponent } from './import/import.component';
 import { MessagerieModule } from '../messagerie/messagerie.module';
 import { SelectGroupComponent } from './components/select-group/select-group.component';
@@ -31,23 +31,8 @@ import { PrevisualizeDataFileComponent } from './components/previsualize-data-fi
     MessagerieModule,
     MatStepperModule,
 
-    SharedModule
-  ],
-  providers   : [
-    {
-        provide : MAT_DATE_FORMATS,
-        useValue: {
-            parse  : {
-                dateInput: 'D'
-            },
-            display: {
-                dateInput         : 'DDD',
-                monthYearLabel    : 'LLL yyyy',
-                dateA11yLabel     : 'DD',
-                monthYearA11yLabel: 'LLLL yyyy'
-            }
-        }
-    }
-]
+    SharedModule,
+    DatePickerModule
+  ]
 })
 export class ContactModule { }

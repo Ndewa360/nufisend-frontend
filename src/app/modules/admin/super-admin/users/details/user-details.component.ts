@@ -37,6 +37,8 @@ import { environment } from 'environments/environment';
                 <div><strong>Statut:</strong> {{user.isBlocked ? 'Bloqué' : 'Actif'}}</div>
                 <div><strong>Email confirmé:</strong> {{user.emailConfirmed ? 'Oui' : 'Non'}}</div>
                 <div><strong>WhatsApp synchronisé:</strong> {{user.hasSyncWhatsApp ? 'Oui' : 'Non'}}</div>
+                <div><strong>Contacts:</strong> {{user.contactsCount ?? 0}}</div>
+                <div><strong>Groupes:</strong> {{user.groupsCount ?? 0}}</div>
                 <div><strong>Date création:</strong> {{user.createdAt | date:'medium'}}</div>
                 <div><strong>Bloqué le:</strong> {{user.blockedAt ? (user.blockedAt | date:'medium') : 'N/A'}}</div>
               </div>

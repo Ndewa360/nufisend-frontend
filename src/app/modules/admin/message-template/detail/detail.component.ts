@@ -9,6 +9,7 @@ import { FormUtils } from 'app/shared/utils/form-utils';
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { ListComponent } from '../list/list.component';
+import { debugLog } from 'app/shared/utils/debug-log';
 
 @Component({
   selector: 'app-detail',
@@ -240,7 +241,7 @@ export class DetailComponent {
       const messageTemplateModel = FormUtils.removeNullAttribut(this.messageTemplateModelForm.getRawValue());
 
       this.submitted=true;
-      console.log("update ",messageTemplateModel,this.messageTemplateModel._id)
+      debugLog("update ",messageTemplateModel,this.messageTemplateModel._id)
       this._store.dispatch(new MessageTemplateAction.UpdateMessageTemplate(messageTemplateModel,this.messageTemplateModel._id));
       // Mark for check
       this._changeDetectorRef.markForCheck();

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, ReplaySubject, tap } from 'rxjs';
+import { Observable, of, ReplaySubject, tap } from 'rxjs';
 import { Navigation } from 'app/core/navigation/navigation.types';
+import { buildNavigation } from 'app/core/navigation/navigation.data';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +13,7 @@ export class NavigationService
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient)
+    constructor()
     {
     }
 
@@ -46,7 +46,8 @@ export class NavigationService
      */
     get(): Observable<Navigation>
     {
-        return this._httpClient.get<Navigation>('api/common/navigation').pipe(
+        // Menu statique : il etait auparavant servi par la Mock API de Fuse.
+        return of(buildNavigation()).pipe(
             tap((navigation) => {
                 this._navigation.next(navigation);
             })

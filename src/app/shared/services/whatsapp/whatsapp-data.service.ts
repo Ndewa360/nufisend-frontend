@@ -3,8 +3,9 @@ import { Store } from '@ngxs/store';
 import { WhatsappContactModel, WhatsappContactAction, GlobalAction } from 'app/shared/store';
 import { BehaviorSubject } from 'rxjs';
 import { Socket } from 'ngx-socket-io';
+import { debugLog } from 'app/shared/utils/debug-log';
 
-const log = (...args: any[]) => console.log('[WaData]', ...args);
+const log = (...args: any[]) => debugLog('[WaData]', ...args);
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,14 @@ export class WhatsappDataService {
       // not append to the existing list — SetAllWhatsappContactToLocal replaces,
       // but two rapid dispatches can cause the component to render both updates
       // before Angular's CD collapses them, making the list appear doubled.
+      // Connexion automatique sans chargement des contacts : seul l'etat change.
+      if (!Array.isArray(value?.contacts)) {
+        this.store.dispatch([
+          new GlobalAction.ChangeWhatsAppConnectedStatus(true),
+          new WhatsappContactAction.SetLoadingState(false)
+        ]);
+        return;
+      }
       const existing = this.store.selectSnapshot((s: any) => s?.whatsapp_contacts?.contacts);
       if (existing && existing.length > 0 && value?.contacts?.length === existing.length) {
         log('info: contacts already loaded (same count), skipping duplicate dispatch');
