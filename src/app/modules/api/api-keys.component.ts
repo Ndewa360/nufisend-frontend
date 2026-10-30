@@ -146,6 +146,11 @@ export class ConfirmRevokeDialogComponent {
                   <li><code>GET /v1/me</code> — Informations utilisateur</li>
                   <li><code>GET /v1/messages/planned</code> — Messages programmés</li>
                   <li><code>POST /v1/messages/send</code> — Envoyer un message</li>
+                  <li>
+                    <code>GET /v1/messages/send</code> — Envoyer un message par URL (environnements limités aux requêtes GET)
+                    <div class="mt-1 text-xs break-all"><code>/v1/messages/send?apiKey=VOTRE_CLE&amp;contacts=ID1,ID2&amp;text=Bonjour&amp;idempotencyKey=cmd-123</code></div>
+                    <div class="text-xs">Encodez chaque valeur ; une clé dans l'URL peut apparaître dans les journaux : utilisez une clé dédiée et <code>idempotencyKey</code> contre les doubles envois.</div>
+                  </li>
                   <li><code>POST /v1/messages/send-bulk</code> — Envoi en masse</li>
                   <li><code>GET /v1/contacts</code> — Liste des contacts</li>
                   <li><code>GET /v1/groups</code> — Liste des groupes</li>
