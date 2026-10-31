@@ -83,6 +83,14 @@ export class WalletService
             .pipe(map((res) => res.data));
     }
 
+    /** Membre gestionnaire : solde personnel transfere vers l'organisation (tout par defaut). */
+    transferToOrganization(amount?: number): Observable<{ amount: number; personalAvailable: number; organizationAvailable: number }>
+    {
+        return this._http
+            .post<ApiResponse<any>>(`${this._baseUrl}/transfer-to-organization`, amount ? { amount } : {})
+            .pipe(map((res) => res.data), tap(() => this.refresh().subscribe({ error: () => undefined })));
+    }
+
     topup(amount: number, phone: string, operator: PaymentOperator): Observable<Payment>
     {
         return this._http

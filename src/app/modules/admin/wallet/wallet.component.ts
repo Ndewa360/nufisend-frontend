@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { WalletService } from 'app/core/wallet/wallet.service';
 import {
@@ -38,6 +40,7 @@ export class WalletComponent implements OnInit, OnDestroy
     paymentsPage = 0;
 
     reservations: WalletHold[] = [];
+    transferring = false;
 
     readonly pageSize = 15;
     private readonly _destroy$ = new Subject<void>();
@@ -46,6 +49,8 @@ export class WalletComponent implements OnInit, OnDestroy
         private _walletService: WalletService,
         private _dialog: MatDialog,
         private _cdr: ChangeDetectorRef,
+        private _confirmation: FuseConfirmationService,
+        private _toastr: ToastrService,
     ) {}
 
     ngOnInit(): void
@@ -150,6 +155,41 @@ export class WalletComponent implements OnInit, OnDestroy
     get isOrganization(): boolean
     {
         return this.summary?.accountType === 'organization';
+    }
+
+    get hasPersonalBalance(): boolean
+    {
+        const personal = this.summary?.personalWallet;
+        return this.isOrganization && !!personal && (personal.available > 0 || personal.reserved > 0);
+    }
+
+    transferPersonal(): void
+    {
+        const amount = this.summary?.personalWallet?.available || 0;
+        if (amount <= 0) return;
+        this._confirmation.open({
+            title  : "Transférer vers l'organisation",
+            message: `${amount.toLocaleString('fr-FR')} FCFA de votre solde personnel seront ajoutés au portefeuille de ${this.summary?.organizationName}. Cette opération est définitive.`,
+            icon   : { show: true, name: 'heroicons_outline:switch-horizontal', color: 'primary' },
+            actions: { confirm: { label: 'Transférer', color: 'primary' }, cancel: { label: 'Annuler' } },
+        }).afterClosed().subscribe((result) => {
+            if (result !== 'confirmed') return;
+            this.transferring = true;
+            this._cdr.markForCheck();
+            this._walletService.transferToOrganization(amount).subscribe({
+                next : (res) => {
+                    this.transferring = false;
+                    this._toastr.success(`${res.amount.toLocaleString('fr-FR')} FCFA transférés vers l'organisation`, 'Portefeuille');
+                    this.reloadAll();
+                },
+                error: (err) => {
+                    this.transferring = false;
+                    const message = err?.error?.message;
+                    this._toastr.error(Array.isArray(message) ? message.join(' ') : message || 'Transfert impossible', 'Portefeuille');
+                    this._cdr.markForCheck();
+                },
+            });
+        });
     }
 
     get canTopup(): boolean

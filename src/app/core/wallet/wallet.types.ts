@@ -24,6 +24,8 @@ export interface WalletSummary {
     canTopup?: boolean;
     /** Tarifs WhatsApp Business par categorie (organisations). */
     cloudPrices?: Record<string, number> | null;
+    /** Membre d'organisation : son solde personnel (recharge avant l'adhesion). */
+    personalWallet?: { available: number; reserved: number } | null;
 }
 
 export interface LedgerEntry {
@@ -137,6 +139,8 @@ export const LEDGER_LABELS: Record<string, string> = {
     adjustment_credit: 'Crédit (ajustement)',
     adjustment_debit : 'Débit (ajustement)',
     subscription     : 'Abonnement organisation',
+    transfer_out     : 'Transfert vers l\'organisation',
+    transfer_in      : 'Transfert reçu',
 };
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
@@ -148,7 +152,7 @@ export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
 
 /** Sens de l'ecriture sur le solde disponible (+1 credit, -1 debit, 0 neutre). */
 export const ledgerSign = (type: string): number => {
-    if (['topup', 'adjustment_credit', 'release'].includes(type)) return 1;
-    if (['hold', 'debit', 'adjustment_debit'].includes(type)) return -1;
+    if (['topup', 'adjustment_credit', 'release', 'transfer_in'].includes(type)) return 1;
+    if (['hold', 'debit', 'adjustment_debit', 'subscription', 'transfer_out'].includes(type)) return -1;
     return 0;
 };
