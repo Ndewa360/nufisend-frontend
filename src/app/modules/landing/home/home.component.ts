@@ -5,7 +5,11 @@ import {
     OnInit,
     ViewEncapsulation
 } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
+
+/** Hauteur de la barre de navigation fixe (h-20) plus une marge. */
+const NAVBAR_OFFSET_PX = 88;
 
 interface FaqItem
 {
@@ -61,7 +65,8 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
      */
     constructor(
         private _title: Title,
-        private _meta: Meta
+        private _meta: Meta,
+        private _viewportScroller: ViewportScroller
     )
     {
     }
@@ -72,6 +77,8 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
 
     ngOnInit(): void
     {
+        // Liens internes (#features...) : la section n'est pas masquee par la barre fixe.
+        this._viewportScroller.setOffset([0, NAVBAR_OFFSET_PX]);
         this._title.setTitle('NufiSend \u2014 Communication WhatsApp simplifi\u00e9e');
         this._meta.updateTag({
             name   : 'description',
@@ -114,6 +121,7 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
     ngOnDestroy(): void
     {
         this.revealObserver?.disconnect();
+        this._viewportScroller.setOffset([0, 0]);
     }
 
     // -----------------------------------------------------------------------------------------------------

@@ -26,7 +26,12 @@ registerLocaleData(localeFr);
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
-    scrollPositionRestoration: 'enabled'
+    scrollPositionRestoration: 'enabled',
+    // Liens internes de la landing (routerLink="/home" fragment="...") :
+    // defilement vers la section sans recharger la page.
+    anchorScrolling          : 'enabled',
+    // Un second clic sur la meme ancre fait de nouveau defiler.
+    onSameUrlNavigation      : 'reload'
 };
 
 @NgModule({
