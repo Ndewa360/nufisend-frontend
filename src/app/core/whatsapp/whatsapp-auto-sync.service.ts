@@ -21,6 +21,8 @@ export class WhatsAppAutoSyncService implements OnDestroy {
   private _syncProgressToast: any = null;
   private _lastProgressPercent = -1;
   private _hasAutoStarted = false;
+  /** Organisation dont la salle WebSocket a ete rejointe. */
+  private _socketOrganizationId: string | null = null;
 
   constructor(
     private _authService: AuthService,
@@ -48,7 +50,7 @@ export class WhatsAppAutoSyncService implements OnDestroy {
         return;
       }
       if (membership) {
-        this.handleMember(profile);
+        this.handleMember(profile, String(membership?.organization?._id || ''));
         return;
       }
       this.handleProfile(profile);
@@ -129,11 +131,16 @@ export class WhatsAppAutoSyncService implements OnDestroy {
     }
   }
 
-  private handleMember(profile: any): void {
+  private handleMember(profile: any, organizationId: string): void {
     this._hasAutoStarted = false;
     this.clearNotSyncedNotification();
     this.clearSyncProgress();
     try {
+      // La salle de l'organisation est rejointe a la connexion du socket :
+      // reconnexion si l'utilisateur vient de creer ou rejoindre une organisation.
+      const socket = this._socket.ioSocket as any;
+      if (socket?.connected && this._socketOrganizationId !== organizationId) socket.disconnect();
+      this._socketOrganizationId = organizationId;
       this._wsManager.customConnexion(this._authService.user || profile);
     } catch (e) {
       // ignore
