@@ -1,7 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, combineLatest, takeUntil } from 'rxjs';
+import { OrganizationService } from 'app/core/organization/organization.service';
 import { AuthService } from 'app/core/auth/auth.service';
 import { UserProfileAction, UserProfileState } from 'app/shared/store/user-profile';
 import { GlobalAction } from 'app/shared/store/global';
@@ -29,14 +30,25 @@ export class WhatsAppAutoSyncService implements OnDestroy {
     private _wsManager: WebsocketManagerService,
     private _notifications: NotificationsService,
     private _socket: Socket,
-    private _walletService: WalletService
+    private _walletService: WalletService,
+    private _organizationService: OrganizationService
   ) {
     this.init();
   }
 
   private init(): void {
-    this._store.select(UserProfileState.selectStateData).pipe(takeUntil(this._unsubscribeAll)).subscribe((profile: any) => {
+    // Membre d'une organisation : envois par l'API WhatsApp Cloud, aucune
+    // synchronisation du WhatsApp personnel (le WebSocket reste connecte pour
+    // la boite de reception et les rapports d'envoi).
+    combineLatest([
+      this._store.select(UserProfileState.selectStateData),
+      this._organizationService.loadedMembership$,
+    ]).pipe(takeUntil(this._unsubscribeAll)).subscribe(([profile, membership]: [any, any]) => {
       if (!this._authService.authenticated || !profile) {
+        return;
+      }
+      if (membership) {
+        this.handleMember(profile);
         return;
       }
       this.handleProfile(profile);
@@ -112,6 +124,17 @@ export class WhatsAppAutoSyncService implements OnDestroy {
         this.clearSyncProgress();
         this._toastr.error(err?.message || 'Erreur lors de la synchronisation WhatsApp', 'Erreur');
       });
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  private handleMember(profile: any): void {
+    this._hasAutoStarted = false;
+    this.clearNotSyncedNotification();
+    this.clearSyncProgress();
+    try {
+      this._wsManager.customConnexion(this._authService.user || profile);
     } catch (e) {
       // ignore
     }

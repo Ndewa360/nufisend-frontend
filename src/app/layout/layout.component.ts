@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { combineLatest, filter, map, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, skip, Subject, takeUntil } from 'rxjs';
 import { FuseConfigService } from '@fuse/services/config';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FusePlatformService } from '@fuse/services/platform';
@@ -10,6 +10,7 @@ import { Layout } from 'app/layout/layout.types';
 import { AppConfig } from 'app/core/config/app.config';
 import { AuthService } from 'app/core/auth/auth.service';
 import { NavigationService } from 'app/core/navigation/navigation.service';
+import { OrganizationService } from 'app/core/organization/organization.service';
 
 @Component({
     selector     : 'layout',
@@ -34,7 +35,8 @@ export class LayoutComponent implements OnInit, OnDestroy
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fusePlatformService: FusePlatformService,
         private _authService: AuthService,
-        private _navigationService: NavigationService
+        private _navigationService: NavigationService,
+        private _organizationService: OrganizationService
     )
     {
     }
@@ -81,18 +83,21 @@ export class LayoutComponent implements OnInit, OnDestroy
             this._updateLayout();
         });
 
-        // Filter navigation items based on user role — take(1) prevents infinite loop
-        this._navigationService.navigation$
-            .pipe(take(1))
-            .subscribe((nav: any) => {
-                if (nav && nav.default) {
-                    const user = this._authService.user;
-                    const isSuperAdmin = !!(user && user['role'] === 'ADMIN');
-                    if (!isSuperAdmin) {
-                        nav.default = nav.default.filter((item: any) => item.id !== 'super_admin');
-                        this._navigationService.setNavigation(nav);
-                    }
-                }
+        // Menu filtre selon le role et l'organisation (cf. InitialDataResolver),
+        // reconstruit quand l'utilisateur cree, rejoint ou quitte une organisation.
+        this._organizationService.loadedMembership$
+            .pipe(
+                map((membership) => !!membership),
+                distinctUntilChanged(),
+                skip(1),
+                takeUntil(this._unsubscribeAll)
+            )
+            .subscribe((isMember) => {
+                const user = this._authService.user;
+                this._navigationService.applyAccess({
+                    isSuperAdmin: !!(user && user['role'] === 'ADMIN'),
+                    isMember,
+                });
             });
 
         // Set the app version

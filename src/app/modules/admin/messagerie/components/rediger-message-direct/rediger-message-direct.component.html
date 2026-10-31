@@ -4,7 +4,7 @@
         class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto"
         [formGroup]="composeForm">
 
-        <div class="sm:col-span-3 mb-6">
+        <div *ngIf="!cloudTemplateMode" class="sm:col-span-3 mb-6">
             <fuse-alert
                 [appearance]="'outline'"
                 [type]="'info'">
@@ -19,10 +19,11 @@
         </mat-form-field>
 
         <div class="sm:col-span-3 mb-6">
-            <mat-label class="font-medium mb-2">Choisir des fichiers (optionnel)</mat-label>
+            <mat-label class="font-medium mb-2">{{ cloudTemplateMode ? "Média d'en-tête du modèle (si le modèle en a un)" : 'Choisir des fichiers (optionnel)' }}</mat-label>
             <app-file-upload (uploadFileEvent)="setFiles($event)"></app-file-upload>
         </div>
 
+        <ng-container *ngIf="!cloudTemplateMode">
         <!-- Subject -->
         <mat-form-field >
             <mat-label>Choisi un template</mat-label>
@@ -75,6 +76,7 @@
         </mat-autocomplete>  
         <!-- Body -->
         <app-custom-quill-editor class="mt-2" [formControlName]="'body'"  (onContentWriteChanged)="loseFocus()"></app-custom-quill-editor>
+        </ng-container>
         
 
     </form>

@@ -1,0 +1,190 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="p-6 sm:p-8">
+
+        <div *ngIf="membership === undefined" class="flex justify-center py-16">
+            <mat-progress-spinner [diameter]="40" mode="indeterminate"></mat-progress-spinner>
+        </div>
+
+        <!-- Compte personnel : creation -->
+        <ng-container *ngIf="membership === null">
+            <div>
+                <div class="text-3xl font-bold tracking-tight">Créer une organisation</div>
+                <div class="mt-1 text-secondary max-w-3xl">
+                    Envoyez vos messages depuis un numéro WhatsApp Business officiel, partagez l'annuaire et la boîte de réception
+                    avec votre équipe. NufiSend s'occupe de tout auprès de Meta : vous payez uniquement sur NufiSend.
+                </div>
+            </div>
+
+            <div class="mt-6 rounded-xl border border-blue-200 bg-blue-50 text-blue-900 p-4 text-sm dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-100 max-w-3xl">
+                En créant ou en rejoignant une organisation, tous vos envois passent par le numéro WhatsApp Business de l'organisation.
+                Vos messages programmés personnels sont arrêtés et vos contacts personnels ne sont pas partagés.
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
+                <button type="button"
+                        *ngFor="let plan of selfServicePlans"
+                        class="text-left bg-card rounded-2xl shadow p-6 border-2 transition-colors"
+                        [ngClass]="selectedPlan === plan.id ? 'border-primary' : 'border-transparent'"
+                        (click)="selectedPlan = plan.id">
+                    <div class="flex items-center justify-between">
+                        <div class="text-xl font-semibold">{{ planLabels[plan.id] || plan.id }}</div>
+                        <mat-icon *ngIf="selectedPlan === plan.id" class="text-primary" svgIcon="heroicons_solid:check-circle"></mat-icon>
+                    </div>
+                    <div class="mt-3 text-3xl font-bold">{{ plan.price | xaf }}<span class="text-base font-medium text-secondary"> / mois</span></div>
+                    <div class="mt-2 text-secondary">Jusqu'à {{ plan.maxMembers }} membre(s)</div>
+                </button>
+                <div *ngFor="let plan of quotePlans" class="bg-card rounded-2xl shadow p-6">
+                    <div class="text-xl font-semibold">{{ planLabels[plan.id] || plan.id }}</div>
+                    <div class="mt-3 text-3xl font-bold">Sur devis</div>
+                    <div class="mt-2 text-secondary">Jusqu'à {{ plan.maxMembers }} membre(s) · contactez NufiSend</div>
+                </div>
+            </div>
+
+            <div *ngIf="catalog" class="mt-6 bg-card rounded-2xl shadow p-6 max-w-3xl">
+                <div class="font-semibold">Prix par message livré (numéro WhatsApp Business)</div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3">
+                    <div *ngFor="let category of cloudCategories">
+                        <div class="text-sm text-secondary">{{ categoryLabels[category] }}</div>
+                        <div class="text-lg font-semibold">{{ (catalog.cloudPrices[category] || 0) | xaf }}</div>
+                    </div>
+                </div>
+                <div class="text-xs text-secondary mt-3">Seuls les messages livrés sont facturés, depuis le portefeuille de l'organisation.</div>
+            </div>
+
+            <div class="mt-6 bg-card rounded-2xl shadow p-6 max-w-3xl">
+                <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Nom de l'organisation</mat-label>
+                    <input matInput [(ngModel)]="newName" maxlength="80" placeholder="Ex. : Boutique Awa SARL" (keyup.enter)="create()">
+                </mat-form-field>
+                <div class="flex justify-end">
+                    <button mat-flat-button color="primary" type="button" [disabled]="busy || newName.trim().length < 2" (click)="create()">
+                        <mat-progress-spinner *ngIf="busy; else createLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                        <ng-template #createLabel>Créer l'organisation</ng-template>
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- Membre : tableau de bord -->
+        <ng-container *ngIf="membership">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="min-w-0">
+                    <div *ngIf="!renaming" class="flex items-center gap-2">
+                        <div class="text-3xl font-bold tracking-tight truncate">{{ membership.organization.name }}</div>
+                        <button *ngIf="membership.isManager" mat-icon-button type="button" matTooltip="Renommer" (click)="renaming = true">
+                            <mat-icon class="icon-size-5" svgIcon="heroicons_outline:pencil"></mat-icon>
+                        </button>
+                    </div>
+                    <div *ngIf="renaming" class="flex items-center gap-2">
+                        <mat-form-field class="w-80 fuse-mat-dense" appearance="outline" subscriptSizing="dynamic">
+                            <input matInput [(ngModel)]="renameValue" maxlength="80" (keyup.enter)="saveName()">
+                        </mat-form-field>
+                        <button mat-flat-button color="primary" type="button" [disabled]="busy" (click)="saveName()">Enregistrer</button>
+                        <button mat-button type="button" (click)="renaming = false">Annuler</button>
+                    </div>
+                    <div class="mt-1 text-secondary">
+                        Offre {{ planLabels[membership.organization.plan] || membership.organization.plan }} · votre rôle : {{ roleLabels[membership.role] }}
+                    </div>
+                </div>
+                <button mat-stroked-button color="warn" type="button" (click)="leave()">
+                    <mat-icon svgIcon="heroicons_outline:logout"></mat-icon>
+                    <span class="ml-2">Quitter</span>
+                </button>
+            </div>
+
+            <fuse-alert *ngIf="membership.organization.status === 'suspended'" class="mt-6" type="error" appearance="border">
+                <span fuseAlertTitle>Organisation suspendue</span>
+                {{ membership.organization.suspensionReason || 'Les envois sont désactivés. Contactez le support NufiSend.' }}
+            </fuse-alert>
+
+            <fuse-alert *ngIf="!canSend && membership.organization.status === 'active'" class="mt-6" type="warning" appearance="border">
+                <span fuseAlertTitle>Envois désactivés</span>
+                <ng-container *ngIf="membership.organization.subscription?.status === 'pending_payment' || membership.organization.subscription?.status === 'suspended'">
+                    L'abonnement n'est pas réglé : rechargez le portefeuille de l'organisation puis réglez l'abonnement.
+                </ng-container>
+                <ng-container *ngIf="membership.organization.subscription?.status !== 'pending_payment' && membership.organization.subscription?.status !== 'suspended'">
+                    Le numéro WhatsApp Business n'est pas raccordé.
+                    <a class="underline" routerLink="/organisation/whatsapp">Voir le raccordement</a>
+                </ng-container>
+            </fuse-alert>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
+                <!-- Abonnement -->
+                <div class="bg-card rounded-2xl shadow p-6 flex flex-col">
+                    <div class="text-secondary font-medium">Abonnement</div>
+                    <div class="mt-2">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold" [ngClass]="subscriptionTone">
+                            {{ subscriptionLabels[membership.organization.subscription?.status] || '—' }}
+                        </span>
+                    </div>
+                    <div class="mt-3 text-2xl font-bold">{{ (membership.organization.subscription?.monthlyPrice || 0) | xaf }}<span class="text-sm font-medium text-secondary"> / mois</span></div>
+                    <div *ngIf="membership.organization.subscription?.currentPeriodEnd" class="text-sm text-secondary mt-1">
+                        Jusqu'au {{ membership.organization.subscription.currentPeriodEnd | date:'dd/MM/yyyy' }}
+                    </div>
+                    <div *ngIf="membership.organization.subscription?.status === 'past_due' && membership.organization.subscription?.graceUntil" class="text-sm text-amber-600 mt-1">
+                        Envois coupés le {{ membership.organization.subscription.graceUntil | date:'dd/MM/yyyy' }} sans paiement
+                    </div>
+                    <div class="flex-auto"></div>
+                    <button *ngIf="membership.isManager && needsPayment" class="mt-4" mat-flat-button color="primary" type="button" [disabled]="busy" (click)="pay()">
+                        Régler maintenant
+                    </button>
+                </div>
+
+                <!-- Portefeuille -->
+                <div class="bg-card rounded-2xl shadow p-6 flex flex-col">
+                    <div class="text-secondary font-medium">Portefeuille de l'organisation</div>
+                    <div class="mt-3 text-2xl font-bold">{{ membership.wallet.available | xaf }}</div>
+                    <div class="text-sm text-secondary mt-1">{{ membership.wallet.reserved | xaf }} réservés pour des envois en cours</div>
+                    <div class="flex-auto"></div>
+                    <a class="mt-4" mat-stroked-button color="primary" routerLink="/wallet">
+                        {{ membership.isManager ? 'Recharger' : 'Voir le portefeuille' }}
+                    </a>
+                </div>
+
+                <!-- Membres -->
+                <div class="bg-card rounded-2xl shadow p-6 flex flex-col">
+                    <div class="text-secondary font-medium">Membres</div>
+                    <div class="mt-3 text-2xl font-bold">{{ membership.membersCount }} / {{ membership.maxMembers }}</div>
+                    <div class="text-sm text-secondary mt-1">{{ membership.pendingInvitations }} invitation(s) en attente</div>
+                    <div class="flex-auto"></div>
+                    <a class="mt-4" mat-stroked-button color="primary" routerLink="/organisation/members">Gérer les membres</a>
+                </div>
+
+                <!-- WhatsApp Business -->
+                <div class="bg-card rounded-2xl shadow p-6 flex flex-col">
+                    <div class="text-secondary font-medium">Numéro WhatsApp Business</div>
+                    <ng-container [ngSwitch]="membership.organization.whatsapp?.status">
+                        <ng-container *ngSwitchCase="'connected'">
+                            <div class="mt-3 text-xl font-bold">{{ membership.organization.whatsapp.displayPhoneNumber || 'Raccordé' }}</div>
+                            <div class="text-sm text-secondary mt-1">{{ membership.organization.whatsapp.verifiedName }}</div>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'error'">
+                            <div class="mt-3 text-xl font-bold text-red-600">En erreur</div>
+                            <div class="text-sm text-secondary mt-1">{{ membership.organization.whatsapp.lastError }}</div>
+                        </ng-container>
+                        <div *ngSwitchDefault class="mt-3 text-xl font-bold text-secondary">Non raccordé</div>
+                    </ng-container>
+                    <div class="flex-auto"></div>
+                    <a class="mt-4" mat-stroked-button color="primary" routerLink="/organisation/whatsapp">Numéro et modèles</a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <a routerLink="/inbox" class="bg-card rounded-2xl shadow p-6 flex items-center gap-4 hover:shadow-lg transition-shadow">
+                    <mat-icon class="icon-size-8 text-primary" svgIcon="heroicons_outline:inbox"></mat-icon>
+                    <div>
+                        <div class="font-semibold">Boîte de réception</div>
+                        <div class="text-sm text-secondary">Répondez aux clients qui écrivent au numéro de l'organisation.</div>
+                    </div>
+                </a>
+                <a routerLink="/messagerie" class="bg-card rounded-2xl shadow p-6 flex items-center gap-4 hover:shadow-lg transition-shadow">
+                    <mat-icon class="icon-size-8 text-primary" svgIcon="feather:send"></mat-icon>
+                    <div>
+                        <div class="font-semibold">Envoyer une campagne</div>
+                        <div class="text-sm text-secondary">Messages immédiats ou programmés avec un modèle approuvé par Meta.</div>
+                    </div>
+                </a>
+            </div>
+        </ng-container>
+    </div>
+</div>

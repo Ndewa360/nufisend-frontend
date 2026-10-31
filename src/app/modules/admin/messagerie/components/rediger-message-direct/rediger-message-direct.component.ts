@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -27,6 +27,8 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
   selectedMessageTemplate:MessageTemplateModel=null;
   selectedFiles:File[]=[];
 
+  /** Envoi par modele WhatsApp (organisations) : seuls le titre et le fichier sont saisis ici. */
+  @Input() cloudTemplateMode = false;
   @Output() sendMessageData:EventEmitter<{messageTemplate:MessageTemplateModel,message:string,file?:File,title:string}> = new EventEmitter();
   composeForm: UntypedFormGroup;
     copyFields: { cc: boolean; bcc: boolean } = {
@@ -47,8 +49,8 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
     {
     }
   ngAfterViewInit(): void {
-    this.matFormAutoComplete.nativeElement.blur();
-    this.autocompleteTrigger.closePanel();    
+    this.matFormAutoComplete?.nativeElement.blur();
+    this.autocompleteTrigger?.closePanel();
   }
 
     // -----------------------------------------------------------------------------------------------------

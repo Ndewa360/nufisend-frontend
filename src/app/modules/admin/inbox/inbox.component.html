@@ -1,0 +1,150 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="p-6 sm:p-8 pb-0 sm:pb-0">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="text-3xl font-bold tracking-tight">Boîte de réception</div>
+                <div class="mt-1 text-secondary">
+                    Messages reçus sur le numéro WhatsApp Business de {{ membership?.organization?.name }}
+                    <ng-container *ngIf="membership?.organization?.whatsapp?.displayPhoneNumber"> ({{ membership.organization.whatsapp.displayPhoneNumber }})</ng-container>.
+                </div>
+            </div>
+        </div>
+        <fuse-alert *ngIf="membership && !canSend" class="mt-4" type="warning" appearance="border">
+            Les réponses sont désactivées : vérifiez l'abonnement et le numéro sur la page
+            <a class="underline" routerLink="/organisation/overview">Mon organisation</a>.
+        </fuse-alert>
+    </div>
+
+    <div class="p-6 sm:p-8">
+        <div class="bg-card rounded-2xl shadow overflow-hidden flex h-[70vh] min-h-120">
+
+            <!-- Conversations -->
+            <div class="flex flex-col w-full md:w-96 md:border-r flex-0" [ngClass]="{ 'hidden md:flex': active }">
+                <div class="p-4 border-b flex items-center gap-2">
+                    <mat-form-field class="flex-auto fuse-mat-dense" appearance="outline" subscriptSizing="dynamic">
+                        <mat-icon matPrefix class="icon-size-5" svgIcon="heroicons_outline:search"></mat-icon>
+                        <input matInput [(ngModel)]="search" (ngModelChange)="onSearch()" placeholder="Nom ou numéro">
+                    </mat-form-field>
+                    <button mat-icon-button type="button" [matTooltip]="unreadOnly ? 'Toutes les conversations' : 'Non lues uniquement'"
+                            [color]="unreadOnly ? 'primary' : undefined" (click)="toggleUnread()">
+                        <mat-icon svgIcon="heroicons_outline:filter"></mat-icon>
+                    </button>
+                </div>
+                <div class="px-4 py-2 text-xs text-secondary border-b">
+                    {{ total }} conversation(s) · {{ unreadConversations }} non lue(s)
+                </div>
+                <div class="flex-auto overflow-y-auto">
+                    <div *ngIf="loadingList && !conversations.length" class="flex justify-center p-6">
+                        <mat-progress-spinner [diameter]="28" mode="indeterminate"></mat-progress-spinner>
+                    </div>
+                    <div *ngIf="!loadingList && !conversations.length" class="p-6 text-center text-secondary text-sm">
+                        Aucune conversation. Les messages de vos clients apparaîtront ici.
+                    </div>
+                    <button *ngFor="let conversation of conversations; trackBy: trackById" type="button"
+                            class="w-full text-left px-4 py-3 border-b flex gap-3 hover:bg-gray-50 dark:hover:bg-hover"
+                            [ngClass]="{ 'bg-primary-50 dark:bg-hover': active?._id === conversation._id }"
+                            (click)="open(conversation)">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-0 font-semibold">
+                            {{ titleOf(conversation).replace('+', '').charAt(0) | uppercase }}
+                        </div>
+                        <div class="min-w-0 flex-auto">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="truncate" [ngClass]="conversation.unreadCount ? 'font-bold' : 'font-medium'">{{ titleOf(conversation) }}</span>
+                                <span class="text-xs text-secondary flex-0">{{ conversation.lastMessageAt | date:'dd/MM HH:mm' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 mt-0.5">
+                                <span class="text-sm text-secondary truncate">{{ conversation.lastMessagePreview }}</span>
+                                <span *ngIf="conversation.unreadCount" class="flex-0 min-w-5 h-5 px-1.5 rounded-full bg-primary text-on-primary text-xs flex items-center justify-center">
+                                    {{ conversation.unreadCount }}
+                                </span>
+                            </div>
+                            <div *ngIf="conversation.optedOut" class="text-xs text-red-600 mt-0.5">Désinscrit (STOP)</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conversation -->
+            <div class="flex-auto flex-col min-w-0" [ngClass]="active ? 'flex' : 'hidden md:flex'">
+                <div *ngIf="!active" class="flex-auto flex flex-col items-center justify-center text-secondary p-8 text-center">
+                    <mat-icon class="icon-size-16" svgIcon="heroicons_outline:chat-alt-2"></mat-icon>
+                    <div class="mt-4">Sélectionnez une conversation</div>
+                </div>
+
+                <ng-container *ngIf="active">
+                    <div class="px-4 py-3 border-b flex items-center gap-3">
+                        <button class="md:hidden" mat-icon-button type="button" (click)="close()">
+                            <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                        </button>
+                        <div class="min-w-0 flex-auto">
+                            <div class="font-semibold truncate">{{ titleOf(active) }}</div>
+                            <div class="text-xs text-secondary">
+                                +{{ active.waId }}
+                                <ng-container *ngIf="windowOpen"> · fenêtre de réponse libre : encore {{ windowHoursLeft }} h</ng-container>
+                                <ng-container *ngIf="!windowOpen"> · fenêtre de 24 h fermée : réponse par modèle</ng-container>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div #thread class="flex-auto overflow-y-auto p-4 bg-gray-50 dark:bg-transparent">
+                        <div *ngIf="loadingThread" class="flex justify-center p-6">
+                            <mat-progress-spinner [diameter]="28" mode="indeterminate"></mat-progress-spinner>
+                        </div>
+                        <div *ngIf="hasOlder" class="flex justify-center mb-3">
+                            <button mat-button type="button" (click)="loadOlder()">Messages précédents</button>
+                        </div>
+                        <div *ngFor="let message of messages; trackBy: trackById" class="flex mb-3"
+                             [ngClass]="message.direction === 'out' ? 'justify-end' : 'justify-start'">
+                            <div class="max-w-[80%] rounded-2xl px-4 py-2 shadow-sm"
+                                 [ngClass]="message.direction === 'out' ? 'bg-primary-100 dark:bg-primary-800 rounded-br-sm' : 'bg-card rounded-bl-sm'">
+                                <div *ngIf="message.media?.id" class="mb-1">
+                                    <button mat-stroked-button type="button" (click)="downloadMedia(message)">
+                                        <mat-icon class="icon-size-4" svgIcon="heroicons_outline:paper-clip"></mat-icon>
+                                        <span class="ml-1">{{ message.media.filename || message.type }}</span>
+                                    </button>
+                                </div>
+                                <div class="whitespace-pre-line break-words">{{ message.text || (message.media?.id ? '' : '[' + message.type + ']') }}</div>
+                                <div class="flex items-center justify-end gap-1 mt-1 text-xs text-secondary">
+                                    <span *ngIf="message.direction === 'out' && senderName(message)">{{ senderName(message) }} ·</span>
+                                    <span>{{ message.timestamp | date:'dd/MM HH:mm' }}</span>
+                                    <mat-icon *ngIf="message.direction === 'out' && message.status" class="icon-size-4"
+                                              [ngClass]="{ 'text-red-600': message.status === 'failed', 'text-blue-600': message.status === 'read' }"
+                                              [svgIcon]="statusIcons[message.status] || statusIcons.sent"
+                                              [matTooltip]="message.error || message.status"></mat-icon>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reponse -->
+                    <div class="border-t p-4">
+                        <div *ngIf="active.optedOut" class="text-sm text-red-600">
+                            Ce client a demandé à ne plus recevoir de messages (STOP). Il peut se réinscrire en écrivant START.
+                        </div>
+                        <ng-container *ngIf="!active.optedOut">
+                            <div *ngIf="windowOpen" class="flex items-center gap-4 mb-3 text-sm">
+                                <mat-slide-toggle [(ngModel)]="useTemplate" color="primary">Répondre avec un modèle</mat-slide-toggle>
+                            </div>
+                            <app-cloud-template-picker *ngIf="useTemplate || !windowOpen"
+                                                       [allowFreeText]="false"
+                                                       (selectionChange)="setTemplate($event)"></app-cloud-template-picker>
+                            <div class="flex items-end gap-3" [ngClass]="{ 'mt-3': useTemplate || !windowOpen }">
+                                <mat-form-field *ngIf="windowOpen && !useTemplate" class="flex-auto" appearance="outline" subscriptSizing="dynamic">
+                                    <textarea matInput rows="2" [(ngModel)]="replyText" maxlength="4096" placeholder="Votre réponse…"
+                                              (keydown.control.enter)="send()"></textarea>
+                                </mat-form-field>
+                                <div *ngIf="!(windowOpen && !useTemplate)" class="flex-auto text-xs text-secondary">
+                                    Message facturé au tarif de la catégorie du modèle.
+                                </div>
+                                <button mat-flat-button color="primary" type="button" [disabled]="!canReply" (click)="send()">
+                                    <mat-progress-spinner *ngIf="sending; else sendLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                                    <ng-template #sendLabel>Envoyer</ng-template>
+                                </button>
+                            </div>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>

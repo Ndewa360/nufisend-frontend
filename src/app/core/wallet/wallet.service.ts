@@ -57,13 +57,14 @@ export class WalletService
             .pipe(map((res) => res.data));
     }
 
-    quote(recipients: number, hasAttachment: boolean, planification?: any[]): Observable<SendQuote>
+    quote(recipients: number, hasAttachment: boolean, planification?: any[], category?: string | null): Observable<SendQuote>
     {
         return this._http
             .post<ApiResponse<SendQuote>>(`${this._baseUrl}/quote`, {
                 recipients,
                 hasAttachment,
                 ...(planification?.length ? { planification } : {}),
+                ...(category ? { category } : {}),
             })
             .pipe(map((res) => res.data));
     }

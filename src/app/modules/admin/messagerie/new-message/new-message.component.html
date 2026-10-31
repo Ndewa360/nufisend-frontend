@@ -13,14 +13,25 @@
         </button>
     </div>
 
-    <fuse-alert *ngIf="!isWhatsAppSynced" class="m-4 sm:mx-8" [type]="'warning'" [appearance]="'border'" [showIcon]="true">
+    <fuse-alert *ngIf="isCloud" class="m-4 sm:mx-8" [type]="cloudReady ? 'info' : 'warning'" [appearance]="'border'" [showIcon]="true">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span *ngIf="cloudReady">
+                Envoi par le numéro WhatsApp Business de {{ membership.organization.name }}<ng-container *ngIf="membership.organization.whatsapp?.displayPhoneNumber"> ({{ membership.organization.whatsapp.displayPhoneNumber }})</ng-container>,
+                facturé au portefeuille de l'organisation.
+            </span>
+            <span *ngIf="!cloudReady">L'organisation ne peut pas envoyer pour le moment (abonnement ou numéro WhatsApp Business).</span>
+            <a *ngIf="!cloudReady" mat-button color="primary" routerLink="/organisation/overview" (click)="saveAndClose()">Voir l'organisation</a>
+        </div>
+    </fuse-alert>
+
+    <fuse-alert *ngIf="!isCloud && !isWhatsAppSynced" class="m-4 sm:mx-8" [type]="'warning'" [appearance]="'border'" [showIcon]="true">
         <div class="flex flex-col sm:flex-row sm:items-center gap-2">
             <span>Votre compte WhatsApp n'est pas synchronisé. Vous devez le synchroniser avant d'envoyer des messages.</span>
             <a mat-button color="primary" routerLink="/sync_whatsapp" (click)="saveAndClose()">Synchroniser maintenant</a>
         </div>
     </fuse-alert>
 
-    <fuse-alert *ngIf="isWhatsAppSynced && !isWhatsAppReady" class="m-4 sm:mx-8" [type]="'info'" [appearance]="'border'" [showIcon]="true">
+    <fuse-alert *ngIf="!isCloud && isWhatsAppSynced && !isWhatsAppReady" class="m-4 sm:mx-8" [type]="'info'" [appearance]="'border'" [showIcon]="true">
         <div class="flex flex-col sm:flex-row sm:items-center gap-2">
             <span>La synchronisation WhatsApp est en cours. L'envoi sera disponible dès qu'elle sera terminée.</span>
             <a mat-button color="primary" routerLink="/sync_whatsapp" (click)="saveAndClose()">Voir la progression</a>
@@ -100,9 +111,21 @@
                   
                     <mat-step [completed]="isSendingMessage | async">
                         <ng-template matStepLabel>Rediger & Soumettre</ng-template>
-                        <app-rediger-message-direct (sendMessageData)="setMessage($event)"></app-rediger-message-direct>
+                        <div *ngIf="isCloud" class="mb-6">
+                            <div class="font-medium mb-2">Modèle WhatsApp Business</div>
+                            <div class="text-sm text-secondary mb-3">
+                                <ng-container *ngIf="messageSendToNow">Un modèle approuvé est nécessaire pour les contacts qui ne vous ont pas écrit dans les dernières 24 h.</ng-container>
+                                <ng-container *ngIf="!messageSendToNow">Les messages programmés utilisent obligatoirement un modèle approuvé par Meta.</ng-container>
+                            </div>
+                            <app-cloud-template-picker
+                                [allowFreeText]="messageSendToNow"
+                                [hasAttachment]="hasAttachment"
+                                (selectionChange)="setCloudTemplate($event)"></app-cloud-template-picker>
+                        </div>
+                        <app-rediger-message-direct [cloudTemplateMode]="usesCloudTemplate" (sendMessageData)="setMessage($event)"></app-rediger-message-direct>
                         <app-message-cost-estimate
                             [recipients]="recipientsCount"
+                            [category]="costCategory"
                             [hasAttachment]="hasAttachment"
                             [isScheduled]="!messageSendToNow"
                             [planification]="planificationObj.hasPlanification ? planificationObj.planif : null"
@@ -134,8 +157,8 @@
                                     class="px-8"
                                     mat-flat-button
                                     [color]="'primary'"
-                                    [disabled]="(isSendingMessage | async) || !isWhatsAppReady || !costSufficient"
-                                    [matTooltip]="!isWhatsAppReady ? 'La synchronisation WhatsApp doit être terminée pour envoyer' : !costSufficient ? 'Solde insuffisant : rechargez votre portefeuille' : ''"
+                                    [disabled]="(isSendingMessage | async) || !channelReady || !costSufficient"
+                                    [matTooltip]="!channelReady ? (isCloud ? 'L\'organisation ne peut pas envoyer pour le moment' : 'La synchronisation WhatsApp doit être terminée pour envoyer') : !costSufficient ? 'Solde insuffisant : rechargez le portefeuille' : ''"
                                     (click)="sendMessage()">
                                     <mat-progress-spinner *ngIf="(isSendingMessage | async); else endWordTermine" [diameter]="24" [mode]="'indeterminate'">
                                     </mat-progress-spinner>

@@ -77,7 +77,10 @@ export class AuthSignInComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe({
                 next: () => {
-                    this._router.navigateByUrl('/dashboard');
+                    // Retour sur la page demandee (ex. lien d'invitation), chemins internes uniquement.
+                    const redirectURL = this._route.snapshot.queryParamMap.get('redirectURL') || '';
+                    const internal = redirectURL.startsWith('/') && !redirectURL.startsWith('//');
+                    this._router.navigateByUrl(internal ? redirectURL : '/dashboard');
                 },
                 error: (err) => {
                     this.signInForm.enable();

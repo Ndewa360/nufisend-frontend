@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertType } from '@fuse/components/alert';
@@ -28,7 +28,8 @@ export class AuthSignUpComponent implements OnInit, OnDestroy
     constructor(
         private _formBuilder: UntypedFormBuilder,
         private _authService: AuthService,
-        private _router: Router
+        private _router: Router,
+        private _route: ActivatedRoute
     )
     {
     }
@@ -38,7 +39,7 @@ export class AuthSignUpComponent implements OnInit, OnDestroy
         this.signUpForm = this._formBuilder.group({
             firstName      : ['', Validators.required],
             lastName       : ['', Validators.required],
-            email          : ['', [Validators.required, Validators.email]],
+            email          : [this._route.snapshot.queryParamMap.get('email') || '', [Validators.required, Validators.email]],
             password       : ['', [Validators.required, Validators.minLength(8)]],
             confirmPassword: ['', Validators.required]
         });
@@ -78,7 +79,10 @@ export class AuthSignUpComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe({
                 next: () => {
-                    this._router.navigate(['/auth/sign-in'], { queryParams: { registered: payload.email } });
+                    const redirectURL = this._route.snapshot.queryParamMap.get('redirectURL');
+                    this._router.navigate(['/auth/sign-in'], {
+                        queryParams: { registered: payload.email, ...(redirectURL ? { redirectURL } : {}) },
+                    });
                 },
                 error: (err) => {
                     this.signUpForm.enable();

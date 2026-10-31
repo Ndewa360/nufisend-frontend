@@ -1,0 +1,117 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="text-3xl font-bold tracking-tight">Membres</div>
+                <div class="mt-1 text-secondary">
+                    {{ members.length }} membre(s) sur {{ membership?.maxMembers }} place(s) de l'offre.
+                </div>
+            </div>
+            <button mat-stroked-button color="primary" type="button" (click)="reload()" [disabled]="loading">
+                <mat-icon svgIcon="heroicons_outline:refresh"></mat-icon>
+                <span class="ml-2">Actualiser</span>
+            </button>
+        </div>
+
+        <!-- Invitation -->
+        <div *ngIf="membership?.isManager" class="bg-card rounded-2xl shadow p-6 mt-6">
+            <div class="text-lg font-semibold">Inviter un membre</div>
+            <div class="text-sm text-secondary mt-1">
+                Un email avec un lien valable 7 jours est envoyé. La personne accepte avec le compte NufiSend de cette adresse
+                (ou en crée un) ; une personne déjà membre d'une autre organisation doit d'abord la quitter.
+            </div>
+            <div class="flex flex-col md:flex-row gap-4 mt-4 md:items-start">
+                <mat-form-field class="flex-auto" appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" [(ngModel)]="inviteEmail" placeholder="collegue@entreprise.cm" (keyup.enter)="invite()">
+                </mat-form-field>
+                <mat-form-field class="md:w-56" appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Rôle</mat-label>
+                    <mat-select [(ngModel)]="inviteRole">
+                        <mat-option value="member">Membre</mat-option>
+                        <mat-option *ngIf="isOwner" value="admin">Administrateur</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button class="md:mt-1" mat-flat-button color="primary" type="button"
+                        [disabled]="inviting || !inviteEmail.trim() || seatsLeft <= 0" (click)="invite()">
+                    <mat-progress-spinner *ngIf="inviting; else inviteLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                    <ng-template #inviteLabel>Envoyer l'invitation</ng-template>
+                </button>
+            </div>
+            <div *ngIf="seatsLeft <= 0" class="text-sm text-amber-600 mt-3">
+                Toutes les places de l'offre sont occupées (membres et invitations en attente). Contactez NufiSend pour une offre supérieure.
+            </div>
+            <div class="text-xs text-secondary mt-3">
+                Administrateurs : invitent des membres, rechargent le portefeuille, gèrent le numéro et les modèles. Membres : envoient et répondent aux clients.
+            </div>
+        </div>
+
+        <!-- Membres -->
+        <div class="bg-card rounded-2xl shadow overflow-hidden mt-6">
+            <div *ngIf="loading && !members.length" class="flex justify-center p-8">
+                <mat-progress-spinner [diameter]="32" mode="indeterminate"></mat-progress-spinner>
+            </div>
+            <div *ngFor="let member of members" class="flex flex-col sm:flex-row sm:items-center gap-3 px-6 py-4 border-b last:border-b-0">
+                <div class="flex items-center gap-3 flex-auto min-w-0">
+                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-0">
+                        <img *ngIf="member.profilePicture" class="w-full h-full object-cover" [src]="member.profilePicture" alt="">
+                        <mat-icon *ngIf="!member.profilePicture" svgIcon="heroicons_outline:user-circle"></mat-icon>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="font-medium truncate">
+                            {{ displayName(member) }}
+                            <span *ngIf="member.userId === currentUserId" class="text-secondary font-normal">(vous)</span>
+                        </div>
+                        <div class="text-sm text-secondary truncate">{{ member.email }} · depuis le {{ member.joinedAt | date:'dd/MM/yyyy' }}</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span *ngIf="member.isBlocked" class="px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">Compte bloqué</span>
+                    <ng-container *ngIf="canManage(member); else roleBadge">
+                        <mat-form-field class="w-44 fuse-mat-dense" appearance="outline" subscriptSizing="dynamic">
+                            <mat-select [value]="member.role" (selectionChange)="changeRole(member, $event.value)" [disabled]="!isOwner">
+                                <mat-option *ngFor="let role of assignableRoles" [value]="role">{{ roleLabels[role] }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <button mat-icon-button type="button" [matMenuTriggerFor]="memberMenu">
+                            <mat-icon svgIcon="heroicons_outline:dots-vertical"></mat-icon>
+                        </button>
+                        <mat-menu #memberMenu="matMenu">
+                            <button *ngIf="isOwner" mat-menu-item type="button" (click)="transferOwnership(member)">
+                                <mat-icon svgIcon="heroicons_outline:key"></mat-icon>
+                                <span>Transférer la propriété</span>
+                            </button>
+                            <button mat-menu-item type="button" (click)="remove(member)">
+                                <mat-icon class="text-warn" svgIcon="heroicons_outline:user-remove"></mat-icon>
+                                <span>Retirer de l'organisation</span>
+                            </button>
+                        </mat-menu>
+                    </ng-container>
+                    <ng-template #roleBadge>
+                        <span class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-800">{{ roleLabels[member.role] }}</span>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invitations en attente -->
+        <ng-container *ngIf="membership?.isManager && invitations.length">
+            <div class="text-lg font-semibold mt-8">Invitations en attente</div>
+            <div class="bg-card rounded-2xl shadow overflow-hidden mt-3">
+                <div *ngFor="let invitation of invitations" class="flex flex-col sm:flex-row sm:items-center gap-3 px-6 py-4 border-b last:border-b-0">
+                    <div class="flex-auto min-w-0">
+                        <div class="font-medium truncate">{{ invitation.email }}</div>
+                        <div class="text-sm text-secondary">
+                            {{ roleLabels[invitation.role] }} · expire le {{ invitation.expiresAt | date:'dd/MM/yyyy HH:mm' }}
+                            <ng-container *ngIf="invitation.invitedBy"> · invité par {{ invitation.invitedBy.name || invitation.invitedBy.email }}</ng-container>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button mat-stroked-button type="button" (click)="resend(invitation)">Renvoyer</button>
+                        <button mat-stroked-button color="warn" type="button" (click)="revoke(invitation)">Annuler</button>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

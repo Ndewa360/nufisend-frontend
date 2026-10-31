@@ -1,4 +1,7 @@
 import { ChangeDetectorRef, Component, Inject } from '@angular/core';
+import { OrganizationService } from 'app/core/organization/organization.service';
+import { Membership } from 'app/core/organization/organization.types';
+import { TemplateSelection } from 'app/shared/components/cloud-template-picker/cloud-template-picker.component';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Select, Actions, Store, ofActionSuccessful } from '@ngxs/store';
@@ -26,6 +29,9 @@ export class NewMessageForSingleContactComponent {
   @Select(GlobalState.isWhatsAppReady) isWhatsAppReady$:Observable<boolean>;
   isWhatsAppSynced:boolean=false;
   isWhatsAppReady:boolean=false;
+  /** Membre d'une organisation : envoi par le numero WhatsApp Business. */
+  membership: Membership | null = null;
+  cloudSelection: TemplateSelection | null = null;
 
   constructor(
     public matDialogRef: MatDialogRef<NewMessageForSingleContactComponent>,
@@ -34,6 +40,7 @@ export class NewMessageForSingleContactComponent {
     private _ngxsAction:Actions,
     private _store:Store,
     private _toastrService: ToastrService,
+    private _organizationService: OrganizationService,
     @Inject(MAT_DIALOG_DATA) data: {contact: ContactModel}
 )
 {
@@ -65,6 +72,11 @@ export class NewMessageForSingleContactComponent {
           this.isWhatsAppReady = !!ready;
           this._changeDetectorRef.markForCheck();
         });
+
+      this._organizationService.loadedMembership$.pipe(takeUntil(this._unsubscribeAll)).subscribe((membership) => {
+        this.membership = membership;
+        this._changeDetectorRef.markForCheck();
+      });
 
       // Mark for check
       this._changeDetectorRef.markForCheck();
@@ -98,9 +110,47 @@ export class NewMessageForSingleContactComponent {
       this.messageToSend=message;
     }
 
+    get isCloud(): boolean
+    {
+      return !!this.membership;
+    }
+
+    get cloudReady(): boolean
+    {
+      const org = this.membership?.organization;
+      return !!org && org.status === 'active'
+        && org.subscription?.status !== 'pending_payment'
+        && org.subscription?.status !== 'suspended'
+        && org.whatsapp?.status === 'connected';
+    }
+
+    get channelReady(): boolean
+    {
+      return this.isCloud ? this.cloudReady : this.isWhatsAppReady;
+    }
+
+    get usesCloudTemplate(): boolean
+    {
+      return this.isCloud && !!this.cloudSelection?.template;
+    }
+
+    setCloudTemplate(selection: TemplateSelection)
+    {
+      this.cloudSelection = selection;
+      this._changeDetectorRef.markForCheck();
+    }
+
     sendMessage()
     {
-      if (!this.isWhatsAppReady) {
+      if (this.isCloud && !this.cloudReady) {
+        this._toastrService.error("L'organisation ne peut pas envoyer : vérifiez l'abonnement et le numéro WhatsApp Business", 'Envoi impossible');
+        return;
+      }
+      if (this.isCloud && this.cloudSelection?.template && !this.cloudSelection.complete) {
+        this._toastrService.error('Renseignez toutes les variables du modèle', 'Validation');
+        return;
+      }
+      if (!this.isCloud && !this.isWhatsAppReady) {
         this._toastrService.error(
           this.isWhatsAppSynced
             ? "La synchronisation WhatsApp est en cours. Veuillez patienter avant d'envoyer un message."
@@ -114,7 +164,7 @@ export class NewMessageForSingleContactComponent {
         this._toastrService.error('Le titre du message est requis', 'Validation');
         return;
       }
-      if (!this.hasMessageContent()) {
+      if (!this.usesCloudTemplate && !this.hasMessageContent()) {
         this._toastrService.error('Ajoutez un texte, un template ou un fichier au message', 'Validation');
         return;
       }
@@ -131,7 +181,8 @@ export class NewMessageForSingleContactComponent {
         title
         // groupsID:this.destinationGroups.map((group)=>group)
       }
-      if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
+      if (this.usesCloudTemplate) dataToSend.template = this.cloudSelection.template;
+      else if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
       else dataToSend.bodyText=this.messageToSend.message;
       if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
       // console.log("MessageToSend",dataToSend)

@@ -5,6 +5,7 @@ import { environment } from 'environments/environment';
 import { ApiResultFormat } from 'app/shared/store/global';
 import { UserService } from 'app/core/user/user.service';
 import { Store } from '@ngxs/store';
+import { OrganizationService } from 'app/core/organization/organization.service';
 
 export interface User {
     _id?: string;
@@ -43,7 +44,8 @@ export class AuthService
     constructor(
         private _httpClient: HttpClient,
         private _userService: UserService,
-        private _store: Store
+        private _store: Store,
+        private _organizationService: OrganizationService
     )
     {
     }
@@ -138,6 +140,8 @@ export class AuthService
         this._authenticated = false;
         this._user = null;
         this._userService.user = null;
+        // L'organisation est rechargee a la prochaine session.
+        this._organizationService.reset();
         // Reset all NGXS states so no data leaks to the next user session
         this._store.reset({
             contacts:         { contacts: [], loadingContacts: false, initLoadingState: 'NO_LOADED' },

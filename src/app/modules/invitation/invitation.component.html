@@ -1,0 +1,67 @@
+<div class="flex flex-col flex-auto items-center justify-center min-w-0 p-6 sm:p-12">
+    <div class="w-full max-w-lg bg-card rounded-2xl shadow p-8">
+        <div class="flex items-center gap-3">
+            <img class="w-10" src="assets/images/logo/nufisend_n.png" alt="NufiSend">
+            <div class="text-2xl font-bold tracking-tight">Invitation NufiSend</div>
+        </div>
+
+        <div *ngIf="loading" class="flex justify-center py-10">
+            <mat-progress-spinner [diameter]="36" mode="indeterminate"></mat-progress-spinner>
+        </div>
+
+        <fuse-alert *ngIf="!loading && error" class="mt-6" type="error" appearance="border">
+            {{ error }}
+        </fuse-alert>
+
+        <ng-container *ngIf="!loading && preview">
+            <div class="mt-6 text-lg">
+                <span class="font-semibold">{{ preview.invitedBy || 'Un administrateur' }}</span>
+                vous invite à rejoindre <span class="font-semibold">{{ preview.organizationName }}</span>
+                en tant que {{ roleLabels[preview.role] | lowercase }}.
+            </div>
+            <div class="mt-2 text-sm text-secondary">
+                Invitation pour {{ preview.email }} · valable jusqu'au {{ preview.expiresAt | date:'dd/MM/yyyy HH:mm' }}
+            </div>
+
+            <fuse-alert *ngIf="preview.expired" class="mt-6" type="warning" appearance="border">
+                Cette invitation a expiré : demandez-en une nouvelle à l'administrateur de l'organisation.
+            </fuse-alert>
+            <fuse-alert *ngIf="!preview.expired && preview.status !== 'pending'" class="mt-6" type="warning" appearance="border">
+                Cette invitation a déjà été utilisée ou annulée.
+            </fuse-alert>
+
+            <ng-container *ngIf="usable">
+                <div class="mt-6 rounded-xl border border-blue-200 bg-blue-50 text-blue-900 p-4 text-sm dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-100">
+                    En rejoignant l'organisation, vos envois passeront par son numéro WhatsApp Business et seront facturés à son portefeuille.
+                    Vos messages programmés personnels seront arrêtés. Vous ne pouvez appartenir qu'à une seule organisation.
+                </div>
+
+                <ng-container *ngIf="authenticated; else anonymous">
+                    <ng-container *ngIf="!wrongAccount; else wrongAccountTpl">
+                        <button class="w-full mt-6" mat-flat-button color="primary" type="button" [disabled]="accepting" (click)="accept()">
+                            <mat-progress-spinner *ngIf="accepting; else acceptLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                            <ng-template #acceptLabel>Rejoindre {{ preview.organizationName }}</ng-template>
+                        </button>
+                    </ng-container>
+                    <ng-template #wrongAccountTpl>
+                        <fuse-alert class="mt-6" type="warning" appearance="border">
+                            Vous êtes connecté avec {{ currentEmail }}. Cette invitation est destinée à {{ preview.email }}.
+                        </fuse-alert>
+                        <button class="w-full mt-4" mat-stroked-button color="primary" type="button" (click)="signOutAndSwitch()">
+                            Changer de compte
+                        </button>
+                    </ng-template>
+                </ng-container>
+
+                <ng-template #anonymous>
+                    <a class="w-full mt-6" mat-flat-button color="primary" [routerLink]="['/auth/sign-in']" [queryParams]="{ redirectURL: redirectURL }">
+                        Se connecter pour accepter
+                    </a>
+                    <a class="w-full mt-3" mat-stroked-button color="primary" [routerLink]="['/auth/sign-up']" [queryParams]="{ redirectURL: redirectURL, email: preview.email }">
+                        Créer mon compte avec {{ preview.email }}
+                    </a>
+                </ng-template>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>

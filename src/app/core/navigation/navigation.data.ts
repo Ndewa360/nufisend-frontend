@@ -4,8 +4,8 @@ import { cloneDeep } from 'lodash-es';
 import { Navigation } from 'app/core/navigation/navigation.types';
 
 /**
- * Menu principal de l'application. L'entree `super_admin` est masquee pour les
- * comptes non administrateurs (cf. LayoutComponent).
+ * Menu principal de l'application, filtre par `buildNavigation` selon le
+ * profil (super-admin, membre d'une organisation).
  */
 export const defaultNavigation: FuseNavigationItem[] = [
     {
@@ -46,11 +46,25 @@ export const defaultNavigation: FuseNavigationItem[] = [
         link : '/organisation',
         children: [
             {
-                id   : 'user',
-                title: 'Utilisateurs',
+                id   : 'org_overview',
+                title: 'Mon organisation',
+                type : 'basic',
+                icon : 'heroicons_outline:office-building',
+                link : '/organisation/overview',
+            },
+            {
+                id   : 'org_members',
+                title: 'Membres',
                 type : 'basic',
                 icon : 'heroicons_outline:users',
-                link : '/organisation/users',
+                link : '/organisation/members',
+            },
+            {
+                id   : 'org_whatsapp',
+                title: 'WhatsApp Business',
+                type : 'basic',
+                icon : 'heroicons_outline:chat-alt-2',
+                link : '/organisation/whatsapp',
             },
             {
                 id   : 'parameter',
@@ -84,6 +98,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
             
         ]
+    },
+    {
+        id   : 'inbox',
+        title: 'Boîte de réception',
+        type : 'basic',
+        icon : 'heroicons_outline:inbox',
+        link : '/inbox',
     },
     {
         id   : 'wallet',
@@ -131,10 +152,44 @@ export const defaultNavigation: FuseNavigationItem[] = [
     }
 ];
 
+export interface NavigationAccess
+{
+    isSuperAdmin: boolean;
+    /** Membre d'une organisation : envois par l'API WhatsApp Cloud. */
+    isMember: boolean;
+}
+
+/** Entrees masquees selon le profil. */
+const hiddenIds = (access: NavigationAccess): Set<string> =>
+{
+    const hidden = new Set<string>();
+    if (!access.isSuperAdmin) hidden.add('super_admin');
+    if (access.isMember) {
+        // Le WhatsApp personnel n'est pas utilise par les membres.
+        hidden.add('sync_whatsapp');
+    } else {
+        hidden.add('inbox');
+        hidden.add('org_members');
+        hidden.add('org_whatsapp');
+    }
+    return hidden;
+};
+
+const filterItems = (items: FuseNavigationItem[], hidden: Set<string>): FuseNavigationItem[] =>
+    items
+        .filter((item) => !hidden.has(item.id))
+        .map((item) => (item.children ? { ...item, children: filterItems(item.children, hidden) } : item));
+
 /** Toutes les dispositions Fuse partagent le meme menu. */
-export const buildNavigation = (): Navigation => ({
-    compact   : cloneDeep(defaultNavigation),
-    default   : cloneDeep(defaultNavigation),
-    futuristic: cloneDeep(defaultNavigation),
-    horizontal: cloneDeep(defaultNavigation),
-});
+export const buildNavigation = (
+    access: NavigationAccess = { isSuperAdmin: false, isMember: false },
+): Navigation =>
+{
+    const items = filterItems(cloneDeep(defaultNavigation), hiddenIds(access));
+    return {
+        compact   : cloneDeep(items),
+        default   : cloneDeep(items),
+        futuristic: cloneDeep(items),
+        horizontal: cloneDeep(items),
+    };
+};

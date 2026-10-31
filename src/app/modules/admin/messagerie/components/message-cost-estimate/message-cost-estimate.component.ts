@@ -17,6 +17,7 @@ interface QuoteRequest
     recipients: number;
     hasAttachment: boolean;
     planification: any[] | null;
+    category: string | null;
 }
 
 /**
@@ -43,6 +44,7 @@ interface QuoteRequest
                     </div>
                     <div class="mt-1 text-2xl font-bold">{{ quote.amountDue | xaf }}</div>
                     <div class="text-xs text-secondary">Montant maximal réservé : seuls les messages livrés seront facturés, le reste vous est rendu.</div>
+                    <div *ngIf="category" class="text-xs text-secondary">Tarif WhatsApp Business ({{ category }}), débité du portefeuille de l'organisation.</div>
                 </ng-container>
                 <ng-template #scheduled>
                     <div class="mt-2 text-sm">
@@ -75,6 +77,8 @@ export class MessageCostEstimateComponent implements OnChanges, OnDestroy
     @Input() hasAttachment = false;
     @Input() isScheduled = false;
     @Input() planification: any[] | null = null;
+    /** Categorie du modele WhatsApp (organisations) : tarif de l'API Cloud. */
+    @Input() category: string | null = null;
     /** Vrai si le solde couvre l'envoi (ou si l'estimation est indisponible). */
     @Output() sufficientChange = new EventEmitter<boolean>();
     @Output() navigate = new EventEmitter<void>();
@@ -96,7 +100,7 @@ export class MessageCostEstimateComponent implements OnChanges, OnDestroy
                     this.loading = true;
                     this._cdr.markForCheck();
                     return this._walletService
-                        .quote(request.recipients, request.hasAttachment, request.planification || undefined)
+                        .quote(request.recipients, request.hasAttachment, request.planification || undefined, request.category)
                         .pipe(catchError(() => of(null)));
                 }),
                 takeUntil(this._destroy$),
@@ -121,6 +125,7 @@ export class MessageCostEstimateComponent implements OnChanges, OnDestroy
             recipients   : this.recipients,
             hasAttachment: this.hasAttachment,
             planification: this.isScheduled && this.planification?.length ? this.planification : null,
+            category     : this.category,
         });
     }
 

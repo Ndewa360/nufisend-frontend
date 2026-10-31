@@ -8,6 +8,9 @@ import { Observable, Subject, combineLatest, firstValueFrom, takeUntil } from 'r
 import { ToastrService } from 'ngx-toastr';
 import { PrevisualisationMessageContactComponent } from '../components/previsualisation-message-contact/previsualisation-message-contact.component';
 import { Router } from '@angular/router';
+import { OrganizationService } from 'app/core/organization/organization.service';
+import { Membership } from 'app/core/organization/organization.types';
+import { TemplateSelection } from 'app/shared/components/cloud-template-picker/cloud-template-picker.component';
 
 @Component({
   selector: 'app-new-message',
@@ -37,6 +40,9 @@ export class NewMessageComponent implements OnInit{
   recipientsCount:number=0;
   hasAttachment:boolean=false;
   costSufficient:boolean=true;
+  /** Membre d'une organisation : envoi par l'API WhatsApp Cloud (pas de synchro WhatsApp). */
+  membership: Membership | null = null;
+  cloudSelection: TemplateSelection | null = null;
 
   constructor(
     public matDialogRef: MatDialogRef<NewMessageComponent>,
@@ -46,7 +52,8 @@ export class NewMessageComponent implements OnInit{
     private _store:Store,
     private _matDialog: MatDialog,
     private _toastrService: ToastrService,
-    private _router: Router
+    private _router: Router,
+    private _organizationService: OrganizationService
 
 )
 {}
@@ -74,6 +81,11 @@ export class NewMessageComponent implements OnInit{
       this.isWhatsAppReady$.pipe(takeUntil(this._unsubscribeAll)).subscribe((ready) => {
         this.isWhatsAppReady = !!ready;
         this.isWhatsAppSynced = this.isWhatsAppSynced || this.isWhatsAppReady;
+        this._changeDetectorRef.markForCheck();
+      });
+
+      this._organizationService.loadedMembership$.pipe(takeUntil(this._unsubscribeAll)).subscribe((membership) => {
+        this.membership = membership;
         this._changeDetectorRef.markForCheck();
       });
 
@@ -119,6 +131,43 @@ export class NewMessageComponent implements OnInit{
       this._changeDetectorRef.markForCheck();
     }
 
+    get isCloud(): boolean
+    {
+      return !!this.membership;
+    }
+
+    /** L'organisation peut envoyer (abonnement regle, numero raccorde). */
+    get cloudReady(): boolean
+    {
+      const org = this.membership?.organization;
+      return !!org && org.status === 'active'
+        && org.subscription?.status !== 'pending_payment'
+        && org.subscription?.status !== 'suspended'
+        && org.whatsapp?.status === 'connected';
+    }
+
+    get usesCloudTemplate(): boolean
+    {
+      return this.isCloud && !!this.cloudSelection?.template;
+    }
+
+    /** Pret a envoyer (WhatsApp personnel synchronise, ou organisation operationnelle). */
+    get channelReady(): boolean
+    {
+      return this.isCloud ? this.cloudReady : this.isWhatsAppReady;
+    }
+
+    get costCategory(): string | null
+    {
+      return this.isCloud ? (this.cloudSelection?.category || 'service') : null;
+    }
+
+    setCloudTemplate(selection: TemplateSelection)
+    {
+      this.cloudSelection = selection;
+      this._changeDetectorRef.markForCheck();
+    }
+
     setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title:string})
     {
       this.messageToSend=message;
@@ -134,6 +183,10 @@ export class NewMessageComponent implements OnInit{
 
     sendMessage()
     {
+      if (this.isCloud) {
+        this.sendCloudMessage();
+        return;
+      }
       if (!this.isWhatsAppReady && !this.isWhatsAppSynced) {
         this._toastrService.error("Synchronisez votre compte WhatsApp avant d'envoyer un message", 'WhatsApp non synchronisé');
         this._router.navigate(['/sync_whatsapp']);
@@ -182,9 +235,67 @@ export class NewMessageComponent implements OnInit{
       this._store.dispatch(new MessageAction.SendMessage(dataToSend));
     }
 
+    /**
+     * Envoi d'un membre d'organisation : numero WhatsApp Business, modele
+     * approuve obligatoire pour un message programme.
+     */
+    private sendCloudMessage()
+    {
+      if (!this.cloudReady) {
+        this._toastrService.error("L'organisation ne peut pas envoyer : vérifiez l'abonnement et le numéro WhatsApp Business", 'Envoi impossible');
+        return;
+      }
+      const title = (this.messageToSend.title || '').trim();
+      if (!title) {
+        this._toastrService.error('Le titre du message est requis', 'Validation');
+        return;
+      }
+      if (this.destinationContacts.length === 0 && this.destinationGroups.length === 0) {
+        this._toastrService.error('Selectionnez au moins un destinataire', 'Validation');
+        return;
+      }
+      const template = this.cloudSelection?.template || null;
+      if (!this.messageSendToNow && !template) {
+        this._toastrService.error('Un message programmé doit utiliser un modèle WhatsApp approuvé', 'Validation');
+        return;
+      }
+      if (template && !this.cloudSelection.complete) {
+        this._toastrService.error('Renseignez toutes les variables du modèle (et son média d\'en-tête)', 'Validation');
+        return;
+      }
+      if (!template && !this.hasMessageContent()) {
+        this._toastrService.error('Ajoutez un texte ou un fichier, ou choisissez un modèle', 'Validation');
+        return;
+      }
+      if (!this.messageSendToNow && !this.planificationObj.hasPlanification) {
+        this._toastrService.error('Definissez la planification du message', 'Validation');
+        return;
+      }
+      if (!this.costSufficient) {
+        this._toastrService.warning("Rechargez le portefeuille de l'organisation pour couvrir le coût de cet envoi", 'Solde insuffisant');
+        return;
+      }
+
+      this.submitted=true;
+      const dataToSend:MessageModel={
+        type:MessageType.TEXT,
+        isSentToNow:this.messageSendToNow,
+        contactsID:this.destinationContacts.map((contact)=>contact._id),
+        title,
+        groupsID:this.destinationGroups.map((group)=>group._id)
+      }
+      if(!this.messageSendToNow) dataToSend.planification=this.planificationObj.planif;
+      if (template) dataToSend.template = template;
+      else if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
+      else dataToSend.bodyText=this.messageToSend.message;
+      if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
+      this._store.dispatch(new MessageAction.SendMessage(dataToSend));
+    }
+
     canPrevisualise(): boolean
     {
-      return this.isWhatsAppReady && this.hasMessageContent() && (this.destinationContacts.length > 0 || this.destinationGroups.length > 0);
+      if (this.usesCloudTemplate) return false;
+      return this.channelReady && this.hasMessageContent() && (this.destinationContacts.length > 0 || this.destinationGroups.length > 0);
     }
 
     private hasMessageContent(): boolean

@@ -139,6 +139,17 @@ export class WalletComponent implements OnInit, OnDestroy
         return !!this.summary && this.summary.available < (this.summary.lowBalanceThreshold || 0);
     }
 
+    /** Membre d'une organisation : portefeuille partage de l'organisation. */
+    get isOrganization(): boolean
+    {
+        return this.summary?.accountType === 'organization';
+    }
+
+    get canTopup(): boolean
+    {
+        return !this.summary || this.summary.canTopup !== false;
+    }
+
     holdLabel(hold: WalletHold): string
     {
         if (hold.planification?.title) return hold.planification.title;

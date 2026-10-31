@@ -17,6 +17,13 @@ export interface WalletSummary {
     maxTopup: number;
     lowBalanceThreshold: number;
     paymentAvailable: boolean;
+    /** Portefeuille personnel, ou celui de l'organisation pour ses membres. */
+    accountType?: 'user' | 'organization';
+    organizationName?: string | null;
+    /** Recharge autorisee (proprietaire / administrateurs pour une organisation). */
+    canTopup?: boolean;
+    /** Tarifs WhatsApp Business par categorie (organisations). */
+    cloudPrices?: Record<string, number> | null;
 }
 
 export interface LedgerEntry {
@@ -129,6 +136,7 @@ export const LEDGER_LABELS: Record<string, string> = {
     write_off        : 'Non encaissé',
     adjustment_credit: 'Crédit (ajustement)',
     adjustment_debit : 'Débit (ajustement)',
+    subscription     : 'Abonnement organisation',
 };
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {

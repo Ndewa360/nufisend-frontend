@@ -22,13 +22,13 @@
         <mat-icon [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
         <span>Mon profil</span>
     </button>
-    <button mat-menu-item (click)="goToOrganisationUsers()">
-        <mat-icon [svgIcon]="'heroicons_outline:users'"></mat-icon>
-        <span>Utilisateurs</span>
-    </button>
-    <button mat-menu-item (click)="goToOrganisationSettings()">
+    <button mat-menu-item (click)="goToOrganisation()">
         <mat-icon [svgIcon]="'heroicons_outline:office-building'"></mat-icon>
         <span>Organisation</span>
+    </button>
+    <button mat-menu-item (click)="goToOrganisationSettings()">
+        <mat-icon [svgIcon]="'heroicons_outline:cog'"></mat-icon>
+        <span>Préférences</span>
     </button>
     <mat-divider class="my-2"></mat-divider>
     <button

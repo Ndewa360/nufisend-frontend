@@ -154,7 +154,18 @@ export class ConfirmRevokeDialogComponent {
                   <li><code>POST /v1/messages/send-bulk</code> — Envoi en masse</li>
                   <li><code>GET /v1/contacts</code> — Liste des contacts</li>
                   <li><code>GET /v1/groups</code> — Liste des groupes</li>
+                  <li><code>GET /v1/templates</code> — Modèles WhatsApp approuvés (membres d'une organisation)</li>
                 </ul>
+                <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 text-blue-900 p-3 text-sm dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-100">
+                  <p class="font-medium">Membres d'une organisation (numéro WhatsApp Business)</p>
+                  <p class="mt-1">
+                    Les envois par l'API passent par le numéro de l'organisation et sont facturés à son portefeuille.
+                    Un message programmé, ou adressé à un contact qui ne vous a pas écrit dans les dernières 24 h, doit utiliser un modèle approuvé :
+                    <code>"template": {{ '{' }} "name": "promo", "language": "fr", "variables": ["Awa"] {{ '}' }}</code> dans le corps,
+                    ou <code>template=promo&amp;templateLanguage=fr&amp;templateVariables=Awa</code> dans l'URL (variables séparées par des virgules ou tableau JSON).
+                  </p>
+                  <p class="mt-1">L'envoi répond <code>pending</code> : le résultat (livrés, échecs, montant facturé) se consulte avec <code>GET /v1/messages/:id</code>.</p>
+                </div>
               </div>
             </mat-card-content>
           </mat-card>

@@ -35,6 +35,16 @@ export const appRoutes: Route[] = [
     },
 
     {
+        // Lien d'invitation a une organisation (public : apercu, puis connexion).
+        path: 'invitations/:token',
+        component: LayoutComponent,
+        data: {
+            layout: 'empty'
+        },
+        loadChildren: () => import('app/modules/invitation/invitation.module').then(m => m.InvitationModule),
+    },
+
+    {
         path: 'getting-started',
         component: LayoutComponent,
         data: {
@@ -180,6 +190,20 @@ export const appRoutes: Route[] = [
             layout: 'enterprise'
         },
         loadChildren:() => import('app/modules/api/api-keys.module').then(m =>m.ApiKeysModule)
+    },
+
+    {
+        path: 'inbox',
+        canActivate: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+            initialLoadingData: InitialLoadingDataResolver
+        },
+        data: {
+            layout: 'enterprise'
+        },
+        loadChildren:() => import('app/modules/admin/inbox/inbox.module').then(m =>m.InboxModule)
     },
 
     {path: '**', pathMatch : 'full', redirectTo: 'home'},

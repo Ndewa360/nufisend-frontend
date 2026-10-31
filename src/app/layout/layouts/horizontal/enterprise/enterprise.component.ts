@@ -12,6 +12,7 @@ import { UserProfileState, UserProfileModel, UserProfileAction } from 'app/share
 import { ToastrService } from 'ngx-toastr';
 import { FuseAlertService } from '@fuse/components/alert';
 import { GlobalState } from 'app/shared/store';
+import { OrganizationService } from 'app/core/organization/organization.service';
 
 @Component({
     selector     : 'enterprise-layout',
@@ -48,7 +49,8 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
         private _userService:UserService,
         private _toastrService:ToastrService,
         private _fuseAlertService: FuseAlertService,
-        private _store:Store,private _ngxsAction:Actions
+        private _store:Store,private _ngxsAction:Actions,
+        private _organizationService: OrganizationService
 
     )
     {
@@ -111,9 +113,19 @@ export class EnterpriseLayoutComponent implements OnInit, OnDestroy
                 takeUntil(this._unsubscribeAll),
                 ofActionSuccessful(UserProfileAction.FetchUserProfile)
             ),
-            this.userProfile$
-        ]) .subscribe(([_,user])=>{
-            if(user && user.hasSyncWhatsApp) 
+            this.userProfile$,
+            this._organizationService.loadedMembership$
+        ]) .subscribe(([_,user,membership])=>{
+            // Membre d'une organisation : envois par le numero WhatsApp
+            // Business, aucune synchronisation personnelle a demander.
+            if(membership)
+            {
+                this._fuseAlertService.dismiss("synchro_whatsapp")
+                this._fuseAlertService.dismiss("synchro_whatsapp_loading")
+                this.showSynchroWhatsappAlert=false
+                this.showSynchroWhatsappLoading=false;
+            }
+            else if(user && user.hasSyncWhatsApp) 
             {
                 if(!this.userProfile) {                    
                     if(!this.hasConnectedWhatsApp) {

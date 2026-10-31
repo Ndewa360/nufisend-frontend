@@ -1,0 +1,179 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="text-3xl font-bold tracking-tight">WhatsApp Business</div>
+                <div class="mt-1 text-secondary">Numéro officiel de l'organisation et modèles de messages validés par Meta.</div>
+            </div>
+            <button *ngIf="whatsapp?.status && whatsapp.status !== 'not_connected'" mat-stroked-button color="primary" type="button"
+                    (click)="refresh()" [disabled]="loading">
+                <mat-icon svgIcon="heroicons_outline:refresh"></mat-icon>
+                <span class="ml-2">Actualiser l'état</span>
+            </button>
+        </div>
+
+        <div *ngIf="loading && !whatsapp" class="flex justify-center py-12">
+            <mat-progress-spinner [diameter]="36" mode="indeterminate"></mat-progress-spinner>
+        </div>
+
+        <!-- Numero -->
+        <div *ngIf="whatsapp" class="bg-card rounded-2xl shadow p-6 mt-6">
+            <ng-container [ngSwitch]="whatsapp.status">
+                <div *ngSwitchCase="'connected'" class="flex flex-col md:flex-row md:items-center gap-6">
+                    <div class="w-14 h-14 rounded-full bg-green-100 text-green-700 flex items-center justify-center flex-0">
+                        <mat-icon class="icon-size-8" svgIcon="heroicons_outline:check-circle"></mat-icon>
+                    </div>
+                    <div class="flex-auto">
+                        <div class="text-2xl font-bold">{{ whatsapp.displayPhoneNumber || whatsapp.phoneNumberId }}</div>
+                        <div class="text-secondary">{{ whatsapp.verifiedName }}</div>
+                        <div class="flex flex-wrap gap-2 mt-3 text-sm">
+                            <span *ngIf="whatsapp.qualityRating" class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">Qualité : {{ whatsapp.qualityRating }}</span>
+                            <span *ngIf="whatsapp.messagingLimitTier" class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">Limite : {{ whatsapp.messagingLimitTier }}</span>
+                            <span *ngIf="whatsapp.connectedAt" class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">Raccordé le {{ whatsapp.connectedAt | date:'dd/MM/yyyy' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngSwitchCase="'error'">
+                    <fuse-alert type="error" appearance="border">
+                        <span fuseAlertTitle>Numéro en erreur : envois arrêtés</span>
+                        {{ whatsapp.lastError || 'Le jeton Meta a été révoqué ou le compte est bloqué.' }}
+                    </fuse-alert>
+                    <div class="mt-4 text-secondary text-sm">
+                        <ng-container *ngIf="whatsapp.embeddedSignup?.enabled && isManager; else contactSupport">
+                            Reconnectez le numéro pour reprendre les envois.
+                        </ng-container>
+                    </div>
+                    <button *ngIf="whatsapp.embeddedSignup?.enabled && isManager" class="mt-4" mat-flat-button color="primary" type="button"
+                            [disabled]="connecting" (click)="startEmbeddedSignup()">Reconnecter avec Meta</button>
+                </div>
+
+                <div *ngSwitchDefault class="flex flex-col md:flex-row md:items-center gap-6">
+                    <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-0">
+                        <mat-icon class="icon-size-8" svgIcon="heroicons_outline:phone"></mat-icon>
+                    </div>
+                    <div class="flex-auto">
+                        <div class="text-xl font-semibold">Aucun numéro raccordé</div>
+                        <div class="text-secondary text-sm mt-1">
+                            <ng-container *ngIf="whatsapp.embeddedSignup?.enabled; else contactSupport">
+                                Connectez-vous à Meta en quelques clics pour choisir (ou créer) le numéro WhatsApp Business de l'organisation.
+                                Il doit pouvoir recevoir un SMS ou un appel de vérification et ne pas être utilisé dans l'application WhatsApp.
+                            </ng-container>
+                        </div>
+                    </div>
+                    <button *ngIf="whatsapp.embeddedSignup?.enabled && isManager" mat-flat-button color="primary" type="button"
+                            [disabled]="connecting" (click)="startEmbeddedSignup()">
+                        <mat-progress-spinner *ngIf="connecting; else connectLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                        <ng-template #connectLabel>Raccorder avec Meta</ng-template>
+                    </button>
+                </div>
+            </ng-container>
+            <ng-template #contactSupport>
+                Le raccordement du numéro est réalisé par l'équipe NufiSend : contactez le support en indiquant le nom de votre organisation
+                et le numéro à utiliser. Vous n'avez aucune démarche à faire chez Meta.
+            </ng-template>
+        </div>
+
+        <!-- Modeles -->
+        <ng-container *ngIf="whatsapp?.status === 'connected'">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-10">
+                <div>
+                    <div class="text-xl font-semibold">Modèles de messages</div>
+                    <div class="text-sm text-secondary">
+                        Obligatoires pour les messages programmés et pour écrire à un client qui ne vous a pas écrit depuis 24 h.
+                        Variables : {{ '{{1}}' }}, {{ '{{2}}' }}…
+                    </div>
+                </div>
+                <div *ngIf="isManager" class="flex gap-2">
+                    <button mat-stroked-button type="button" (click)="syncTemplates()" [disabled]="syncing">
+                        <mat-icon svgIcon="heroicons_outline:refresh"></mat-icon>
+                        <span class="ml-2">Synchroniser</span>
+                    </button>
+                    <button mat-flat-button color="primary" type="button" (click)="openCreate()">
+                        <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                        <span class="ml-2">Nouveau modèle</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Creation -->
+            <div *ngIf="showCreate" class="bg-card rounded-2xl shadow p-6 mt-4">
+                <div class="text-lg font-semibold">Nouveau modèle</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Nom (identifiant)</mat-label>
+                        <input matInput [(ngModel)]="draft.name" placeholder="promo_noel" maxlength="512">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Catégorie</mat-label>
+                        <mat-select [(ngModel)]="draft.category">
+                            <mat-option value="MARKETING">Marketing (promotions, annonces)</mat-option>
+                            <mat-option value="UTILITY">Utilitaire (commande, rendez-vous)</mat-option>
+                            <mat-option value="AUTHENTICATION">Authentification (code)</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Langue</mat-label>
+                        <mat-select [(ngModel)]="draft.language">
+                            <mat-option *ngFor="let language of languages" [value]="language.code">{{ language.label }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <mat-form-field class="w-full mt-4" appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>En-tête (facultatif)</mat-label>
+                    <input matInput [(ngModel)]="draft.headerText" maxlength="60">
+                </mat-form-field>
+                <mat-form-field class="w-full mt-4" appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Texte du message</mat-label>
+                    <textarea matInput rows="4" [(ngModel)]="draft.body" (ngModelChange)="syncExamples()" maxlength="1024"
+                              placeholder="Bonjour {{ '{{1}}' }}, profitez de -20 % ce week-end dans notre boutique."></textarea>
+                </mat-form-field>
+                <div *ngIf="variablesCount" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <mat-form-field *ngFor="let example of draft.bodyExamples; let i = index; trackBy: trackByIndex" appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Exemple pour {{ '{{' + (i + 1) + '}}' }}</mat-label>
+                        <input matInput [(ngModel)]="draft.bodyExamples[i]">
+                    </mat-form-field>
+                </div>
+                <mat-form-field class="w-full mt-4" appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Pied de page (facultatif)</mat-label>
+                    <input matInput [(ngModel)]="draft.footer" maxlength="60" placeholder="Répondez STOP pour ne plus recevoir nos offres">
+                </mat-form-field>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button mat-button type="button" (click)="showCreate = false">Annuler</button>
+                    <button mat-flat-button color="primary" type="button" [disabled]="creating" (click)="createTemplate()">
+                        <mat-progress-spinner *ngIf="creating; else submitLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                        <ng-template #submitLabel>Soumettre à Meta</ng-template>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-card rounded-2xl shadow overflow-hidden mt-4">
+                <div *ngIf="!templates.length" class="p-8 text-center text-secondary">
+                    Aucun modèle. {{ isManager ? 'Créez-en un ou synchronisez ceux déjà présents chez Meta.' : 'Un administrateur doit en créer un.' }}
+                </div>
+                <div *ngFor="let template of templates" class="flex flex-col md:flex-row md:items-start gap-3 px-6 py-4 border-b last:border-b-0">
+                    <div class="flex-auto min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-semibold">{{ template.name }}</span>
+                            <span class="text-sm text-secondary">{{ template.language }}</span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold"
+                                  [ngClass]="templateStatus[template.status]?.tone || 'bg-gray-100'">
+                                {{ templateStatus[template.status]?.label || template.status }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">
+                                {{ categoryLabels[(template.category || '').toLowerCase()] || template.category }}
+                            </span>
+                        </div>
+                        <div class="text-sm mt-2 whitespace-pre-line">{{ templateBody(template) }}</div>
+                        <div *ngIf="template.status === 'REJECTED' && template.rejectedReason" class="text-sm text-red-600 mt-1">
+                            Motif : {{ template.rejectedReason }}
+                        </div>
+                    </div>
+                    <button *ngIf="isManager" mat-icon-button type="button" matTooltip="Supprimer" (click)="deleteTemplate(template)">
+                        <mat-icon class="text-warn" svgIcon="heroicons_outline:trash"></mat-icon>
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

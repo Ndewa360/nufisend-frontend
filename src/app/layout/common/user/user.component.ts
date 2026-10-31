@@ -60,8 +60,8 @@ export class UserComponent implements OnInit, OnDestroy
         this._router.navigate(['/organisation/settings']);
     }
 
-    goToOrganisationUsers(): void
+    goToOrganisation(): void
     {
-        this._router.navigate(['/organisation/users']);
+        this._router.navigate(['/organisation/overview']);
     }
 }

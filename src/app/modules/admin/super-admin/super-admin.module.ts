@@ -6,6 +6,9 @@ import { SuperAdminGuard } from 'app/core/auth/guards/super-admin.guard';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UsersListComponent } from './users/users-list.component';
 import { UserDetailsComponent } from './users/details/user-details.component';
+import { OrganizationsListComponent } from './organizations/organizations-list.component';
+import { OrganizationDetailsComponent } from './organizations/organization-details.component';
+import { XafPipe } from 'app/shared/pipes/xaf.pipe';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
@@ -30,6 +33,8 @@ const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'users', component: UsersListComponent },
       { path: 'users/:id', component: UserDetailsComponent },
+      { path: 'organizations', component: OrganizationsListComponent },
+      { path: 'organizations/:id', component: OrganizationDetailsComponent },
       { path: 'finance', loadChildren: () => import('./finance/finance.module').then((m) => m.FinanceModule) },
     ]
   }
@@ -40,6 +45,8 @@ const routes: Routes = [
     DashboardComponent,
     UsersListComponent,
     UserDetailsComponent,
+    OrganizationsListComponent,
+    OrganizationDetailsComponent,
   ],
   imports: [
     CommonModule,
@@ -59,6 +66,7 @@ const routes: Routes = [
     MatMenuModule,
     MatSelectModule,
     MatTabsModule,
+    XafPipe,
   ]
 })
 export class SuperAdminModule { }

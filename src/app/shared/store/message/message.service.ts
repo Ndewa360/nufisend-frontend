@@ -24,7 +24,7 @@ export class MessageService
         const formData = new FormData();
         Object.entries(message || {}).forEach(([key, value]) => {
             if (value === undefined || value === null) return;
-            if (key === "planification") {
+            if (key === "planification" || key === "template") {
                 formData.append(key, JSON.stringify(value));
             } else if (Array.isArray(value)) {
                 formData.append(key, value.join(","));

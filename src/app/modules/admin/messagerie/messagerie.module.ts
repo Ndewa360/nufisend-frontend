@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { CloudTemplatePickerComponent } from 'app/shared/components/cloud-template-picker/cloud-template-picker.component';
 import { CommonModule } from '@angular/common';
 import { MatStepperModule } from '@angular/material/stepper';
 
@@ -48,6 +49,7 @@ import { XafPipe } from 'app/shared/pipes/xaf.pipe';
     DatePickerModule,
     RichTextEditorModule,
     XafPipe,
+    CloudTemplatePickerComponent,
   ],
   exports:[
     NewMessageForSingleContactComponent

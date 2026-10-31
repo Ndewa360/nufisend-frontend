@@ -3,10 +3,13 @@
         <!-- En-tete -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="text-3xl font-bold tracking-tight">Mon portefeuille</div>
-                <div class="mt-1 text-secondary">Rechargez par Mobile Money et suivez votre consommation. Seuls les messages livrés sont facturés.</div>
+                <div class="text-3xl font-bold tracking-tight">{{ isOrganization ? 'Portefeuille de ' + summary.organizationName : 'Mon portefeuille' }}</div>
+                <div class="mt-1 text-secondary">
+                    <ng-container *ngIf="!isOrganization">Rechargez par Mobile Money et suivez votre consommation. Seuls les messages livrés sont facturés.</ng-container>
+                    <ng-container *ngIf="isOrganization">Partagé par les membres : envois par le numéro WhatsApp Business et abonnement. Seuls les messages livrés sont facturés.</ng-container>
+                </div>
             </div>
-            <button mat-flat-button color="primary" (click)="openTopup()" [disabled]="!summary || !summary.paymentAvailable"
+            <button *ngIf="canTopup" mat-flat-button color="primary" (click)="openTopup()" [disabled]="!summary || !summary.paymentAvailable"
                     [matTooltip]="summary && !summary.paymentAvailable ? 'Le paiement Mobile Money sera bientôt disponible' : ''">
                 <mat-icon svgIcon="heroicons_outline:plus-circle"></mat-icon>
                 <span class="ml-2">Recharger</span>
@@ -16,7 +19,10 @@
         <mat-progress-bar *ngIf="loadingSummary && !summary" class="mt-6" mode="indeterminate"></mat-progress-bar>
 
         <fuse-alert *ngIf="isLow" class="mt-6" type="warning" appearance="border">
-            Votre solde est bas. Rechargez votre portefeuille pour ne pas interrompre vos envois et vos campagnes programmées.
+            Le solde est bas. {{ canTopup ? 'Rechargez le portefeuille' : 'Demandez à un administrateur de recharger le portefeuille' }} pour ne pas interrompre les envois et les campagnes programmées.
+        </fuse-alert>
+        <fuse-alert *ngIf="isOrganization && !canTopup" class="mt-6" type="info" appearance="border">
+            Seuls le propriétaire et les administrateurs de l'organisation peuvent recharger ce portefeuille.
         </fuse-alert>
 
         <!-- Soldes -->
@@ -31,12 +37,21 @@
                 <div class="mt-2 text-4xl font-bold tracking-tight">{{ summary.reserved | xaf }}</div>
                 <div class="mt-1 text-sm text-secondary">Bloqué pour vos envois en cours et programmés</div>
             </div>
-            <div class="bg-card rounded-2xl shadow p-6">
+            <div *ngIf="!isOrganization" class="bg-card rounded-2xl shadow p-6">
                 <div class="text-secondary font-medium">Messages offerts ce mois</div>
                 <div class="mt-2 text-4xl font-bold tracking-tight">{{ summary.freeRemaining }} <span class="text-xl text-secondary">/ {{ summary.freeMonthlyQuota }}</span></div>
                 <div class="mt-1 text-sm text-secondary">Utilisés avant votre solde</div>
             </div>
-            <div class="bg-card rounded-2xl shadow p-6">
+            <div *ngIf="isOrganization" class="bg-card rounded-2xl shadow p-6 xl:col-span-2">
+                <div class="text-secondary font-medium">Tarif par message livré (WhatsApp Business)</div>
+                <div class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1">
+                    <div class="flex justify-between"><span>Marketing</span><span class="font-semibold">{{ (summary.cloudPrices?.marketing || 0) | xaf }}</span></div>
+                    <div class="flex justify-between"><span>Utilitaire</span><span class="font-semibold">{{ (summary.cloudPrices?.utility || 0) | xaf }}</span></div>
+                    <div class="flex justify-between"><span>Authentification</span><span class="font-semibold">{{ (summary.cloudPrices?.authentication || 0) | xaf }}</span></div>
+                    <div class="flex justify-between"><span>Réponse (24 h)</span><span class="font-semibold">{{ (summary.cloudPrices?.service || 0) | xaf }}</span></div>
+                </div>
+            </div>
+            <div *ngIf="!isOrganization" class="bg-card rounded-2xl shadow p-6">
                 <div class="text-secondary font-medium">Tarif par destinataire <span *ngIf="summary.prices.custom" class="text-primary">(négocié)</span></div>
                 <div class="mt-2 flex flex-col gap-1">
                     <div class="flex justify-between"><span>Texte</span><span class="font-semibold">{{ summary.prices.text | xaf }}</span></div>
@@ -57,7 +72,7 @@
                         <mat-button-toggle-group [value]="transactionsFilter" (change)="onTransactionsFilter($event.value)">
                             <mat-button-toggle value="">Tout</mat-button-toggle>
                             <mat-button-toggle value="topup,adjustment_credit">Crédits</mat-button-toggle>
-                            <mat-button-toggle value="capture,debit">Consommation</mat-button-toggle>
+                            <mat-button-toggle value="capture,debit,subscription">Consommation</mat-button-toggle>
                             <mat-button-toggle value="hold,release">Réservations</mat-button-toggle>
                             <mat-button-toggle value="free">Offerts</mat-button-toggle>
                         </mat-button-toggle-group>
