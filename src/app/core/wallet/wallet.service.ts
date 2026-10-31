@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Observable, map, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, map, tap } from 'rxjs';
 import {
     LedgerEntry,
     Paginated,
@@ -24,6 +24,8 @@ interface ApiResponse<T> {
 export class WalletService
 {
     private readonly _summary = new BehaviorSubject<WalletSummary | null>(null);
+    /** Mouvement confirme par le serveur (recharge creditee, refusee...). */
+    private readonly _changed = new Subject<void>();
     private readonly _baseUrl = `${environment.apiUrl}/wallet`;
 
     constructor(private _http: HttpClient) {}
@@ -31,6 +33,18 @@ export class WalletService
     get summary$(): Observable<WalletSummary | null>
     {
         return this._summary.asObservable();
+    }
+
+    get changed$(): Observable<void>
+    {
+        return this._changed.asObservable();
+    }
+
+    /** Signale un changement du portefeuille (evenement temps reel) et recharge le solde. */
+    notifyChanged(): void
+    {
+        this._changed.next();
+        this.refresh().subscribe({ error: () => undefined });
     }
 
     refresh(): Observable<WalletSummary>

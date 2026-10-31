@@ -54,6 +54,13 @@ export class WalletComponent implements OnInit, OnDestroy
             this.summary = summary;
             this._cdr.markForCheck();
         });
+        // Recharge validee sur le telephone apres la fermeture de la fenetre :
+        // historique et recharges mis a jour sans recharger la page.
+        this._walletService.changed$.pipe(takeUntil(this._destroy$)).subscribe(() => {
+            this.loadTransactions();
+            this.loadPayments();
+            this.loadReservations();
+        });
         this.reloadAll();
     }
 

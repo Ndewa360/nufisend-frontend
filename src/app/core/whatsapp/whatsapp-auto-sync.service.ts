@@ -121,6 +121,25 @@ export class WhatsAppAutoSyncService implements OnDestroy {
         this._walletService.refresh().subscribe({ error: () => undefined });
       });
 
+      // Recharge confirmee (ou refusee) par Easy-Transact, parfois apres la
+      // fermeture de la fenetre de recharge : solde mis a jour partout.
+      (this._socket.ioSocket as any)?.on('wallet-updated', (event: any) => {
+        const amount = `${Number(event?.amount || 0).toLocaleString('fr-FR')} FCFA`;
+        if (event?.status === 'success') {
+          this._toastr.success(`Recharge de ${amount} créditée sur le portefeuille`, 'Portefeuille');
+          this._notifications.create({
+            icon       : 'heroicons_outline:credit-card',
+            title      : 'Recharge créditée',
+            description: `${amount} (réf. ${event?.reference || ''})`,
+            link       : '/wallet',
+            useRouter  : true,
+          }).subscribe();
+        } else if (event?.status === 'failed') {
+          this._toastr.error(`Recharge de ${amount} : ${event?.reason || 'paiement refusé'}`, 'Portefeuille');
+        }
+        this._walletService.notifyChanged();
+      });
+
       (this._socket.ioSocket as any)?.on('sync-error', (err: any) => {
         this._store.dispatch(new GlobalAction.SetWhatsAppSyncStatus('error', 0, err?.message || 'Erreur de synchronisation'));
         this.clearSyncProgress();
