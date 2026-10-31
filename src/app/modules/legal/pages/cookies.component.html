@@ -4,8 +4,8 @@
 
     <div class="prose prose-sm sm:prose max-w-none mt-8">
         <p>
-            {{ info.serviceName }} n'utilise <strong>aucun cookie publicitaire ni outil de mesure d'audience</strong>. Le site enregistre
-            uniquement dans votre navigateur les éléments strictement nécessaires à son fonctionnement, qui ne requièrent pas votre consentement.
+            {{ info.serviceName }} n'utilise <strong>aucun cookie publicitaire</strong>. Le site enregistre dans votre navigateur les seuls
+            éléments nécessaires à son fonctionnement et utilise une mesure d'audience anonyme, <strong>sans cookie</strong>, que vous pouvez désactiver ci-dessous.
         </p>
         <div class="overflow-x-auto">
             <table>
@@ -14,9 +14,27 @@
                     <tr><td>Jeton de connexion (<code>accessToken</code>, stockage local)</td><td>Vous garder connecté de façon sécurisée</td><td>Jusqu'à la déconnexion ou l'expiration de la session</td></tr>
                     <tr><td>Préférences de l'espace (<code>nufisend.workspace.preferences</code> : fuseau horaire, pays par défaut)</td><td>Mémoriser vos réglages</td><td>Jusqu'à leur suppression</td></tr>
                     <tr><td>Information sur les cookies (<code>nufisend-cookie-notice</code>)</td><td>Ne plus afficher le bandeau d'information</td><td>12 mois</td></tr>
+                    <tr><td>Refus de la mesure d'audience (<code>nufisend-analytics-optout</code>)</td><td>Mémoriser votre opposition à la mesure d'audience</td><td>Jusqu'à ce que vous la réactiviez</td></tr>
                 </tbody>
             </table>
         </div>
+        <h2>Mesure d'audience</h2>
+        <p>
+            Le site est hébergé par {{ info.frontendHostName }} ({{ info.frontendHostCountry }}), dont le service <strong>Vercel Web Analytics</strong>
+            compte les visites de façon agrégée : page consultée (adresse sans paramètres ni jetons), page de provenance, pays, type d'appareil,
+            navigateur et système. Aucun cookie n'est déposé et aucun identifiant ne permet de vous suivre d'un jour à l'autre ou d'un site à l'autre ;
+            ces statistiques servent uniquement à améliorer le site.
+        </p>
+        <div class="not-prose rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div class="flex-auto text-sm">
+                Mesure d'audience sur ce navigateur :
+                <strong [class.text-green-700]="!analyticsOptedOut" [class.text-amber-700]="analyticsOptedOut">{{ analyticsOptedOut ? 'désactivée' : 'activée' }}</strong>
+            </div>
+            <button mat-stroked-button color="primary" type="button" (click)="toggleAnalytics()">
+                {{ analyticsOptedOut ? 'Réactiver la mesure d\'audience' : 'Désactiver la mesure d\'audience' }}
+            </button>
+        </div>
+
         <h2>Services tiers</h2>
         <p>
             Lorsqu'un administrateur d'organisation raccorde son numéro WhatsApp Business avec la connexion Meta intégrée, le kit de

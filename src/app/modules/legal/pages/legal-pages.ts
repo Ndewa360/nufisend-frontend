@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Directive, OnInit } from '@angular/core';
+import { isAnalyticsOptedOut, setAnalyticsOptOut } from 'app/core/analytics/analytics';
 import { LEGAL_INFO } from 'app/core/legal/legal.config';
 import {
     LegalDocumentId,
@@ -59,7 +60,18 @@ export class PrivacyPolicyComponent extends LegalPageBase {}
 export class TermsComponent extends LegalPageBase {}
 
 @Component({ selector: 'app-cookies', templateUrl: './cookies.component.html', changeDetection: ChangeDetectionStrategy.OnPush })
-export class CookiesComponent extends LegalPageBase {}
+export class CookiesComponent extends LegalPageBase
+{
+    analyticsOptedOut = isAnalyticsOptedOut();
+
+    /** Opposition a la mesure d'audience, memorisee dans ce navigateur. */
+    toggleAnalytics(): void
+    {
+        this.analyticsOptedOut = !this.analyticsOptedOut;
+        setAnalyticsOptOut(this.analyticsOptedOut);
+        this._cdr.markForCheck();
+    }
+}
 
 @Component({ selector: 'app-processing-agreement', templateUrl: './processing-agreement.component.html', changeDetection: ChangeDetectionStrategy.OnPush })
 export class ProcessingAgreementComponent extends LegalPageBase {}

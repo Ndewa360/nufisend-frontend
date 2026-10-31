@@ -28,6 +28,7 @@
         "@ngneat/transloco": "6.0.4",
         "@ngxs/store": "3.8.2",
         "@types/node": "^20.10.5",
+        "@vercel/analytics": "2.0.1",
         "angularx-qrcode": "17.0.1",
         "apexcharts": "3.49.0",
         "cron-parser": "^4.9.0",

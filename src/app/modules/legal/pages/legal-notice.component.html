@@ -18,11 +18,14 @@
         </ul>
 
         <h2>Hébergement</h2>
+        <p *ngIf="info.frontendHostName">
+            Le site web (interface) est hébergé par <strong>{{ info.frontendHostName }}</strong><ng-container *ngIf="info.frontendHostCountry"> ({{ info.frontendHostCountry }})</ng-container>.
+        </p>
         <p *ngIf="info.hostName">
-            Le service est hébergé par <strong>{{ info.hostName }}</strong><ng-container *ngIf="info.hostAddress">, {{ info.hostAddress }}</ng-container><ng-container *ngIf="info.hostCountry"> ({{ info.hostCountry }})</ng-container>.
+            Les serveurs et la base de données sont hébergés par <strong>{{ info.hostName }}</strong><ng-container *ngIf="info.hostAddress">, {{ info.hostAddress }}</ng-container><ng-container *ngIf="info.hostCountry"> ({{ info.hostCountry }})</ng-container>.
         </p>
         <p *ngIf="!info.hostName">
-            Les coordonnées de l'hébergeur sont communiquées sur simple demande à <a [href]="'mailto:' + info.editorEmail">{{ info.editorEmail }}</a>.
+            Les coordonnées de l'hébergeur des serveurs et de la base de données sont communiquées sur simple demande à <a [href]="'mailto:' + info.editorEmail">{{ info.editorEmail }}</a>.
         </p>
 
         <h2>Protection des données personnelles</h2>

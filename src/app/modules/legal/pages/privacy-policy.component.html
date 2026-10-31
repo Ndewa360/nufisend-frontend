@@ -36,8 +36,9 @@
             <li><strong>Intégration</strong> : clés API (seule une empreinte est conservée) et journal de leur utilisation.</li>
             <li><strong>Consentements</strong> : documents acceptés, version, date, adresse IP tronquée et navigateur, à titre de preuve.</li>
             <li><strong>Données techniques</strong> : journaux de sécurité et de fonctionnement (adresse IP, date, opération réalisée), conservés de façon limitée.</li>
+            <li><strong>Mesure d'audience</strong> : pages consultées (adresse sans paramètres ni jetons), page de provenance, pays, type d'appareil, navigateur et système, collectés de façon agrégée par Vercel Web Analytics, sans cookie ni identifiant persistant.</li>
         </ul>
-        <p>Nous ne collectons pas de données sensibles et n'utilisons aucun traceur publicitaire ni outil de mesure d'audience.</p>
+        <p>Nous ne collectons pas de données sensibles et n'utilisons aucun traceur publicitaire.</p>
 
         <h2 id="finalites">3. Pourquoi et sur quelle base ?</h2>
         <div class="overflow-x-auto">
@@ -50,6 +51,7 @@
                     <tr><td>Vous informer (confirmation d'email, livraison des messages programmés, solde bas, sécurité)</td><td>Exécution du contrat</td></tr>
                     <tr><td>Répondre à vos demandes et à celles des personnes contactées</td><td>Obligation légale</td></tr>
                     <tr><td>Conserver la preuve de vos consentements</td><td>Obligation légale</td></tr>
+                    <tr><td>Mesurer l'audience du site de façon anonyme et agrégée (nombre de visiteurs, pages consultées) pour l'améliorer</td><td>Intérêt légitime de l'éditeur ; vous pouvez vous y opposer à tout moment depuis la page <a routerLink="/legal/cookies">Cookies et stockage local</a></td></tr>
                 </tbody>
             </table>
         </div>
@@ -58,7 +60,8 @@
         <h2 id="destinataires">4. Qui reçoit vos données ?</h2>
         <p>Seules les personnes habilitées de {{ info.editorName }} y accèdent, dans la limite de leurs fonctions. Nous faisons appel aux prestataires suivants, liés par des obligations de confidentialité et de sécurité :</p>
         <ul>
-            <li><strong>Hébergement</strong><ng-container *ngIf="info.hostName"> : {{ info.hostName }}<ng-container *ngIf="info.hostCountry"> ({{ info.hostCountry }})</ng-container></ng-container> — serveurs et base de données.</li>
+            <li><strong>Hébergement du site et mesure d'audience</strong><ng-container *ngIf="info.frontendHostName"> : {{ info.frontendHostName }}<ng-container *ngIf="info.frontendHostCountry"> ({{ info.frontendHostCountry }})</ng-container></ng-container> — diffusion de l'interface web et statistiques de visite anonymes.</li>
+            <li><strong>Hébergement des serveurs</strong><ng-container *ngIf="info.hostName"> : {{ info.hostName }}<ng-container *ngIf="info.hostCountry"> ({{ info.hostCountry }})</ng-container></ng-container> — serveurs et base de données.</li>
             <li><strong>WhatsApp / Meta Platforms</strong> — acheminement des messages (WhatsApp Web pour les comptes personnels, API WhatsApp Business Cloud pour les organisations).</li>
             <li><strong>Easy-Transact et les opérateurs MTN et Orange</strong> — traitement des recharges Mobile Money.</li>
             <li><strong>Envoi d'emails</strong><ng-container *ngIf="info.emailProvider"> : {{ info.emailProvider }}</ng-container> — emails transactionnels.</li>
@@ -67,8 +70,8 @@
 
         <h2 id="transferts">5. Transferts hors du Cameroun</h2>
         <p>
-            L'acheminement des messages WhatsApp implique un traitement par Meta sur des serveurs situés hors du Cameroun, et
-            certains prestataires techniques peuvent être établis à l'étranger. Ces transferts sont limités à ce qui est
+            L'acheminement des messages WhatsApp implique un traitement par Meta sur des serveurs situés hors du Cameroun ; le site
+            web et sa mesure d'audience sont fournis par Vercel (États-Unis), et certains prestataires techniques peuvent être établis à l'étranger. Ces transferts sont limités à ce qui est
             nécessaire au service et encadrés conformément à la {{ info.lawReference }} (pays assurant un niveau de protection
             suffisant, garanties contractuelles appropriées ou autorisation de {{ info.authorityName }} lorsqu'elle est requise).
         </p>
@@ -139,7 +142,7 @@
         <p>{{ info.serviceName }} est destiné aux professionnels et aux personnes majeures. Nous ne collectons pas sciemment de données concernant des mineurs.</p>
 
         <h2 id="cookies">11. Cookies</h2>
-        <p>Le site n'utilise que le stockage strictement nécessaire à son fonctionnement : voir la page <a routerLink="/legal/cookies">Cookies et stockage local</a>.</p>
+        <p>Le site n'utilise aucun cookie publicitaire : seul le stockage nécessaire à son fonctionnement et une mesure d'audience anonyme sans cookie, désactivable, sont utilisés. Voir la page <a routerLink="/legal/cookies">Cookies et stockage local</a>.</p>
 
         <h2 id="modifications">12. Modifications</h2>
         <p>

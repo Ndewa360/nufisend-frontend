@@ -21,8 +21,8 @@ const VALIDITY_MS = 365 * 86_400_000;
              class="fixed inset-x-0 bottom-0 z-[999] p-4 sm:p-6 print:hidden">
             <div class="mx-auto max-w-3xl rounded-2xl bg-card shadow-2xl border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
                 <p class="text-sm text-secondary flex-auto">
-                    NufiSend n'utilise ni cookie publicitaire ni mesure d'audience : seuls les éléments nécessaires à votre connexion
-                    et à vos préférences sont enregistrés dans votre navigateur.
+                    NufiSend n'utilise aucun cookie publicitaire : seuls les éléments nécessaires à votre connexion et à vos préférences
+                    sont enregistrés, et l'audience est mesurée de façon anonyme, sans cookie (désactivable).
                     <a class="text-primary underline" routerLink="/legal/cookies">En savoir plus</a>
                 </p>
                 <button mat-flat-button color="primary" type="button" (click)="dismiss()">J'ai compris</button>

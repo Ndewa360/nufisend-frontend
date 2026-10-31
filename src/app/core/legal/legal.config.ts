@@ -27,6 +27,9 @@ export const LEGAL_INFO = {
     hostName          : '',
     hostAddress       : '',
     hostCountry       : '',
+    /** Hebergeur du site web (interface) et de la mesure d'audience. */
+    frontendHostName   : 'Vercel Inc.',
+    frontendHostCountry: 'États-Unis',
     /** Prestataire d'envoi des emails transactionnels. */
     emailProvider     : '',
     /** Autorite de controle (loi n° 2024/017 du 23 decembre 2024). */
