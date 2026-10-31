@@ -1,0 +1,81 @@
+<article class="bg-card rounded-2xl shadow p-6 sm:p-10">
+    <h1 class="text-3xl font-extrabold tracking-tight">Exercer mes droits</h1>
+    <p class="mt-3 text-secondary max-w-3xl">
+        Conformément à la {{ info.lawReference }}, vous pouvez accéder à vos données, les faire rectifier ou effacer, vous opposer à
+        leur traitement ou en demander la limitation. Nous répondons dans un délai de {{ responseDelay }} jours.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+        <div class="rounded-2xl border p-5">
+            <div class="font-semibold">Vous avez un compte {{ info.serviceName }}</div>
+            <p class="text-sm text-secondary mt-1">
+                Téléchargez vos données, supprimez votre compte ou envoyez une demande depuis
+                <em>Paramètres &gt; Confidentialité &amp; données</em> : c'est immédiat et sécurisé.
+            </p>
+            <a class="mt-4" mat-flat-button color="primary" routerLink="/settings/privacy">Accéder à mon espace</a>
+        </div>
+        <div class="rounded-2xl border p-5">
+            <div class="font-semibold">Vous avez reçu un message envoyé via {{ info.serviceName }}</div>
+            <p class="text-sm text-secondary mt-1">
+                Répondez <strong>STOP</strong> aux messages d'un numéro WhatsApp Business pour ne plus en recevoir, ou utilisez le formulaire
+                ci-dessous : nous transmettons votre demande à l'expéditeur et pouvons suspendre les envois abusifs.
+            </p>
+        </div>
+    </div>
+
+    <form *ngIf="!submitted" class="mt-10 max-w-2xl" (ngSubmit)="submit()" #requestForm="ngForm">
+        <h2 class="text-xl font-semibold">Formulaire de demande</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Nom complet</mat-label>
+                <input matInput name="fullName" [(ngModel)]="form.fullName" required minlength="2" maxlength="120">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Email (pour la réponse)</mat-label>
+                <input matInput name="email" type="email" [(ngModel)]="form.email" required email>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Numéro concerné (facultatif)</mat-label>
+                <input matInput name="phone" [(ngModel)]="form.phone" maxlength="30" placeholder="+237 6XX XX XX XX">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Votre demande</mat-label>
+                <mat-select name="type" [(ngModel)]="form.type" required>
+                    <mat-option *ngFor="let type of types" [value]="type">{{ labels[type] }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <mat-form-field class="w-full mt-4" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Détails</mat-label>
+            <textarea matInput name="message" rows="5" [(ngModel)]="form.message" required minlength="5" maxlength="4000"
+                      placeholder="Ex. : je reçois des messages de l'entreprise X sur mon numéro, je souhaite ne plus en recevoir."></textarea>
+        </mat-form-field>
+        <!-- Champ piege anti-robot (invisible) -->
+        <input class="hidden" name="website" [(ngModel)]="form.website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="text-xs text-secondary mt-3">
+            Ces informations servent uniquement à traiter votre demande ; elles sont conservées {{ days('requestsDays') }} après son traitement.
+            Une pièce d'identité peut vous être demandée en cas de doute sur votre identité.
+        </p>
+        <div class="flex justify-end mt-4">
+            <button mat-flat-button color="primary" type="submit" [disabled]="sending || !requestForm.form.valid">
+                <mat-progress-spinner *ngIf="sending; else sendLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                <ng-template #sendLabel>Envoyer ma demande</ng-template>
+            </button>
+        </div>
+        <fuse-alert *ngIf="error" class="mt-4" type="error" appearance="border">{{ error }}</fuse-alert>
+    </form>
+
+    <fuse-alert *ngIf="submitted" class="mt-10 max-w-2xl" type="success" appearance="border">
+        <span fuseAlertTitle>Demande enregistrée</span>
+        Référence <strong>{{ submitted.reference }}</strong>. Un accusé de réception vous a été envoyé par email ; nous vous répondrons au plus
+        tard le {{ submitted.dueAt | date:'dd/MM/yyyy' }}.
+    </fuse-alert>
+
+    <div class="prose prose-sm max-w-none mt-10">
+        <h2>Autres moyens</h2>
+        <p>
+            Par email : <a [href]="'mailto:' + info.privacyEmail">{{ info.privacyEmail }}</a>. Par courrier : {{ info.editorName }},
+            {{ info.editorAddress }}. Si la réponse ne vous satisfait pas, vous pouvez saisir {{ info.authorityName }}.
+        </p>
+    </div>
+</article>

@@ -1,4 +1,5 @@
 import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
+import { CookieNoticeComponent } from 'app/shared/components/cookie-notice/cookie-notice.component';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { BrowserModule } from '@angular/platform-browser';
@@ -42,6 +43,7 @@ const routerConfig: ExtraOptions = {
         FuseLoadingModule,
 
         CoreModule,
+        CookieNoticeComponent,
 
         LayoutModule,
 

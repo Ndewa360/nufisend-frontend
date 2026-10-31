@@ -95,6 +95,25 @@
                         <mat-error *ngIf="signUpForm.get('confirmPassword').hasError('required')">La confirmation est obligatoire</mat-error>
                     </mat-form-field>
 
+                    <!-- Consentement -->
+                    <div class="mt-2">
+                        <mat-checkbox formControlName="acceptTerms" color="primary">
+                            <span class="text-sm leading-5">
+                                J'accepte les
+                                <a class="text-primary underline" routerLink="/legal/conditions-utilisation" target="_blank" (click)="$event.stopPropagation()">conditions générales d'utilisation</a>
+                                et la
+                                <a class="text-primary underline" routerLink="/legal/confidentialite" target="_blank" (click)="$event.stopPropagation()">politique de confidentialité</a>.
+                            </span>
+                        </mat-checkbox>
+                        <mat-error *ngIf="signUpForm.get('acceptTerms').touched && signUpForm.get('acceptTerms').invalid" class="text-sm ml-10">
+                            Vous devez accepter les conditions pour créer un compte.
+                        </mat-error>
+                        <p class="text-xs text-secondary mt-2">
+                            Vos données sont traitées par Ndewa360 pour gérer votre compte et fournir le service, conformément à la
+                            loi n° 2024/017 du 23 décembre 2024. Vous pouvez y accéder, les rectifier ou les supprimer à tout moment.
+                        </p>
+                    </div>
+
                     <!-- Bouton -->
                     <button
                         class="fuse-mat-button-large w-full mt-6"

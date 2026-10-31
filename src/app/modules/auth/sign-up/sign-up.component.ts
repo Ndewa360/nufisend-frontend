@@ -41,7 +41,9 @@ export class AuthSignUpComponent implements OnInit, OnDestroy
             lastName       : ['', Validators.required],
             email          : [this._route.snapshot.queryParamMap.get('email') || '', [Validators.required, Validators.email]],
             password       : ['', [Validators.required, Validators.minLength(8)]],
-            confirmPassword: ['', Validators.required]
+            confirmPassword: ['', Validators.required],
+            // Consentement aux CGU et a la politique de confidentialite (preuve conservee).
+            acceptTerms    : [false, Validators.requiredTrue]
         });
     }
 

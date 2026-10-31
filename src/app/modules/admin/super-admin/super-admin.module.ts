@@ -9,6 +9,7 @@ import { UserDetailsComponent } from './users/details/user-details.component';
 import { OrganizationsListComponent } from './organizations/organizations-list.component';
 import { OrganizationDetailsComponent } from './organizations/organization-details.component';
 import { XafPipe } from 'app/shared/pipes/xaf.pipe';
+import { PrivacyRequestsComponent } from './privacy/privacy-requests.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
@@ -35,6 +36,7 @@ const routes: Routes = [
       { path: 'users/:id', component: UserDetailsComponent },
       { path: 'organizations', component: OrganizationsListComponent },
       { path: 'organizations/:id', component: OrganizationDetailsComponent },
+      { path: 'privacy', component: PrivacyRequestsComponent },
       { path: 'finance', loadChildren: () => import('./finance/finance.module').then((m) => m.FinanceModule) },
     ]
   }
@@ -47,6 +49,7 @@ const routes: Routes = [
     UserDetailsComponent,
     OrganizationsListComponent,
     OrganizationDetailsComponent,
+    PrivacyRequestsComponent,
   ],
   imports: [
     CommonModule,

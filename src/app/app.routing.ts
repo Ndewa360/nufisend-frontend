@@ -35,6 +35,16 @@ export const appRoutes: Route[] = [
     },
 
     {
+        // Pages legales publiques (mentions, confidentialite, CGU, droits).
+        path: 'legal',
+        component: LayoutComponent,
+        data: {
+            layout: 'empty'
+        },
+        loadChildren: () => import('app/modules/legal/legal.module').then(m => m.LegalModule),
+    },
+
+    {
         // Lien d'invitation a une organisation (public : apercu, puis connexion).
         path: 'invitations/:token',
         component: LayoutComponent,

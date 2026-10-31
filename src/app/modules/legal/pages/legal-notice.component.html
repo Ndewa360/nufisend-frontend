@@ -1,0 +1,54 @@
+<article class="bg-card rounded-2xl shadow p-6 sm:p-10">
+    <h1 class="text-3xl font-extrabold tracking-tight">Mentions légales</h1>
+    <p class="mt-2 text-sm text-secondary">En vigueur au {{ info.effectiveDate }}</p>
+
+    <div class="prose prose-sm sm:prose max-w-none mt-8">
+        <h2>Éditeur du service</h2>
+        <p>
+            Le service <strong>{{ info.serviceName }}</strong>, accessible à l'adresse
+            <a [href]="info.websiteUrl">{{ info.websiteUrl }}</a>, est édité par <strong>{{ info.editorName }}</strong><ng-container *ngIf="info.editorLegalForm">, {{ info.editorLegalForm }}</ng-container>.
+        </p>
+        <ul>
+            <li>Adresse : {{ info.editorAddress }}</li>
+            <li *ngIf="info.editorRccm">Registre du commerce et du crédit mobilier (RCCM) : {{ info.editorRccm }}</li>
+            <li *ngIf="info.editorNiu">Numéro d'identifiant unique (NIU) : {{ info.editorNiu }}</li>
+            <li>Email : <a [href]="'mailto:' + info.editorEmail">{{ info.editorEmail }}</a></li>
+            <li *ngIf="info.editorPhone">Téléphone : {{ info.editorPhone }}</li>
+            <li *ngIf="info.publicationDirector">Directeur de la publication : {{ info.publicationDirector }}</li>
+        </ul>
+
+        <h2>Hébergement</h2>
+        <p *ngIf="info.hostName">
+            Le service est hébergé par <strong>{{ info.hostName }}</strong><ng-container *ngIf="info.hostAddress">, {{ info.hostAddress }}</ng-container><ng-container *ngIf="info.hostCountry"> ({{ info.hostCountry }})</ng-container>.
+        </p>
+        <p *ngIf="!info.hostName">
+            Les coordonnées de l'hébergeur sont communiquées sur simple demande à <a [href]="'mailto:' + info.editorEmail">{{ info.editorEmail }}</a>.
+        </p>
+
+        <h2>Protection des données personnelles</h2>
+        <p>
+            Les traitements de données personnelles réalisés par {{ info.serviceName }} respectent la {{ info.lawReference }}.
+            Ils sont décrits dans la <a routerLink="/legal/confidentialite">politique de confidentialité</a>.
+            Pour toute question ou pour exercer vos droits : <a [href]="'mailto:' + info.privacyEmail">{{ info.privacyEmail }}</a>
+            ou la page <a routerLink="/legal/exercer-mes-droits">Exercer mes droits</a>.
+        </p>
+
+        <h2>Propriété intellectuelle</h2>
+        <p>
+            La marque {{ info.serviceName }}, les logos, textes, interfaces et logiciels du service sont la propriété de {{ info.editorName }}
+            ou de ses partenaires. Toute reproduction ou réutilisation sans autorisation écrite est interdite.
+            WhatsApp est une marque de WhatsApp LLC (groupe Meta) ; {{ info.serviceName }} n'est ni affilié à WhatsApp ni approuvé par lui.
+        </p>
+
+        <h2>Signalement d'un contenu ou d'un abus</h2>
+        <p>
+            Pour signaler un usage abusif du service (messages non sollicités, contenu illicite), écrivez à
+            <a [href]="'mailto:' + info.editorEmail">{{ info.editorEmail }}</a> en précisant le numéro expéditeur et la date du message.
+            Un destinataire qui ne souhaite plus recevoir de messages peut également nous écrire via la page
+            <a routerLink="/legal/exercer-mes-droits">Exercer mes droits</a>.
+        </p>
+
+        <h2>Droit applicable</h2>
+        <p>Les présentes mentions sont régies par le droit camerounais.</p>
+    </div>
+</article>

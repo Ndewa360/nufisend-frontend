@@ -1,0 +1,31 @@
+<article class="bg-card rounded-2xl shadow p-6 sm:p-10">
+    <h1 class="text-3xl font-extrabold tracking-tight">Cookies et stockage local</h1>
+    <p class="mt-2 text-sm text-secondary">En vigueur au {{ info.effectiveDate }}</p>
+
+    <div class="prose prose-sm sm:prose max-w-none mt-8">
+        <p>
+            {{ info.serviceName }} n'utilise <strong>aucun cookie publicitaire ni outil de mesure d'audience</strong>. Le site enregistre
+            uniquement dans votre navigateur les éléments strictement nécessaires à son fonctionnement, qui ne requièrent pas votre consentement.
+        </p>
+        <div class="overflow-x-auto">
+            <table>
+                <thead><tr><th>Élément</th><th>Finalité</th><th>Durée</th></tr></thead>
+                <tbody>
+                    <tr><td>Jeton de connexion (<code>accessToken</code>, stockage local)</td><td>Vous garder connecté de façon sécurisée</td><td>Jusqu'à la déconnexion ou l'expiration de la session</td></tr>
+                    <tr><td>Préférences de l'espace (<code>nufisend.workspace.preferences</code> : fuseau horaire, pays par défaut)</td><td>Mémoriser vos réglages</td><td>Jusqu'à leur suppression</td></tr>
+                    <tr><td>Information sur les cookies (<code>nufisend-cookie-notice</code>)</td><td>Ne plus afficher le bandeau d'information</td><td>12 mois</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <h2>Services tiers</h2>
+        <p>
+            Lorsqu'un administrateur d'organisation raccorde son numéro WhatsApp Business avec la connexion Meta intégrée, le kit de
+            développement de Facebook (Meta) est chargé pour cette seule opération ; Meta peut alors déposer ses propres cookies, régis par sa
+            politique de confidentialité.
+        </p>
+        <h2>Gérer le stockage</h2>
+        <p>
+            Vous pouvez supprimer à tout moment les données enregistrées par le site depuis les réglages de votre navigateur ; vous serez alors déconnecté.
+        </p>
+    </div>
+</article>

@@ -135,6 +135,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/settings',
             },
             {
+                id   : 'privacy_settings',
+                title: 'Confidentialité & données',
+                type : 'basic',
+                icon : 'heroicons_outline:shield-check',
+                link : '/settings/privacy',
+            },
+            {
                 id   : 'api_keys',
                 title: 'API & Intégration',
                 type : 'basic',

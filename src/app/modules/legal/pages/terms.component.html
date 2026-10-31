@@ -1,0 +1,92 @@
+<article class="bg-card rounded-2xl shadow p-6 sm:p-10">
+    <h1 class="text-3xl font-extrabold tracking-tight">Conditions générales d'utilisation</h1>
+    <p class="mt-2 text-sm text-secondary">Version {{ version('terms') }} · en vigueur au {{ info.effectiveDate }}</p>
+
+    <div class="prose prose-sm sm:prose max-w-none mt-8">
+        <h2>1. Objet</h2>
+        <p>
+            Les présentes conditions régissent l'utilisation de {{ info.serviceName }}, service édité par {{ info.editorName }}
+            permettant de gérer un annuaire de contacts et d'envoyer, immédiatement ou de façon programmée, des messages WhatsApp
+            depuis le compte WhatsApp de l'utilisateur ou, pour les organisations, depuis un numéro WhatsApp Business.
+            La création d'un compte vaut acceptation des présentes conditions et de la
+            <a routerLink="/legal/confidentialite">politique de confidentialité</a>.
+        </p>
+
+        <h2>2. Compte</h2>
+        <ul>
+            <li>Le service est réservé aux personnes majeures et aux professionnels. Les informations fournies doivent être exactes.</li>
+            <li>L'utilisateur confirme son adresse email et garde ses identifiants et clés API confidentiels ; il est responsable des actions réalisées depuis son compte.</li>
+            <li>Toute utilisation non autorisée doit nous être signalée sans délai à <a [href]="'mailto:' + info.editorEmail">{{ info.editorEmail }}</a>.</li>
+        </ul>
+
+        <h2>3. Description du service</h2>
+        <ul>
+            <li><strong>Compte personnel</strong> : l'utilisateur relie son propre compte WhatsApp en scannant un QR code ; les messages partent de son numéro. {{ info.serviceName }} n'est ni affilié à WhatsApp ni approuvé par lui ; l'utilisateur reste soumis aux conditions de WhatsApp.</li>
+            <li><strong>Organisation</strong> : les membres partagent un annuaire, une boîte de réception et un portefeuille, et envoient depuis le numéro WhatsApp Business de l'organisation (API officielle de Meta). Les messages programmés, ou adressés à un contact n'ayant pas écrit dans les dernières 24 heures, utilisent un modèle approuvé par Meta.</li>
+            <li><strong>API</strong> : les envois peuvent être déclenchés par l'API publique au moyen d'une clé API, dans le respect des quotas indiqués dans la documentation.</li>
+        </ul>
+
+        <h2>4. Règles d'utilisation</h2>
+        <p>L'utilisateur s'engage à :</p>
+        <ul>
+            <li>n'écrire qu'à des personnes qui ont accepté de recevoir ses messages ou avec lesquelles il entretient une relation justifiant le contact, et à les en informer ;</li>
+            <li>respecter immédiatement toute demande de désinscription (réponse STOP, demande directe ou transmise par {{ info.serviceName }}) ;</li>
+            <li>disposer d'une base légale pour les données de contacts qu'il importe, conformément à la {{ info.lawReference }} ;</li>
+            <li>ne pas envoyer de contenus illicites, frauduleux, trompeurs, haineux, violents, portant atteinte aux droits d'autrui, ni de logiciels malveillants ;</li>
+            <li>ne pas contourner les limites techniques du service ni porter atteinte à sa sécurité.</li>
+        </ul>
+        <p>
+            L'utilisateur est seul responsable du contenu de ses messages et de l'usage de son annuaire. Un usage abusif peut entraîner le
+            blocage du numéro WhatsApp par Meta : {{ info.serviceName }} applique une cadence d'envoi destinée à limiter ce risque, sans pouvoir l'exclure.
+        </p>
+
+        <h2>5. Tarifs, portefeuille et paiement</h2>
+        <ul>
+            <li>Le service fonctionne avec un <strong>portefeuille prépayé</strong> en francs CFA, rechargé par Mobile Money (MTN, Orange). Les tarifs en vigueur sont affichés dans l'application avant chaque envoi.</li>
+            <li><strong>Seuls les messages livrés sont facturés.</strong> Le coût estimé d'un envoi est réservé avant son départ ; la part correspondant aux messages non livrés est rendue au portefeuille. Pour une programmation récurrente, la réserve est constituée semaine par semaine.</li>
+            <li>Un quota de messages gratuits mensuel peut être offert aux comptes personnels.</li>
+            <li>Les organisations règlent un <strong>abonnement mensuel</strong> prélevé sur leur portefeuille ; à défaut de paiement, une période de grâce de 7 jours précède la suspension des envois. Les messages envoyés par le numéro WhatsApp Business sont facturés selon leur catégorie (marketing, utilitaire, authentification, service).</li>
+            <li>Le solde du portefeuille ne produit pas d'intérêts et est destiné à l'utilisation du service. Toute demande de remboursement est à adresser à <a [href]="'mailto:' + info.editorEmail">{{ info.editorEmail }}</a>.</li>
+            <li>Un membre d'une organisation peut transférer son solde personnel vers le portefeuille de l'organisation ; ce transfert est définitif.</li>
+        </ul>
+
+        <h2>6. Disponibilité</h2>
+        <p>
+            {{ info.editorName }} met en œuvre les moyens raisonnables pour assurer l'accès au service. Celui-ci peut être interrompu pour
+            maintenance ou en raison de services tiers (WhatsApp, Meta, opérateurs de paiement, réseau). Un envoi programmé qui ne peut être
+            réalisé n'est pas facturé.
+        </p>
+
+        <h2>7. Responsabilité</h2>
+        <p>
+            {{ info.editorName }} n'est pas responsable des contenus envoyés par les utilisateurs, des décisions de WhatsApp ou de Meta
+            (blocage de numéro, refus de modèle), ni des dommages indirects. Dans les limites autorisées par la loi, sa responsabilité est
+            limitée aux sommes payées par l'utilisateur au cours des trois derniers mois.
+        </p>
+
+        <h2>8. Données personnelles</h2>
+        <p>
+            Le traitement des données des utilisateurs est décrit dans la <a routerLink="/legal/confidentialite">politique de confidentialité</a>.
+            Pour les données des contacts de l'utilisateur, {{ info.serviceName }} agit en sous-traitant selon l'
+            <a routerLink="/legal/sous-traitance">accord de sous-traitance</a>, qui fait partie intégrante des présentes conditions.
+        </p>
+
+        <h2>9. Suspension et résiliation</h2>
+        <ul>
+            <li>L'utilisateur peut supprimer son compte à tout moment depuis <em>Paramètres &gt; Confidentialité &amp; données</em>.</li>
+            <li>{{ info.editorName }} peut suspendre ou fermer un compte en cas de manquement grave aux présentes conditions (envois abusifs, fraude, contenus illicites), après information de l'utilisateur sauf urgence.</li>
+        </ul>
+
+        <h2>10. Propriété intellectuelle</h2>
+        <p>Le service et ses éléments restent la propriété de {{ info.editorName }}. L'utilisateur conserve la propriété de ses contenus et accorde à {{ info.editorName }} le droit de les traiter dans la seule mesure nécessaire à la fourniture du service.</p>
+
+        <h2>11. Modifications</h2>
+        <p>Les présentes conditions peuvent évoluer. Toute modification importante est notifiée et doit être acceptée lors de la connexion suivante ; à défaut, l'utilisateur peut supprimer son compte.</p>
+
+        <h2>12. Droit applicable et litiges</h2>
+        <p>
+            Les présentes conditions sont soumises au droit camerounais. En cas de litige, les parties recherchent d'abord une solution amiable ;
+            à défaut, le litige est porté devant {{ info.jurisdiction }}.
+        </p>
+    </div>
+</article>

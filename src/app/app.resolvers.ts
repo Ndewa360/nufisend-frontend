@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Resolve } from '@angular/router';
+import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
+import { LegalConsentService } from 'app/core/legal/legal-consent';
 import { Observable, map, of, switchMap } from 'rxjs';
 import { AuthService } from 'app/core/auth/auth.service';
 import { NavigationService } from 'app/core/navigation/navigation.service';
@@ -14,14 +15,17 @@ export class InitialDataResolver implements Resolve<Navigation>
     constructor(
         private _navigationService: NavigationService,
         private _organizationService: OrganizationService,
-        private _authService: AuthService
+        private _authService: AuthService,
+        private _legalConsent: LegalConsentService
     )
     {
     }
 
     /** Menu adapte au profil : l'adhesion a une organisation est chargee une fois par session. */
-    resolve(): Observable<Navigation>
+    resolve(_route?: ActivatedRouteSnapshot, state?: RouterStateSnapshot): Observable<Navigation>
     {
+        // Nouvelle version des CGU / de la politique : acceptation demandee.
+        this._legalConsent.check(state?.url || '');
         const membership = this._organizationService.membership;
         const membership$ = membership === undefined
             ? this._organizationService.load()

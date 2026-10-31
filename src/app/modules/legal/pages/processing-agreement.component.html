@@ -1,0 +1,58 @@
+<article class="bg-card rounded-2xl shadow p-6 sm:p-10">
+    <h1 class="text-3xl font-extrabold tracking-tight">Accord de sous-traitance des données</h1>
+    <p class="mt-2 text-sm text-secondary">Annexe aux conditions générales d'utilisation · version {{ version('terms') }}</p>
+
+    <div class="prose prose-sm sm:prose max-w-none mt-8">
+        <p>
+            Cet accord encadre le traitement, par {{ info.editorName }} (le <strong>sous-traitant</strong>), des données personnelles que le
+            client (le <strong>responsable du traitement</strong> : utilisateur ou organisation) confie à {{ info.serviceName }}, conformément à la
+            {{ info.lawReference }}. Il s'applique automatiquement à tout client du service.
+        </p>
+
+        <h2>1. Objet et données concernées</h2>
+        <ul>
+            <li><strong>Finalité</strong> : stocker l'annuaire du client et envoyer en son nom les messages WhatsApp qu'il programme ou déclenche ; recevoir et présenter les réponses de ses clients (organisations).</li>
+            <li><strong>Personnes concernées</strong> : contacts et destinataires du client, personnes écrivant au numéro WhatsApp Business de l'organisation.</li>
+            <li><strong>Données</strong> : noms, numéros de téléphone, emails et informations saisies par le client ; contenus des messages ; statuts de livraison.</li>
+            <li><strong>Durée</strong> : celle de l'utilisation du service, puis effacement selon les durées indiquées dans la politique de confidentialité.</li>
+        </ul>
+
+        <h2>2. Engagements du sous-traitant</h2>
+        <ul>
+            <li>Traiter les données uniquement sur instruction documentée du client (ses envois, ses programmations, ses paramètres) et pour la seule fourniture du service ;</li>
+            <li>garantir la confidentialité : accès réservé aux personnes habilitées, soumises à une obligation de confidentialité ;</li>
+            <li>mettre en œuvre des mesures de sécurité appropriées : chiffrement des connexions et des jetons d'accès, cloisonnement des données entre clients, contrôle des accès, journalisation ;</li>
+            <li>ne recourir à d'autres sous-traitants qu'aux conditions de l'article 3 ;</li>
+            <li>aider le client à répondre aux demandes des personnes concernées (accès, rectification, effacement, opposition) et lui transmettre sans délai celles qui lui parviennent directement ;</li>
+            <li>notifier au client toute violation de données le concernant dans les meilleurs délais après en avoir eu connaissance, avec les informations utiles à ses propres obligations ;</li>
+            <li>au terme du service, supprimer les données du client (suppression du compte ou dissolution de l'organisation), sous réserve des obligations légales de conservation ;</li>
+            <li>mettre à disposition du client les informations nécessaires pour démontrer le respect de ces obligations.</li>
+        </ul>
+
+        <h2>3. Sous-traitants ultérieurs</h2>
+        <p>Le client autorise le recours aux prestataires suivants, strictement nécessaires au service :</p>
+        <ul>
+            <li>hébergeur des serveurs et de la base de données<ng-container *ngIf="info.hostName"> ({{ info.hostName }})</ng-container> ;</li>
+            <li>WhatsApp / Meta Platforms, pour l'acheminement des messages ;</li>
+            <li>prestataire d'envoi d'emails transactionnels<ng-container *ngIf="info.emailProvider"> ({{ info.emailProvider }})</ng-container>.</li>
+        </ul>
+        <p>Tout changement de ces prestataires est annoncé par la mise à jour du présent accord ; le client peut s'y opposer en mettant fin au service.</p>
+
+        <h2>4. Engagements du client</h2>
+        <ul>
+            <li>Disposer d'une base légale pour chaque contact (consentement, relation client existante…) et informer ses contacts de l'utilisation de leurs données ;</li>
+            <li>respecter sans délai les demandes d'opposition et de désinscription (y compris la réponse STOP, mémorisée automatiquement pour les numéros WhatsApp Business) ;</li>
+            <li>ne pas importer de données sensibles ni de données de mineurs sans base légale adaptée ;</li>
+            <li>désigner, pour une organisation, les personnes habilitées (propriétaire, administrateurs, membres) et révoquer les accès des personnes qui la quittent.</li>
+        </ul>
+
+        <h2>5. Transferts</h2>
+        <p>
+            L'acheminement des messages par WhatsApp implique un traitement par Meta hors du Cameroun. Le client en est informé et l'accepte ;
+            {{ info.editorName }} limite ces transferts au strict nécessaire et les encadre conformément à la loi.
+        </p>
+
+        <h2>6. Contact</h2>
+        <p>Pour toute question relative à cet accord : <a [href]="'mailto:' + info.privacyEmail">{{ info.privacyEmail }}</a>.</p>
+    </div>
+</article>

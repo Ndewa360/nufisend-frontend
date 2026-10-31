@@ -22,6 +22,10 @@ import { environment } from 'environments/environment';
                 <mat-icon [svgIcon]="'heroicons_outline:currency-dollar'"></mat-icon>
                 <span class="ml-2">Finance</span>
               </button>
+              <button mat-flat-button [color]="'accent'" [routerLink]="['/super-admin/privacy']">
+                <mat-icon [svgIcon]="'heroicons_outline:shield-check'"></mat-icon>
+                <span class="ml-2">Données personnelles</span>
+              </button>
               <button mat-flat-button [color]="'accent'" [routerLink]="['/super-admin/organizations']">
                 <mat-icon [svgIcon]="'heroicons_outline:office-building'"></mat-icon>
                 <span class="ml-2">Organisations</span>

@@ -1,0 +1,129 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="p-6 sm:p-8">
+        <div>
+            <div class="text-3xl font-bold tracking-tight">Confidentialité &amp; données</div>
+            <div class="mt-1 text-secondary max-w-3xl">
+                Vos droits sur vos données personnelles ({{ info.lawReference }}).
+                <a class="text-primary underline" routerLink="/legal/confidentialite" target="_blank">Politique de confidentialité</a>
+            </div>
+        </div>
+
+        <div *ngIf="loading && !overview" class="flex justify-center py-12">
+            <mat-progress-spinner [diameter]="36" mode="indeterminate"></mat-progress-spinner>
+        </div>
+
+        <ng-container *ngIf="overview as o">
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
+                <!-- Export -->
+                <div class="bg-card rounded-2xl shadow p-6 flex flex-col">
+                    <div class="text-lg font-semibold">Télécharger mes données</div>
+                    <p class="text-sm text-secondary mt-1 flex-auto">
+                        Droits d'accès et de portabilité : un fichier JSON avec votre profil, votre annuaire, vos messages, programmations,
+                        paiements, mouvements du portefeuille et consentements. Aucun mot de passe ni clé n'y figure.
+                    </p>
+                    <div class="mt-4">
+                        <button mat-flat-button color="primary" type="button" [disabled]="exporting" (click)="exportData()">
+                            <mat-progress-spinner *ngIf="exporting; else exportLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                            <ng-template #exportLabel>
+                                <mat-icon svgIcon="heroicons_outline:download"></mat-icon><span class="ml-2">Télécharger (JSON)</span>
+                            </ng-template>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Consentements -->
+                <div class="bg-card rounded-2xl shadow p-6">
+                    <div class="text-lg font-semibold">Mes consentements</div>
+                    <div class="mt-3 text-sm">
+                        <div *ngFor="let d of o.documents" class="flex items-center justify-between py-2 border-b last:border-b-0">
+                            <a class="text-primary underline" [routerLink]="documentPaths[d.document]" target="_blank">{{ d.title }}</a>
+                            <span *ngIf="!o.pending.includes(d.document)" class="text-green-700">Version {{ d.version }} acceptée</span>
+                            <span *ngIf="o.pending.includes(d.document)" class="text-amber-600">Nouvelle version à accepter</span>
+                        </div>
+                    </div>
+                    <div *ngIf="o.consents.length" class="mt-4 text-xs text-secondary">
+                        Historique :
+                        <div *ngFor="let c of o.consents">{{ titleOf(c.document) }} v{{ c.version }} — {{ c.acceptedAt | date:'dd/MM/yyyy HH:mm' }}</div>
+                    </div>
+                    <p class="text-xs text-secondary mt-3">
+                        Retirer votre consentement aux CGU revient à cesser d'utiliser le service : supprimez alors votre compte ci-dessous.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Demande -->
+            <div class="bg-card rounded-2xl shadow p-6 mt-6">
+                <div class="text-lg font-semibold">Faire une demande</div>
+                <p class="text-sm text-secondary mt-1">
+                    Rectification (les informations du profil sont aussi modifiables dans <a class="underline" routerLink="/settings">Paramètres généraux</a>),
+                    opposition, limitation, retrait du consentement ou toute question. Réponse sous 30 jours.
+                </p>
+                <div class="flex flex-col md:flex-row gap-4 mt-4">
+                    <mat-form-field class="md:w-80" appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Type de demande</mat-label>
+                        <mat-select [(ngModel)]="requestType">
+                            <mat-option *ngFor="let type of requestTypes" [value]="type">{{ requestLabels[type] }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="flex-auto" appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Détails</mat-label>
+                        <textarea matInput rows="2" [(ngModel)]="requestMessage" maxlength="4000"></textarea>
+                    </mat-form-field>
+                </div>
+                <div class="flex justify-end mt-3">
+                    <button mat-stroked-button color="primary" type="button" [disabled]="sendingRequest || requestMessage.trim().length < 5" (click)="sendRequest()">
+                        Envoyer la demande
+                    </button>
+                </div>
+
+                <div *ngIf="o.requests.length" class="mt-6">
+                    <div class="font-medium text-sm">Mes demandes</div>
+                    <div *ngFor="let r of o.requests" class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-2 border-b last:border-b-0 text-sm">
+                        <span class="font-mono text-xs">{{ r.reference }}</span>
+                        <span class="flex-auto">{{ requestLabels[r.type] }}<span *ngIf="r.response" class="text-secondary"> — {{ r.response }}</span></span>
+                        <span class="text-secondary">{{ r.createdAt | date:'dd/MM/yyyy' }}</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{{ statusLabels[r.status] }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suppression -->
+            <div class="bg-card rounded-2xl shadow p-6 mt-6 border border-red-200 dark:border-red-900">
+                <div class="text-lg font-semibold text-red-600">Supprimer mon compte</div>
+                <p class="text-sm text-secondary mt-1">
+                    Droit à l'effacement : votre compte et vos données personnelles sont supprimés définitivement. Les écritures comptables
+                    (paiements, mouvements du portefeuille) sont conservées sans donnée permettant de vous identifier, pour nos obligations légales.
+                </p>
+                <ul class="text-sm mt-3 list-disc pl-6 space-y-1">
+                    <li *ngIf="o.deletion.contacts">{{ o.deletion.contacts }} contact(s) supprimé(s)</li>
+                    <li *ngIf="o.deletion.activeCampaigns">{{ o.deletion.activeCampaigns }} programmation(s) en cours arrêtée(s)</li>
+                    <li *ngIf="o.deletion.balance > 0" class="text-amber-700">
+                        Votre solde de {{ o.deletion.balance | xaf }} sera perdu : utilisez-le ou demandez son remboursement avant de supprimer votre compte.
+                    </li>
+                    <li *ngIf="o.deletion.organizationRole === 'owner' && !o.deletion.ownerWithMembers">Votre organisation sera dissoute (annuaire, boîte de réception et modèles supprimés).</li>
+                    <li *ngIf="o.deletion.organizationRole && o.deletion.organizationRole !== 'owner'">Vous quitterez votre organisation.</li>
+                </ul>
+                <fuse-alert *ngIf="o.deletion.ownerWithMembers" class="mt-4" type="warning" appearance="border">
+                    Vous êtes propriétaire d'une organisation qui a d'autres membres : transférez d'abord la propriété
+                    (<a class="underline" routerLink="/organisation/members">Membres</a>).
+                </fuse-alert>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Mot de passe</mat-label>
+                        <input matInput type="password" autocomplete="current-password" [(ngModel)]="deletePassword">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Saisissez SUPPRIMER pour confirmer</mat-label>
+                        <input matInput [(ngModel)]="deleteConfirmation" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button mat-flat-button color="warn" type="button" [disabled]="deleting || !canDelete" (click)="deleteAccount()">
+                        <mat-progress-spinner *ngIf="deleting; else deleteLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                        <ng-template #deleteLabel>Supprimer définitivement</ng-template>
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>
