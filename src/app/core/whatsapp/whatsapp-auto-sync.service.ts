@@ -3,7 +3,7 @@ import { Store } from '@ngxs/store';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { AuthService } from 'app/core/auth/auth.service';
-import { UserProfileState } from 'app/shared/store/user-profile';
+import { UserProfileAction, UserProfileState } from 'app/shared/store/user-profile';
 import { GlobalAction } from 'app/shared/store/global';
 import { SyncQrcodeService } from 'app/shared/services/whatsapp/sync-qrcode.service';
 import { WebsocketManagerService } from 'app/shared/services/websocket-manager/websocket-manager.service';
@@ -64,6 +64,21 @@ export class WhatsAppAutoSyncService implements OnDestroy {
       (this._socket.ioSocket as any)?.on('sync-connected', () => {
         this._store.dispatch(new GlobalAction.SetWhatsAppSyncStatus('syncing', 0, 'WhatsApp connecté, chargement des contacts...'));
         this.showSyncProgress('Chargement des contacts WhatsApp', 0);
+      });
+
+      // Appareil delie depuis le telephone (ou session perdue) : un nouveau
+      // scan du QR code est necessaire, les envois sont suspendus d'ici la.
+      (this._socket.ioSocket as any)?.on('session-expired', () => {
+        this._hasAutoStarted = false;
+        this.clearSyncProgress();
+        this._store.dispatch(new UserProfileAction.UpdateUserWhatsappSyncProfile(false));
+        this._store.dispatch(new GlobalAction.SetWhatsAppSyncStatus('not_synced', 0, 'WhatsApp déconnecté depuis le téléphone'));
+        this._toastr.warning(
+          'Votre WhatsApp a été déconnecté depuis le téléphone. Scannez à nouveau le QR code pour reprendre vos envois.',
+          'Reconnexion WhatsApp requise',
+          { timeOut: 0, extendedTimeOut: 0, closeButton: true }
+        );
+        this.showNotSyncedBlocking();
       });
 
       (this._socket.ioSocket as any)?.on('disconnected', () => {
