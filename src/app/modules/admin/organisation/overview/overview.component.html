@@ -92,6 +92,8 @@
                 </button>
             </div>
 
+            <app-personal-data-transfer class="block mt-6"></app-personal-data-transfer>
+
             <fuse-alert *ngIf="membership.organization.status === 'suspended'" class="mt-6" type="error" appearance="border">
                 <span fuseAlertTitle>Organisation suspendue</span>
                 {{ membership.organization.suspensionReason || 'Les envois sont désactivés. Contactez le support NufiSend.' }}

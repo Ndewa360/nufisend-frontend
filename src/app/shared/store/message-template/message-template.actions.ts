@@ -19,6 +19,8 @@ export namespace MessageTemplateAction
     export class FetchAllMessageTemplate
     {
         static readonly type = '[MessageTemplate] Fectch All MessageTemplate'
+        /** force : recharger meme si les modeles sont deja en memoire. */
+        constructor(public force:boolean = false){}
     }
 
     //Delete contact

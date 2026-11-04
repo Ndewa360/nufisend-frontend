@@ -1,3 +1,4 @@
+import { PersonalDataTransferComponent } from 'app/shared/components/personal-data-transfer/personal-data-transfer.component';
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { SharedModule } from "app/shared/shared.module";
@@ -19,6 +20,7 @@ import { OrganisationWhatsappComponent } from "./whatsapp/whatsapp-business.comp
         CommonModule,
         SharedModule,
         XafPipe,
+        PersonalDataTransferComponent,
         OrganisationRoutingModule
     ]
 })

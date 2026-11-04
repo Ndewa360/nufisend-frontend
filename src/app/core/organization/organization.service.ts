@@ -63,6 +63,19 @@ export class OrganizationService
         return !!this._membership.value;
     }
 
+    /** Contacts, groupes et modeles crees avant l'adhesion (non transferes). */
+    personalDataSummary(): Observable<{ contacts: number; groups: number; templates: number }>
+    {
+        return this._http.get<ApiResponse<{ contacts: number; groups: number; templates: number }>>(`${this._baseUrl}/me/personal-data`)
+            .pipe(data());
+    }
+
+    /** Transfere les donnees personnelles vers l'annuaire de l'organisation. */
+    transferPersonalData(): Observable<{ contactsMoved: number; contactsMerged: number; groupsMoved: number; groupsMerged: number; templatesMoved: number }>
+    {
+        return this._http.post<ApiResponse<any>>(`${this._baseUrl}/me/personal-data/transfer`, {}).pipe(data());
+    }
+
     load(): Observable<Membership | null>
     {
         return this._http.get<ApiResponse<Membership | null>>(`${this._baseUrl}/me`).pipe(

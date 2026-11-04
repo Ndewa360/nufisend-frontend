@@ -1,3 +1,4 @@
+import { PersonalDataTransferComponent } from 'app/shared/components/personal-data-transfer/personal-data-transfer.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -27,6 +28,7 @@ import { PrevisualizeDataFileComponent } from './components/previsualize-data-fi
   ],
   imports: [
     CommonModule,
+    PersonalDataTransferComponent,
     ContactRoutingModule,
     MessagerieModule,
     MatStepperModule,

@@ -19,6 +19,8 @@ export namespace ContactAction
     export class FetchAllContact
     {
         static readonly type = '[Contact] Fectch All Contact'
+        /** force : recharger meme si les contacts sont deja en memoire. */
+        constructor(public force:boolean = false){}
     }
 
     //Delete contact

@@ -141,10 +141,10 @@ export class MessageTemplateState{
     }
 
     @Action(MessageTemplateAction.FetchAllMessageTemplate)
-    fetchAllTemplates(ctx:StateContext<MessageTemplateStateModel>)
+    fetchAllTemplates(ctx:StateContext<MessageTemplateStateModel>, {force}:MessageTemplateAction.FetchAllMessageTemplate)
     {
         const state = ctx.getState();
-        if(state.messageTemplates.length>0) {
+        if(state.messageTemplates.length>0 && !force) {
             if(state.initLoadingState !== "LOADED") ctx.patchState({initLoadingState:"LOADED"});
             return of(true);
         }
