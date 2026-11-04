@@ -19,6 +19,8 @@ export namespace GroupAction
     export class FetchAllGroup
     {
         static readonly type = '[Group] Fectch All Group'
+        /** force : recharger meme si les groupes sont deja en memoire. */
+        constructor(public force:boolean = false){}
     }
 
     //Delete group

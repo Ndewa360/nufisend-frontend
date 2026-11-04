@@ -16,4 +16,7 @@ export interface GroupModel
     
     profilePicture:string;
 
+    /** Groupe par defaut : contient automatiquement tous les contacts. */
+    isDefault?:boolean;
+
 }

@@ -151,10 +151,10 @@ export class GroupState{
     }
 
     @Action(GroupAction.FetchAllGroup)
-    fetchAllContats(ctx:StateContext<GroupStateModel>)
+    fetchAllContats(ctx:StateContext<GroupStateModel>, {force}:GroupAction.FetchAllGroup)
     {
         const state = ctx.getState();
-        if(state.groups.length>0) {
+        if(state.groups.length>0 && !force) {
             if(state.initLoadingState !== "LOADED") ctx.patchState({initLoadingState:"LOADED"});
             return of(true);
         }

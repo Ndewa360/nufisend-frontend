@@ -49,6 +49,7 @@
                             </button>
 
                             <button
+                                *ngIf="!groupModel.isDefault"
                                 mat-stroked-button
                                 (click)="deleteGroup()" 
                                 [color]="'warn'"
@@ -64,6 +65,10 @@
                     
 
                     <div class="flex flex-col mt-4 pt-6 border-t space-y-8">
+                        <div *ngIf="groupModel.isDefault" class="rounded-lg bg-primary-50 text-primary-800 dark:bg-hover dark:text-on-primary px-4 py-3 text-sm">
+                            Groupe par défaut : il contient automatiquement tous vos contacts, y compris ceux que vous ajoutez ou importez.
+                            Sélectionnez-le pour envoyer une campagne à tout votre annuaire.
+                        </div>
                         <!-- Description -->
                         <ng-container *ngIf="groupModel?.description">
                             <div class="flex sm:items-center">
@@ -158,7 +163,10 @@
                         <div
                             class="w-full"
                             [subscriptSizing]="'dynamic'">
-                            <app-select-contact [isNewGroup]="false" [selectedGroup]="groupModel" [editMode]="editMode" (contactsSelected)="selectedContactEvent($event)"></app-select-contact>
+                            <app-select-contact *ngIf="!groupModel.isDefault; else defaultMembers" [isNewGroup]="false" [selectedGroup]="groupModel" [editMode]="editMode" (contactsSelected)="selectedContactEvent($event)"></app-select-contact>
+                            <ng-template #defaultMembers>
+                                <p class="text-sm text-secondary">Les membres de ce groupe sont gérés automatiquement : tous vos contacts en font partie.</p>
+                            </ng-template>
                         </div>
                     </div>
             
@@ -167,6 +175,7 @@
                     <div class="flex items-center mt-10 -mx-6 sm:-mx-8 py-4 pr-4 pl-1 sm:pr-12 sm:pl-7 border-t bg-gray-50 dark:bg-transparent">
                         <!-- Delete -->
                         <button
+                            *ngIf="!groupModel.isDefault"
                             mat-button
                             [color]="'warn'"
                             [matTooltip]="'Supprimer'"

@@ -47,6 +47,7 @@
                     </div>
                     <!-- Title -->
                     <div class="mt-5 text-lg font-medium leading-5">{{group.name}}</div>
+                    <span *ngIf="group.isDefault" class="mt-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-50 text-primary-700 dark:bg-primary dark:text-on-primary">Par défaut</span>
                     <!-- Description -->
                     <div class="mt-0.5 line-clamp-2 text-secondary">{{group.description}}</div>
                     <!-- Members -->

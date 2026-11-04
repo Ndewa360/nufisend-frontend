@@ -39,8 +39,9 @@ export class SelectGroupComponent {
   ngOnInit(): void {
     // Get the groups
     this.groups$.subscribe((groups)=>{
-      this.groupsFiltered= [...groups];
-      this.groups = [...groups ]
+      // Le groupe par defaut est attribue automatiquement : non selectionnable.
+      this.groups = groups.filter((group)=>!group.isDefault);
+      this.groupsFiltered= [...this.groups];
       this._changeDetectorRef.markForCheck();
     })
 
@@ -75,8 +76,8 @@ export class SelectGroupComponent {
     {
       this.groupLoading$.subscribe((loading)=>{
         if(!loading) this._store.select(GroupState.selectStateByGroupsId(this.selectedContact?.groups || [])).subscribe((values)=>{
-          this.selectedGroupList=[...values];
-          values.forEach((value)=>this.selectectGroups.set(value._id,true))
+          this.selectedGroupList=values.filter((group)=>!group.isDefault);
+          this.selectedGroupList.forEach((value)=>this.selectectGroups.set(value._id,true))
           this.emitData();
           this._changeDetectorRef.markForCheck();
         })

@@ -2,6 +2,7 @@ import { Action, Selector, State, StateContext, createSelector } from "@ngxs/sto
 import { ContactModel } from "./contact.model";
 import { Injectable } from "@angular/core";
 import { ContactAction } from "./contact.actions";
+import { GroupAction } from "../group/group.actions";
 import { ContactService } from "./contact.service";
 import { ToastrService } from "ngx-toastr";
 import { catchError, of, tap, throwError } from "rxjs";
@@ -78,6 +79,7 @@ export class ContactState{
                         contacts:[...state.contacts,result.data]
                     })
                     this._toastrService.success("Contact ajouté avec success", 'Contact');
+                    ctx.dispatch(new GroupAction.FetchAllGroup(true));
                 }
             ),
             catchError((error) => {
@@ -142,6 +144,7 @@ export class ContactState{
                         loadingContacts:false,
                         contacts:[...contacts]
                     })
+                    ctx.dispatch(new GroupAction.FetchAllGroup(true));
                 }
             ),
             catchError((error) => {
@@ -180,6 +183,7 @@ export class ContactState{
                         initLoadingState: 'NO_LOADED'
                     });
                     ctx.dispatch(new ContactAction.FetchAllContact());
+                    ctx.dispatch(new GroupAction.FetchAllGroup(true));
                 }
             ),
             catchError((error) => {
@@ -220,6 +224,7 @@ export class ContactState{
                         initLoadingState:"NO_LOADED"
                     })
                     ctx.dispatch(new ContactAction.FetchAllContact());
+                    ctx.dispatch(new GroupAction.FetchAllGroup(true));
                 }
             ),
             catchError((error) => {
