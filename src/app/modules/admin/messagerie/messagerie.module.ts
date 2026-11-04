@@ -1,3 +1,4 @@
+import { ActiveCampaignsComponent } from './components/active-campaigns/active-campaigns.component';
 import { NgModule } from '@angular/core';
 import { CloudTemplatePickerComponent } from 'app/shared/components/cloud-template-picker/cloud-template-picker.component';
 import { CommonModule } from '@angular/common';
@@ -42,6 +43,7 @@ import { XafPipe } from 'app/shared/pipes/xaf.pipe';
   ],
   imports: [
     CommonModule,
+    ActiveCampaignsComponent,
     MessagerieRoutingModule,
     FuseCardModule,
     MatStepperModule,

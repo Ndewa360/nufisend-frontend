@@ -102,8 +102,22 @@ export class WhatsAppAutoSyncService implements OnDestroy {
         this._store.dispatch(new GlobalAction.SetWhatsAppSyncStatus('not_synced', 0, 'WhatsApp déconnecté'));
       });
 
-      // Fin d'un envoi immediat poursuivi en arriere-plan.
+      // Fin (ou mise en pause) d'un envoi poursuivi en arriere-plan.
       (this._socket.ioSocket as any)?.on('message-status', (event: any) => {
+        if (event?.status === 'paused') {
+          const progress = event?.progress ? ` (${event.progress.processed}/${event.progress.total} traités)` : '';
+          const reason = event?.reason || 'WhatsApp est déconnecté.';
+          this._toastr.warning(`« ${event?.title || 'Message'} »${progress} : ${reason}`, 'Envoi en pause', { timeOut: 15000 });
+          this._notifications.create({
+            icon       : 'feather:pause-circle',
+            title      : 'Envoi en pause',
+            description: `${event?.title || 'Message'}${progress} : ${reason}`,
+            link       : '/messagerie',
+            useRouter  : true,
+          }).subscribe();
+          this._walletService.refresh().subscribe({ error: () => undefined });
+          return;
+        }
         const sent = event?.result?.sent ?? 0;
         const total = event?.result?.total ?? 0;
         const charged = event?.amountCharged ? ` · ${event.amountCharged} FCFA facturés` : '';

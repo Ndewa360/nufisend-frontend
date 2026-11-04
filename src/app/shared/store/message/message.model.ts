@@ -13,7 +13,9 @@ export enum MessageStatus{
     SCHEDULED = "scheduled",
     SENT = "sent",
     PARTIAL = "partial",
-    FAILED = "failed"
+    FAILED = "failed",
+    /** Campagne interrompue (WhatsApp deconnecte) : reprise automatique ou manuelle. */
+    PAUSED = "paused"
 }
 
 export interface MessagePlanification

@@ -49,7 +49,9 @@ export class MessageState{
                         sendingMessage:false
                     })
                     const status = result?.data?.status;
-                    if (message.isSentToNow && status === 'pending')
+                    if (message.isSentToNow && status === 'paused')
+                        this._toastrService.warning("WhatsApp s'est déconnecté : l'envoi est en pause et reprendra automatiquement. Suivez-le dans la messagerie.", 'Envoi en pause');
+                    else if (message.isSentToNow && status === 'pending')
                         this._toastrService.info("L'envoi se poursuit en arrière-plan : vous serez notifié à la fin.", 'Envoi en cours');
                     else if (message.isSentToNow && status === 'partial')
                         this._toastrService.warning(`${result?.data?.lastSendResult?.sent ?? 0}/${result?.data?.lastSendResult?.total ?? 0} message(s) livré(s)`, 'Envoi partiel');
