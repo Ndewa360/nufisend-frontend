@@ -27,7 +27,7 @@ export class NewMessageComponent implements OnInit{
   destinationContacts:ContactModel[] = []
   destinationGroups:GroupModel[]=[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title?:string}={}
+  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title?:string}={}
   planificationObj:{hasPlanification:boolean, planif:MessagePlanification[]}={hasPlanification:false,planif:[]};
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
@@ -168,10 +168,10 @@ export class NewMessageComponent implements OnInit{
       this._changeDetectorRef.markForCheck();
     }
 
-    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title:string})
+    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title:string})
     {
       this.messageToSend=message;
-      this.hasAttachment=!!message?.file;
+      this.hasAttachment=!!message?.files?.length;
       this._changeDetectorRef.markForCheck();
     }
 
@@ -231,7 +231,7 @@ export class NewMessageComponent implements OnInit{
       if(!this.messageSendToNow && this.planificationObj.hasPlanification) dataToSend.planification=this.planificationObj.planif;
       if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
       else dataToSend.bodyText=this.messageToSend.message;
-      if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
+      if(this.messageToSend.files?.length) dataToSend.bodyFile = this.messageToSend.files;
       this._store.dispatch(new MessageAction.SendMessage(dataToSend));
     }
 
@@ -288,7 +288,7 @@ export class NewMessageComponent implements OnInit{
       if (template) dataToSend.template = template;
       else if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
       else dataToSend.bodyText=this.messageToSend.message;
-      if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
+      if(this.messageToSend.files?.length) dataToSend.bodyFile = this.messageToSend.files;
       this._store.dispatch(new MessageAction.SendMessage(dataToSend));
     }
 
@@ -300,7 +300,7 @@ export class NewMessageComponent implements OnInit{
 
     private hasMessageContent(): boolean
     {
-      return !!(this.messageToSend.messageTemplate || (this.messageToSend.message && this.messageToSend.message.trim()) || this.messageToSend.file);
+      return !!(this.messageToSend.messageTemplate || (this.messageToSend.message && this.messageToSend.message.trim()) || this.messageToSend.files?.length);
     }
 
     setPlanification(planif)

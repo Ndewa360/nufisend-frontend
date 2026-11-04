@@ -26,6 +26,9 @@ export class MessageService
             if (value === undefined || value === null) return;
             if (key === "planification" || key === "template") {
                 formData.append(key, JSON.stringify(value));
+            } else if (Array.isArray(value) && value.some((item) => item instanceof Blob)) {
+                // Plusieurs fichiers : un champ multipart par fichier.
+                value.forEach((item) => formData.append(key, item));
             } else if (Array.isArray(value)) {
                 formData.append(key, value.join(","));
             } else if (value instanceof File || value instanceof Blob) {

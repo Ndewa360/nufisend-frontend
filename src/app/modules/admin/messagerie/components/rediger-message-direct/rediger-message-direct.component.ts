@@ -4,6 +4,7 @@ import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Select, Store } from '@ngxs/store';
 import { MessageTemplateAction, MessageTemplateModel, MessageTemplateState } from 'app/shared/store';
+import { ATTACHMENT_ACCEPT, ATTACHMENT_HINT, validateAttachments } from 'app/shared/utils/attachment-rules';
 import { QuillEditorComponent, QuillViewComponent } from 'ngx-quill';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 
@@ -29,7 +30,10 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
 
   /** Envoi par modele WhatsApp (organisations) : seuls le titre et le fichier sont saisis ici. */
   @Input() cloudTemplateMode = false;
-  @Output() sendMessageData:EventEmitter<{messageTemplate:MessageTemplateModel,message:string,file?:File,title:string}> = new EventEmitter();
+  @Output() sendMessageData:EventEmitter<{messageTemplate:MessageTemplateModel,message:string,files:File[],title:string}> = new EventEmitter();
+  readonly attachmentAccept = ATTACHMENT_ACCEPT;
+  readonly attachmentHint = ATTACHMENT_HINT;
+  readonly validateAttachments = validateAttachments;
   composeForm: UntypedFormGroup;
     copyFields: { cc: boolean; bcc: boolean } = {
         cc : false,
@@ -86,7 +90,7 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
                 this.sendMessage(
                     this.selectedMessageTemplate,
                     this.selectedMessageTemplate ? null : this.composeForm.value.body,
-                    this.selectedFiles.length > 0 ? this.selectedFiles[0] : null
+                    this.selectedFiles
                 );
                 this._changeDetectorRef.markForCheck();
             });
@@ -136,7 +140,7 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
       this.selectedMessageTemplate=msgTmpModel;
       this.composeForm.controls.body.setValue(msgTmpModel.content)
       // this.composeForm.controls.body.disable({onlySelf:true})
-      this.sendMessage(null,msgTmpModel.content, this.selectedFiles.length>0?this.selectedFiles[0]:null)
+      this.sendMessage(null,msgTmpModel.content, this.selectedFiles)
 
       // Mark for check
       this._changeDetectorRef.markForCheck();
@@ -147,7 +151,7 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
       this.selectedMessageTemplate=null;
       this.composeForm.controls.body.setValue("");
       this.composeForm.controls.subject.setValue("");      
-      this.sendMessage(null,null, this.selectedFiles.length>0?this.selectedFiles[0]:null)
+      this.sendMessage(null,null, this.selectedFiles)
 
       // // Mark for check
       // this.autocompleteTrigger.closePanel();
@@ -158,18 +162,18 @@ export class RedigerMessageDirectComponent implements OnInit,AfterViewInit{
 
     loseFocus()
     {
-      this.sendMessage(null,this.composeForm.value.body, this.selectedFiles.length>0?this.selectedFiles[0]:null)
+      this.sendMessage(null,this.composeForm.value.body, this.selectedFiles)
     }
 
     setFiles(files:File[])
     {
       this.selectedFiles = [...files];
-      this.sendMessage(this.selectedMessageTemplate,this.selectedMessageTemplate?null:this.composeForm.value.body,this.selectedFiles[0])
+      this.sendMessage(this.selectedMessageTemplate,this.selectedMessageTemplate?null:this.composeForm.value.body,this.selectedFiles)
     }
 
-    sendMessage(messageTemplate:MessageTemplateModel | null,message:string | null,file?:File | null)
+    sendMessage(messageTemplate:MessageTemplateModel | null,message:string | null,files:File[] = [])
     {
-      this.sendMessageData.next({messageTemplate:messageTemplate,message:message,file:file,title:this.composeForm.value.title})
+      this.sendMessageData.next({messageTemplate:messageTemplate,message:message,files:[...files],title:this.composeForm.value.title})
     }
     
     /**

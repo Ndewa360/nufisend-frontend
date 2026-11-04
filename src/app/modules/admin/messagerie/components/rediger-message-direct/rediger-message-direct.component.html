@@ -20,7 +20,7 @@
 
         <div class="sm:col-span-3 mb-6">
             <mat-label class="font-medium mb-2">{{ cloudTemplateMode ? "Média d'en-tête du modèle (si le modèle en a un)" : 'Choisir des fichiers (optionnel)' }}</mat-label>
-            <app-file-upload (uploadFileEvent)="setFiles($event)"></app-file-upload>
+            <app-file-upload [isMultiple]="!cloudTemplateMode" [acceptedFileType]="attachmentAccept" [acceptedFile]="attachmentHint" [validateFiles]="validateAttachments" (uploadFileEvent)="setFiles($event)"></app-file-upload>
         </div>
 
         <ng-container *ngIf="!cloudTemplateMode">

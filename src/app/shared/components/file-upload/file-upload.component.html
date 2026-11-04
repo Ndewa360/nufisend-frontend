@@ -49,7 +49,10 @@
     </div>
 
     <input id="dropzone-file" #inputDropzone type="file" [accept]="acceptedFileType" [multiple]="isMultiple" class="hidden" (change)="uploadFile($event)"/>
-</div>  
+</div>
+<ul *ngIf="errors.length" class="mt-2 space-y-1 text-sm text-warn" role="alert">
+    <li *ngFor="let error of errors">{{error}}</li>
+</ul>  
 
 
 

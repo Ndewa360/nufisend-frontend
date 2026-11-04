@@ -67,5 +67,6 @@ export interface MessageModel
     lastSendResult?:Record<string, unknown>;
     
     bodyText?:string;
-    bodyFile?:File;
+    /** Pieces jointes (envoyees sous le champ multipart `bodyFile`). */
+    bodyFile?:File[];
 }

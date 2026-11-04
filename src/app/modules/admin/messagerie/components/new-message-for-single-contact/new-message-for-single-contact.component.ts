@@ -21,7 +21,7 @@ export class NewMessageForSingleContactComponent {
   messageSendToNow:boolean=false;
   destinationContact:ContactModel=null
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title?:string}={}
+  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title?:string}={}
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
   @Select(UserProfileState.selectStateData) userProfile$:Observable<UserProfileModel>;
@@ -105,7 +105,7 @@ export class NewMessageForSingleContactComponent {
     }
 
 
-    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,file?:File | null,title:string})
+    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title:string})
     {
       this.messageToSend=message;
     }
@@ -184,14 +184,14 @@ export class NewMessageForSingleContactComponent {
       if (this.usesCloudTemplate) dataToSend.template = this.cloudSelection.template;
       else if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
       else dataToSend.bodyText=this.messageToSend.message;
-      if(this.messageToSend.file) dataToSend.bodyFile = this.messageToSend.file;
+      if(this.messageToSend.files?.length) dataToSend.bodyFile = this.messageToSend.files;
       // console.log("MessageToSend",dataToSend)
       this._store.dispatch(new MessageAction.SendMessage(dataToSend));
     }
 
     private hasMessageContent(): boolean
     {
-      return !!(this.messageToSend.messageTemplate || (this.messageToSend.message && this.messageToSend.message.trim()) || this.messageToSend.file);
+      return !!(this.messageToSend.messageTemplate || (this.messageToSend.message && this.messageToSend.message.trim()) || this.messageToSend.files?.length);
     }
 
     /**
