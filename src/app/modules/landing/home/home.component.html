@@ -24,7 +24,7 @@
                     </h1>
 
                     <p class="mt-6 max-w-xl text-[17px] leading-8 text-slate-600">
-                        NufiSend synchronise vos contacts WhatsApp, organise vos groupes de diffusion et programme vos messages.
+                        NufiSend connecte votre WhatsApp Business, organise vos contacts et vos groupes de diffusion, puis programme vos messages.
                         Une seule interface pour communiquer avec <span class="nufi-underline font-semibold text-nufi-800">tous vos contacts</span>, sans copier-coller.
                     </p>
 
@@ -32,7 +32,7 @@
                         <a
                             routerLink="/auth/sign-up"
                             class="group inline-flex items-center justify-center gap-2 rounded-full bg-nufi-600 px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_18px_38px_-14px_rgba(5,136,86,0.55)] transition duration-300 hover:-translate-y-0.5 hover:bg-nufi-700 hover:shadow-[0_22px_44px_-14px_rgba(4,112,71,0.6)] focus:outline-none focus-visible:ring-4 focus-visible:ring-nufi-200">
-                            Créer un compte gratuit
+                            Créer un compte
                             <mat-icon class="icon-size-5 transition-transform duration-300 group-hover:translate-x-0.5" svgIcon="heroicons_solid:arrow-right"></mat-icon>
                         </a>
                         <a
@@ -48,15 +48,15 @@
                     <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-[12px] font-medium text-slate-500">
                         <span class="inline-flex items-center gap-1.5">
                             <mat-icon class="icon-size-4 text-nufi-500" svgIcon="heroicons_solid:check-circle"></mat-icon>
-                            Gratuit pour démarrer
+                            Sans engagement
                         </span>
                         <span class="inline-flex items-center gap-1.5">
                             <mat-icon class="icon-size-4 text-nufi-500" svgIcon="heroicons_solid:check-circle"></mat-icon>
-                            Synchronisation par QR code
+                            Connexion WhatsApp Business
                         </span>
                         <span class="inline-flex items-center gap-1.5">
                             <mat-icon class="icon-size-4 text-nufi-500" svgIcon="heroicons_solid:check-circle"></mat-icon>
-                            Sans carte bancaire
+                            Paiement Mobile Money
                         </span>
                     </div>
                 </div>
@@ -329,12 +329,12 @@
                         <div class="flex items-center justify-between">
                             <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-nufi-900 text-[15px] font-extrabold text-white shadow-lg">01</span>
                             <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-nufi-50 text-nufi-600">
-                                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:qrcode"></mat-icon>
+                                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:badge-check"></mat-icon>
                             </span>
                         </div>
-                        <h3 class="mt-6 text-[17px] font-bold text-nufi-900">Connectez votre WhatsApp</h3>
+                        <h3 class="mt-6 text-[17px] font-bold text-nufi-900">Connectez votre WhatsApp Business</h3>
                         <p class="mt-2 text-[14px] leading-6 text-slate-500">
-                            Scannez le QR code depuis votre espace NufiSend et laissez vos contacts se synchroniser.
+                            Raccordez votre numéro WhatsApp Business depuis votre espace NufiSend et laissez vos contacts se synchroniser.
                         </p>
                     </article>
 
@@ -366,8 +366,8 @@
                 </div>
 
                 <div class="mt-10 flex justify-center" data-reveal>
-                    <a routerLink="/auth/sign-up" class="group inline-flex items-center gap-2 text-[14px] font-bold text-nufi-700 transition hover:text-nufi-800">
-                        Essayer gratuitement
+                    <a routerLink="/home" fragment="pricing" class="group inline-flex items-center gap-2 text-[14px] font-bold text-nufi-700 transition hover:text-nufi-800">
+                        Voir les offres
                         <mat-icon class="icon-size-4 transition-transform duration-300 group-hover:translate-x-1" svgIcon="heroicons_solid:arrow-right"></mat-icon>
                     </a>
                 </div>
@@ -489,8 +489,8 @@
                                 <mat-icon class="icon-size-4" svgIcon="heroicons_solid:check"></mat-icon>
                             </span>
                             <div>
-                                <div class="text-[14px] font-bold text-white">Connexion WhatsApp par QR code</div>
-                                <div class="mt-0.5 text-[13px] text-slate-400">Votre numéro reste le vôtre, sans nouveau compte à créer.</div>
+                                <div class="text-[14px] font-bold text-white">Connexion WhatsApp Business sécurisée</div>
+                                <div class="mt-0.5 text-[13px] text-slate-400">Votre numéro professionnel reste le vôtre, rattaché de façon sécurisée.</div>
                             </div>
                         </li>
                         <li class="flex items-start gap-3">
@@ -540,8 +540,8 @@
 
                         <div class="mt-6 space-y-2.5">
                             <div class="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3">
-                                <span class="text-[12px] text-slate-400">Appareil</span>
-                                <span class="text-[12px] font-semibold text-white">WhatsApp Web</span>
+                                <span class="text-[12px] text-slate-400">Canal</span>
+                                <span class="text-[12px] font-semibold text-white">WhatsApp Business</span>
                             </div>
                             <div class="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3">
                                 <span class="text-[12px] text-slate-400">Contacts synchronisés</span>
@@ -561,7 +561,7 @@
                         </div>
 
                         <div class="mt-5 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[12px] font-semibold text-slate-300">
-                            <mat-icon class="icon-size-4" svgIcon="heroicons_solid:qrcode"></mat-icon>
+                            <mat-icon class="icon-size-4" svgIcon="heroicons_solid:shield-check"></mat-icon>
                             Déconnexion possible à tout moment
                         </div>
                     </div>
@@ -570,126 +570,214 @@
         </section>
 
         <!-- Pricing -->
-        <!-- Pricing -->
         <section id="pricing" class="scroll-mt-24 bg-white py-20 sm:py-24">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl text-center" data-reveal>
                     <span class="nufi-eyebrow">Tarifs</span>
                     <h2 class="mt-4 text-[2rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-nufi-900 sm:text-[2.6rem]">
-                        Des tarifs simples, sans surprise.
+                        Des offres claires, sans surprise.
                     </h2>
                     <p class="mt-4 text-[16px] leading-7 text-slate-500">
-                        Commencez gratuitement. Payez uniquement ce que vous utilisez.
+                        Choisissez le volume qui correspond à votre activité. Toutes les offres incluent la connexion WhatsApp Business, les contacts, les groupes et les modèles.
                     </p>
                 </div>
 
-                <div class="mt-14 grid items-stretch gap-5 lg:grid-cols-3">
-                    <!-- DÃ©couverte -->
-                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-7" data-reveal>
+                <div class="mt-14 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                    <!-- Découverte -->
+                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-6" data-reveal>
                         <div>
-                            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Découverte</div>
-                            <div class="mt-1 text-[15px] font-bold text-nufi-900">Gratuit</div>
-                            <div class="mt-6 flex items-end gap-1">
-                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">0</span>
-                                <span class="pb-1 text-[14px] font-semibold text-slate-500">FCFA</span>
+                            <div class="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Découverte</div>
+                            <div class="mt-1 text-[14px] font-bold text-nufi-900">Pour tester</div>
+                            <div class="mt-5 flex items-end gap-1 whitespace-nowrap">
+                                <span class="text-[1.9rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">9 000</span>
+                                <span class="pb-1 text-[12px] font-semibold text-slate-500">FCFA / mois</span>
                             </div>
-                            <div class="mt-1 text-[12px] text-slate-400">Pour toujours</div>
+                            <div class="mt-1 text-[11px] text-slate-400">500 messages inclus</div>
+                            <div class="mt-0.5 text-[11px] font-semibold text-nufi-600">soit 18 FCFA / message</div>
                         </div>
-                        <ul class="mt-6 flex-1 space-y-3">
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                        <ul class="mt-5 flex-1 space-y-2.5">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Accès aux fonctionnalités essentielles
+                                Connexion WhatsApp Business
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Connexion WhatsApp par QR code
+                                1 utilisateur
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Synchronisation des contacts
+                                Contacts et groupes
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                5 messages de test offerts / mois
+                                Support par e-mail
                             </li>
                         </ul>
-                        <p class="mt-5 text-[11px] italic text-slate-400">Testez le service avant de payer.</p>
                         <a routerLink="/auth/sign-up" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
-                            Commencer gratuitement
+                            Choisir
                         </a>
                     </article>
 
-                    <!-- À la consommation -->
-                    <article class="nufi-card relative flex flex-col rounded-3xl bg-nufi-900 p-7 text-white shadow-[0_30px_70px_-30px_rgba(3,37,46,0.55)] ring-1 ring-nufi-700" data-reveal style="transition-delay: 80ms">
-                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-nufi-accent px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-nufi-900 shadow-lg">
-                            Offre principale
+                    <!-- Starter -->
+                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-6" data-reveal style="transition-delay: 60ms">
+                        <div>
+                            <div class="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Starter</div>
+                            <div class="mt-1 text-[14px] font-bold text-nufi-900">Pour les petites structures</div>
+                            <div class="mt-5 flex items-end gap-1 whitespace-nowrap">
+                                <span class="text-[1.9rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">18 000</span>
+                                <span class="pb-1 text-[12px] font-semibold text-slate-500">FCFA / mois</span>
+                            </div>
+                            <div class="mt-1 text-[11px] text-slate-400">1 000 messages inclus</div>
+                            <div class="mt-0.5 text-[11px] font-semibold text-nufi-600">soit 18 FCFA / message</div>
+                        </div>
+                        <ul class="mt-5 flex-1 space-y-2.5">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Connexion WhatsApp Business
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                2 utilisateurs
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Campagnes programmées
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Modèles de messages
+                            </li>
+                        </ul>
+                        <a routerLink="/auth/sign-up" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
+                            Choisir
+                        </a>
+                    </article>
+
+                    <!-- Business -->
+                    <article class="nufi-card relative flex flex-col rounded-3xl bg-nufi-900 p-6 text-white shadow-[0_30px_70px_-30px_rgba(3,37,46,0.55)] ring-1 ring-nufi-700" data-reveal style="transition-delay: 120ms">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-nufi-accent px-3 py-1 text-[9px] font-extrabold uppercase tracking-[0.14em] text-nufi-900 shadow-lg">
+                            Le plus choisi
                         </span>
                         <div>
-                            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">À la consommation</div>
-                            <div class="mt-1 text-[15px] font-bold text-white">10 FCFA par destinataire</div>
-                            <div class="mt-6 flex items-end gap-1">
-                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-white">10</span>
-                                <span class="pb-1 text-[14px] font-semibold text-slate-300">FCFA / msg</span>
+                            <div class="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Business</div>
+                            <div class="mt-1 text-[14px] font-bold text-white">Pour les équipes</div>
+                            <div class="mt-5 flex items-end gap-1 whitespace-nowrap">
+                                <span class="text-[1.9rem] font-extrabold leading-none tracking-[-0.04em] text-white">51 000</span>
+                                <span class="pb-1 text-[12px] font-semibold text-slate-300">FCFA / mois</span>
                             </div>
-                            <div class="mt-1 text-[12px] text-slate-400">12 FCFA avec pièce jointe · sans abonnement</div>
+                            <div class="mt-1 text-[11px] text-slate-400">3 000 messages inclus</div>
+                            <div class="mt-0.5 text-[11px] font-semibold text-nufi-accent">soit 17 FCFA / message</div>
                         </div>
-                        <ul class="mt-6 flex-1 space-y-3">
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
+                        <ul class="mt-5 flex-1 space-y-2.5">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-200">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
-                                Recharge par MTN Mobile Money ou Orange Money
+                                Connexion WhatsApp Business
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-200">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
-                                Seuls les messages livrés sont facturés
+                                5 utilisateurs
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-200">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
-                                Campagnes immédiates et programmées
+                                Envois par lots
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-200">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-200">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-accent" svgIcon="heroicons_solid:check"></mat-icon>
-                                Historique détaillé de la consommation
+                                Support prioritaire
                             </li>
                         </ul>
-                        <p class="mt-5 text-[11px] italic text-slate-400">Crédit prépayé, sans frais de recharge, non remboursable.</p>
                         <a routerLink="/auth/sign-up" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-nufi-accent px-5 py-3 text-[13px] font-bold text-nufi-900 transition duration-300 hover:bg-white">
-                            Se lancer
+                            Choisir
                         </a>
                     </article>
 
-                    <!-- Organisation / Entreprise -->
-                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-7" data-reveal style="transition-delay: 160ms">
+                    <!-- Pro -->
+                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-6" data-reveal style="transition-delay: 180ms">
                         <div>
-                            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Organisation / Entreprise</div>
-                            <div class="mt-1 text-[15px] font-bold text-nufi-900">Sur devis</div>
-                            <div class="mt-6 flex items-end gap-1">
-                                <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">&#8212;</span>
+                            <div class="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Pro</div>
+                            <div class="mt-1 text-[14px] font-bold text-nufi-900">Pour les envois réguliers</div>
+                            <div class="mt-5 flex items-end gap-1 whitespace-nowrap">
+                                <span class="text-[1.9rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">80 000</span>
+                                <span class="pb-1 text-[12px] font-semibold text-slate-500">FCFA / mois</span>
                             </div>
-                            <div class="mt-1 text-[12px] text-slate-400">Conditions adaptées au volume</div>
+                            <div class="mt-1 text-[11px] text-slate-400">5 000 messages inclus</div>
+                            <div class="mt-0.5 text-[11px] font-semibold text-nufi-600">soit 16 FCFA / message</div>
                         </div>
-                        <ul class="mt-6 flex-1 space-y-3">
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                        <ul class="mt-5 flex-1 space-y-2.5">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Gestion de plusieurs utilisateurs
+                                Connexion WhatsApp Business
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Annuaire partagé et rôles d'accès
+                                10 utilisateurs
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Accompagnement et support dédie
+                                Statistiques avancées
                             </li>
-                            <li class="flex items-start gap-2.5 text-[13px] text-slate-600">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
                                 <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
-                                Conditions commerciales adaptées
+                                Support dédié
                             </li>
                         </ul>
-                        <p class="mt-5 text-[11px] italic text-slate-400">Pour les structures qui utilisent NufiSend en équipe.</p>
-                        <a href="mailto:contact@ndewa-360.com" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
-                            Nous contacter
+                        <a routerLink="/auth/sign-up" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
+                            Choisir
                         </a>
                     </article>
+
+                    <!-- Enterprise -->
+                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-6" data-reveal style="transition-delay: 240ms">
+                        <div>
+                            <div class="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Enterprise</div>
+                            <div class="mt-1 text-[14px] font-bold text-nufi-900">Pour les gros volumes</div>
+                            <div class="mt-5 flex items-end gap-1 whitespace-nowrap">
+                                <span class="text-[1.9rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">112 000</span>
+                                <span class="pb-1 text-[12px] font-semibold text-slate-500">FCFA / mois</span>
+                            </div>
+                            <div class="mt-1 text-[11px] text-slate-400">7 000 messages inclus</div>
+                            <div class="mt-0.5 text-[11px] font-semibold text-nufi-600">soit 16 FCFA / message</div>
+                        </div>
+                        <ul class="mt-5 flex-1 space-y-2.5">
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Connexion WhatsApp Business
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Utilisateurs illimités
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Accompagnement dédié
+                            </li>
+                            <li class="flex items-start gap-2.5 text-[12px] text-slate-600">
+                                <mat-icon class="icon-size-4 shrink-0 text-nufi-500" svgIcon="heroicons_solid:check"></mat-icon>
+                                Conditions sur mesure
+                            </li>
+                        </ul>
+                        <a routerLink="/auth/sign-up" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-nufi-200 bg-white px-5 py-3 text-[13px] font-bold text-nufi-800 transition duration-300 hover:border-nufi-300 hover:bg-nufi-50">
+                            Choisir
+                        </a>
+                    </article>
+                </div>
+
+                <div class="mt-6 flex flex-col gap-4 rounded-2xl border border-nufi-100 bg-nufi-50/60 p-5 sm:flex-row sm:items-center sm:justify-between" data-reveal>
+                    <div class="flex items-start gap-3">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-nufi-600 ring-1 ring-nufi-100">
+                            <mat-icon class="icon-size-5" svgIcon="heroicons_solid:qrcode"></mat-icon>
+                        </span>
+                        <div>
+                            <div class="text-[14px] font-bold text-nufi-900">WhatsApp personnel par QR code</div>
+                            <p class="mt-1 max-w-2xl text-[12px] leading-5 text-slate-500">
+                                Vous préférez garder votre WhatsApp actuel ? La connexion par QR code reste disponible, facturée 10 FCFA par message livré, sans abonnement.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="shrink-0 rounded-xl bg-white px-4 py-3 text-center ring-1 ring-nufi-100">
+                        <div class="text-[1.4rem] font-extrabold leading-none text-nufi-900">10</div>
+                        <div class="mt-1 text-[10px] font-semibold text-slate-500">FCFA / message</div>
+                    </div>
                 </div>
 
                 <p class="mt-8 text-center text-[12px] text-slate-400">
@@ -769,11 +857,11 @@
                         Vos prochaines communications WhatsApp commencent ici.
                     </h2>
                     <p class="mx-auto mt-5 max-w-xl text-[16px] leading-7 text-slate-300">
-                        Créez votre compte, connectez votre WhatsApp et préparez votre première campagne en quelques minutes.
+                        Créez votre compte, connectez votre WhatsApp Business et préparez votre première campagne en quelques minutes.
                     </p>
                     <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                         <a routerLink="/auth/sign-up" class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-[14px] font-bold text-nufi-900 transition duration-300 hover:bg-nufi-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/20">
-                            Créer un compte gratuit
+                            Créer un compte
                             <mat-icon class="icon-size-5" svgIcon="heroicons_solid:arrow-right"></mat-icon>
                         </a>
                         <a routerLink="/auth/sign-in" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-6 py-3.5 text-[14px] font-bold text-white transition duration-300 hover:bg-white/10">
@@ -781,7 +869,7 @@
                         </a>
                     </div>
                     <p class="mt-5 text-[12px] text-slate-400">
-                        Gratuit pour démarrer · Aucune carte bancaire requise
+                        Offres dès 9 000 FCFA / mois · Paiement Mobile Money
                     </p>
                 </div>
             </div>

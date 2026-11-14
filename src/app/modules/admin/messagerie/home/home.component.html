@@ -13,13 +13,13 @@
                     </div>
                     <div class="flex flex-col min-w-0 ml-4">
                         <ng-container *transloco="let t">
-                            <div class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate">Messagerie</div>
+                            <div class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate">Campagnes</div>
                         </ng-container>
                         <div class="flex items-center">
                             <mat-icon
                                 class="icon-size-5"
                                 [svgIcon]="'heroicons_solid:information-circle'"></mat-icon>
-                            <div class="ml-1.5 leading-6 truncate text-secondary">Envoyer directement ou planifier vos messages pour une date ulterieur </div>
+                            <div class="ml-1.5 leading-6 truncate text-secondary">Envoyez ou planifiez vos campagnes WhatsApp pour une date ultérieure </div>
                         </div>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
 
                     <button (click)="newMessage()" [disabled]="!isWhatsAppReady" [matTooltip]="isWhatsAppReady?'':'La synchronisation WhatsApp doit être terminée pour envoyer un message'" mat-flat-button [color]="'primary'">
                         <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:mail'"></mat-icon>
-                        <span class="ml-2">Nouveau message</span>
+                        <span class="ml-2">Nouvelle campagne</span>
                     </button>
 
                 </div>
@@ -40,7 +40,7 @@
                 matRipple>
                 <div class="flex items-center">
                     <div class="overflow-hidden">
-                        <div class="font-medium leading-6 truncate">Messagerie Whatsapp</div>
+                        <div class="font-medium leading-6 truncate">Campagnes WhatsApp</div>
                     </div>
                 </div>
                 

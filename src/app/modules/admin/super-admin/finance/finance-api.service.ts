@@ -103,6 +103,8 @@ export interface BillingSettings
     freeMonthlyQuota: number;
     tiersEnabled: boolean;
     tiers: { minRecipients: number; discountPercent: number }[];
+    /** Grille au volume des campagnes WhatsApp Business (prix absolus). */
+    campaignPrices: { minRecipients: number; unitPrice: number }[];
     minTopup: number;
     maxTopup: number;
     providerFeePercent: number;

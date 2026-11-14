@@ -34,7 +34,7 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
         },
         {
             question: 'Comment NufiSend se connecte-t-il \u00e0 WhatsApp ?',
-            answer  : 'La connexion se fait via WhatsApp Web : vous scannez un QR code depuis votre compte, puis NufiSend utilise cette session pour synchroniser vos contacts et envoyer vos messages. Vous pouvez déconnecter la session \u00e0 tout moment.'
+            answer  : 'NufiSend se raccorde \u00e0 votre compte WhatsApp Business via l\u2019API officielle de Meta. Vous autorisez la connexion depuis votre espace, puis NufiSend envoie vos messages depuis votre num\u00e9ro professionnel. Vous pouvez d\u00e9connecter le canal \u00e0 tout moment.'
         },
         {
             question: 'Puis-je programmer mes messages \u00e0 l\u2019avance ?',
@@ -46,11 +46,11 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
         },
         {
             question: 'Ai-je besoin d\u2019un compte WhatsApp Business ?',
-            answer  : 'Un compte WhatsApp classique ou WhatsApp Business est n\u00e9cessaire pour \u00e9tablir la connexion. NufiSend fonctionne avec WhatsApp Web, sans installation suppl\u00e9mentaire sur votre t\u00e9l\u00e9phone.'
+            answer  : 'Un compte WhatsApp Business est n\u00e9cessaire pour b\u00e9n\u00e9ficier des offres NufiSend. Si vous n\u2019en avez pas encore, nous vous accompagnons dans sa cr\u00e9ation et sa v\u00e9rification.'
         },
         {
-            question: 'Existe-t-il une offre gratuite ?',
-            answer  : 'Oui. L\u2019offre D\u00e9couverte est gratuite et comprend 10 messages programm\u00e9s, la synchronisation WhatsApp et la gestion de vos contacts et groupes. Vous pouvez commencer sans carte bancaire.'
+            question: 'Quel est le prix des offres ?',
+            answer  : 'L\u2019offre D\u00e9couverte d\u00e9marre \u00e0 9 000 FCFA par mois et inclut 500 messages. La connexion par QR code de votre WhatsApp personnel reste disponible, factur\u00e9e 10 FCFA par message livr\u00e9, sans abonnement.'
         },
         {
             question: 'Mes donn\u00e9es sont-elles prot\u00e9g\u00e9es ?',
@@ -82,7 +82,7 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
         this._title.setTitle('NufiSend \u2014 Communication WhatsApp simplifi\u00e9e');
         this._meta.updateTag({
             name   : 'description',
-            content: 'NufiSend centralise votre communication WhatsApp : contacts synchronis\u00e9s, groupes de diffusion, mod\u00e8les de messages et envois programm\u00e9s.'
+            content: 'NufiSend connecte votre WhatsApp Business : contacts, groupes de diffusion, mod\u00e8les de messages et envois programm\u00e9s depuis une interface unique.'
         });
     }
 

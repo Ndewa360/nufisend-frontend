@@ -83,6 +83,19 @@ export interface Payment {
     ledger?: LedgerEntry[];
 }
 
+export interface CampaignPriceTier {
+    minRecipients: number;
+    unitPrice: number;
+}
+
+export interface CampaignPriceSlice {
+    from: number;
+    to: number;
+    units: number;
+    unitPrice: number;
+    amount: number;
+}
+
 export interface SendQuote {
     recipients: number;
     hasAttachment: boolean;
@@ -95,6 +108,10 @@ export interface SendQuote {
     available: number;
     reserved: number;
     sufficient: boolean;
+    /** Grille au volume appliquee (campagnes WhatsApp Business). */
+    priceTiers?: CampaignPriceTier[];
+    /** Detail par tranche du devis (campagnes). */
+    slices?: CampaignPriceSlice[];
     // Planification
     occurrences?: number;
     finiteOccurrences?: number;

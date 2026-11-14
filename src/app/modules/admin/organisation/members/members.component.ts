@@ -72,6 +72,7 @@ export class OrganisationMembersComponent implements OnInit, OnDestroy
     get seatsLeft(): number
     {
         const max = this.membership?.maxMembers ?? 0;
+        if (max <= 0) return Number.MAX_SAFE_INTEGER;
         return Math.max(0, max - this.members.length - this.invitations.length);
     }
 

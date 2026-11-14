@@ -77,7 +77,7 @@ import { AdminOrganizationDetails, OrganizationsAdminService } from './organizat
 
                     <!-- Membres -->
                     <div class="bg-card rounded-2xl shadow p-6">
-                        <div class="text-lg font-semibold">Membres ({{ d.members.length }} / {{ d.maxMembers }})</div>
+                        <div class="text-lg font-semibold">Membres ({{ d.members.length }} / {{ d.maxMembers > 0 ? d.maxMembers : '∞' }})</div>
                         <div *ngFor="let member of d.members" class="flex items-center justify-between gap-3 py-3 border-b last:border-b-0">
                             <div class="min-w-0">
                                 <a class="font-medium hover:underline" [routerLink]="['/super-admin/users', member.userId]">{{ member.name || member.email }}</a>
@@ -161,11 +161,11 @@ export class OrganizationDetailsComponent implements OnInit
     saving = false;
     connecting = false;
     form: { plan: string; monthlyPrice: number; maxMembers: number | null; status: 'active' | 'suspended'; suspensionReason: string } = {
-        plan: 'pro', monthlyPrice: 0, maxMembers: null, status: 'active', suspensionReason: '',
+        plan: 'starter', monthlyPrice: 0, maxMembers: null, status: 'active', suspensionReason: '',
     };
     connection = { wabaId: '', phoneNumberId: '', accessToken: '', register: false, pin: '' };
 
-    readonly plans = ['pro', 'business', 'enterprise'];
+    readonly plans = ['decouverte', 'starter', 'business', 'pro', 'enterprise'];
     readonly planLabels = PLAN_LABELS;
     readonly subscriptionLabels = SUBSCRIPTION_LABELS;
     readonly roleLabels = ORG_ROLE_LABELS;

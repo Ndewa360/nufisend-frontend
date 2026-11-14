@@ -29,7 +29,7 @@ export class OrganisationOverviewComponent implements OnInit, OnDestroy
 {
     membership: Membership | null | undefined = undefined;
     catalog: PlansCatalog | null = null;
-    selectedPlan = 'pro';
+    selectedPlan = 'starter';
     newName = '';
     renameValue = '';
     renaming = false;
@@ -114,6 +114,38 @@ export class OrganisationOverviewComponent implements OnInit, OnDestroy
             && org.whatsapp?.status === 'connected';
     }
 
+    get currentPlan(): { id: string; price: number; maxMembers: number; monthlyMessages: number }
+    {
+        const organization = this.membership?.organization;
+        if (!organization) return { id: '', price: 0, maxMembers: 0, monthlyMessages: 0 };
+        if (this.membership?.plan) return this.membership.plan;
+        const plan = (this.catalog?.plans || []).find((item) => item.id === organization.plan);
+        return plan
+            ? { id: plan.id, price: plan.price, maxMembers: plan.maxMembers, monthlyMessages: plan.monthlyMessages }
+            : { id: organization.plan, price: organization.subscription?.monthlyPrice || 0, maxMembers: this.membership?.maxMembers || 0, monthlyMessages: 0 };
+    }
+
+    get quota(): { includedMessages: number; messagesUsed: number; remainingMessages: number }
+    {
+        if (this.membership?.quota) return this.membership.quota;
+        const subscription = this.membership?.organization?.subscription;
+        const includedMessages = subscription?.includedMessages || 0;
+        const messagesUsed = subscription?.messagesUsed || 0;
+        return { includedMessages, messagesUsed, remainingMessages: Math.max(0, includedMessages - messagesUsed) };
+    }
+
+    get quotaPercent(): number
+    {
+        const { includedMessages, messagesUsed } = this.quota;
+        return includedMessages > 0 ? Math.min(100, Math.round((messagesUsed / includedMessages) * 100)) : 0;
+    }
+
+    membersLabel(plan: OrganizationPlan | { maxMembers: number } | null): string
+    {
+        if (!plan) return '—';
+        return plan.maxMembers > 0 ? `${plan.maxMembers} membre(s)` : 'Membres illimités';
+    }
+
     create(): void
     {
         const name = this.newName.trim();
@@ -174,6 +206,34 @@ export class OrganisationOverviewComponent implements OnInit, OnDestroy
                 this._toastr.error(readApiError(error), 'Abonnement');
                 this._cdr.markForCheck();
             },
+        });
+    }
+
+    changePlan(plan: OrganizationPlan): void
+    {
+        if (!this.membership || plan.id === this.membership.organization.plan) return;
+        this._confirmation.open({
+            title  : "Changer d'offre",
+            message: `Passer à l'offre ${this.planLabels[plan.id] || plan.id} ? Le nouveau mois est facturé immédiatement (${plan.price} FCFA) depuis le portefeuille de l'organisation, et le quota de messages inclus est réinitialisé.`,
+            actions: { confirm: { label: 'Changer' }, cancel: { label: 'Annuler' } },
+        }).afterClosed().subscribe((result) => {
+            if (result !== 'confirmed') return;
+            this.busy = true;
+            this._organizationService.changePlan(plan.id).subscribe({
+                next : (membership) => {
+                    this.busy = false;
+                    const status = membership?.organization?.subscription?.status;
+                    if (status === 'active') this._toastr.success('Offre mise à jour', 'Organisation');
+                    else this._toastr.warning("Solde insuffisant : rechargez le portefeuille de l'organisation", 'Abonnement');
+                    this._walletService.refresh().subscribe({ error: () => undefined });
+                    this._cdr.markForCheck();
+                },
+                error: (error) => {
+                    this.busy = false;
+                    this._toastr.error(readApiError(error), 'Organisation');
+                    this._cdr.markForCheck();
+                },
+            });
         });
     }
 

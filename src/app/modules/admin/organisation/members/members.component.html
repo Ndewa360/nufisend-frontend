@@ -4,7 +4,9 @@
             <div>
                 <div class="text-3xl font-bold tracking-tight">Membres</div>
                 <div class="mt-1 text-secondary">
-                    {{ members.length }} membre(s) sur {{ membership?.maxMembers }} place(s) de l'offre.
+                    {{ members.length }} membre(s)
+                    <ng-container *ngIf="(membership?.maxMembers || 0) > 0"> sur {{ membership?.maxMembers }} place(s) de l'offre.</ng-container>
+                    <ng-container *ngIf="(membership?.maxMembers || 0) <= 0"> · places illimitées sur votre offre.</ng-container>
                 </div>
             </div>
             <button mat-stroked-button color="primary" type="button" (click)="reload()" [disabled]="loading">

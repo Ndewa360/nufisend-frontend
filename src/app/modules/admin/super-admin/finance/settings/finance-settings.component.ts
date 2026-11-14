@@ -29,6 +29,19 @@ import { FinanceApiService } from '../finance-api.service';
             </div>
 
             <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-lg font-semibold">Campagnes WhatsApp Business (prix par destinataire)</div>
+                <div class="text-sm text-secondary">Grille progressive : chaque destinataire paie le prix de sa tranche. Ajouter du volume ne fait jamais baisser le total.</div>
+                <div class="mt-4 flex flex-col gap-2" formArrayName="campaignPrices">
+                    <div *ngFor="let tier of campaignPrices.controls; let i = index" [formGroupName]="i" class="flex items-center gap-3">
+                        <mat-form-field class="fuse-mat-dense w-52" subscriptSizing="dynamic"><mat-label>À partir de (destinataires)</mat-label><input matInput type="number" min="1" formControlName="minRecipients"></mat-form-field>
+                        <mat-form-field class="fuse-mat-dense w-44" subscriptSizing="dynamic"><mat-label>Prix unitaire (FCFA)</mat-label><input matInput type="number" min="0" step="0.5" formControlName="unitPrice"></mat-form-field>
+                        <button mat-icon-button type="button" (click)="campaignPrices.removeAt(i)"><mat-icon svgIcon="heroicons_outline:trash"></mat-icon></button>
+                    </div>
+                    <div><button mat-stroked-button type="button" (click)="addCampaignTier()">Ajouter une tranche</button></div>
+                </div>
+            </div>
+
+            <div class="bg-card rounded-2xl shadow p-6">
                 <div class="text-lg font-semibold">Recharges et alertes</div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                     <mat-form-field><mat-label>Recharge minimale (FCFA)</mat-label><input matInput type="number" min="1" formControlName="minTopup"></mat-form-field>
@@ -87,6 +100,7 @@ export class FinanceSettingsComponent implements OnInit
         freeMonthlyQuota       : [5, [Validators.required, Validators.min(0)]],
         tiersEnabled           : [false],
         tiers                  : this._fb.array([]),
+        campaignPrices         : this._fb.array([]),
         minTopup               : [500, [Validators.required, Validators.min(1)]],
         maxTopup               : [500000, [Validators.required, Validators.min(1)]],
         providerFeePercent     : [1, [Validators.required, Validators.min(0)]],
@@ -116,15 +130,35 @@ export class FinanceSettingsComponent implements OnInit
         return this.form.get('tiers') as FormArray;
     }
 
+    get campaignPrices(): FormArray
+    {
+        return this.form.get('campaignPrices') as FormArray;
+    }
+
     ngOnInit(): void
     {
         this._api.settings().subscribe((settings) => {
             this.tiers.clear();
             (settings.tiers || []).forEach((tier) => this.addTier(tier.minRecipients, tier.discountPercent));
-            this.form.patchValue({ ...settings, tiers: undefined } as any);
+            this.campaignPrices.clear();
+            const campaignPrices = settings.campaignPrices?.length
+                ? settings.campaignPrices
+                : [{ minRecipients: 1, unitPrice: 18 }, { minRecipients: 501, unitPrice: 17 }, { minRecipients: 3001, unitPrice: 16 }];
+            campaignPrices.forEach((tier) => this.addCampaignTier(tier.minRecipients, tier.unitPrice));
+            this.form.patchValue({ ...settings, tiers: undefined, campaignPrices: undefined } as any);
             this.loaded = true;
             this._cdr.markForCheck();
         });
+    }
+
+    addCampaignTier(minRecipients = 1, unitPrice = 18): void
+    {
+        this.campaignPrices.push(
+            this._fb.group({
+                minRecipients: [minRecipients, [Validators.required, Validators.min(1)]],
+                unitPrice    : [unitPrice, [Validators.required, Validators.min(0)]],
+            }),
+        );
     }
 
     addTier(minRecipients = 100, discountPercent = 5): void
@@ -146,6 +180,10 @@ export class FinanceSettingsComponent implements OnInit
         value.tiers = (value.tiers || []).map((tier: any) => ({
             minRecipients  : Number(tier.minRecipients),
             discountPercent: Number(tier.discountPercent),
+        }));
+        value.campaignPrices = (value.campaignPrices || []).map((tier: any) => ({
+            minRecipients: Number(tier.minRecipients),
+            unitPrice    : Number(tier.unitPrice),
         }));
         this.saving = true;
         this._api.updateSettings(value).subscribe({

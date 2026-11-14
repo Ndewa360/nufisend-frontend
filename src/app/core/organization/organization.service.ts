@@ -126,6 +126,13 @@ export class OrganizationService
             .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
     }
 
+    changePlan(plan: string): Observable<Membership>
+    {
+        return this._http
+            .post<ApiResponse<Membership>>(`${this._baseUrl}/me/subscription/plan`, { plan })
+            .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
+    }
+
     leave(): Observable<unknown>
     {
         return this._http

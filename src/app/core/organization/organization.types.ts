@@ -37,6 +37,8 @@ export interface Organization
         currentPeriodEnd?: string;
         graceUntil?: string;
         lastChargedAt?: string;
+        includedMessages?: number;
+        messagesUsed?: number;
     };
     createdAt?: string;
 }
@@ -50,6 +52,8 @@ export interface Membership
     membersCount: number;
     pendingInvitations: number;
     maxMembers: number;
+    plan?: { id: string; price: number; maxMembers: number; monthlyMessages: number };
+    quota?: { includedMessages: number; messagesUsed: number; remainingMessages: number };
     wallet: { available: number; reserved: number };
 }
 
@@ -92,6 +96,8 @@ export interface OrganizationPlan
     id: string;
     price: number;
     maxMembers: number;
+    unlimitedMembers: boolean;
+    monthlyMessages: number;
     onQuote: boolean;
 }
 
@@ -138,8 +144,10 @@ export const SUBSCRIPTION_LABELS: Record<SubscriptionStatus, string> = {
 };
 
 export const PLAN_LABELS: Record<string, string> = {
-    pro       : 'Pro',
+    decouverte: 'Découverte',
+    starter   : 'Starter',
     business  : 'Business',
+    pro       : 'Pro',
     enterprise: 'Entreprise',
 };
 

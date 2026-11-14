@@ -37,19 +37,40 @@ interface QuoteRequest
 
             <ng-container *ngIf="quote">
                 <ng-container *ngIf="!isScheduled; else scheduled">
-                    <div class="mt-2 text-sm">
-                        {{ quote.recipients }} destinataire(s) × {{ quote.unitPrice | xaf }}
-                        <span *ngIf="quote.discountPercent"> (remise {{ quote.discountPercent }} %)</span>
-                        <span *ngIf="quote.freeUnits"> · {{ quote.freeUnits }} offert(s)</span>
-                    </div>
+                    <ng-container *ngIf="quote.slices?.length; else flatPrice">
+                        <div class="mt-2 text-sm">
+                            {{ quote.recipients }} destinataire(s), facturés par tranches
+                            <span *ngIf="quote.freeUnits"> · {{ quote.freeUnits }} offert(s)</span>
+                        </div>
+                        <ul class="mt-1 text-xs text-secondary flex flex-col gap-0.5">
+                            <li *ngFor="let slice of quote.slices">
+                                {{ slice.from === slice.to ? slice.from : slice.from + '–' + slice.to }}
+                                destinataire(s) × {{ slice.unitPrice | xaf }} = {{ slice.amount | xaf }}
+                            </li>
+                        </ul>
+                    </ng-container>
+                    <ng-template #flatPrice>
+                        <div class="mt-2 text-sm">
+                            {{ quote.recipients }} destinataire(s) × {{ quote.unitPrice | xaf }}
+                            <span *ngIf="quote.discountPercent"> (remise {{ quote.discountPercent }} %)</span>
+                            <span *ngIf="quote.freeUnits"> · {{ quote.freeUnits }} offert(s)</span>
+                        </div>
+                    </ng-template>
                     <div class="mt-1 text-2xl font-bold">{{ quote.amountDue | xaf }}</div>
                     <div class="text-xs text-secondary">Montant maximal réservé : seuls les messages livrés seront facturés, le reste vous est rendu.</div>
-                    <div *ngIf="category" class="text-xs text-secondary">Tarif WhatsApp Business ({{ category }}), débité du portefeuille de l'organisation.</div>
+                    <div *ngIf="category" class="text-xs text-secondary">Tarif WhatsApp Business ({{ category }}){{ quote.slices?.length ? ' au volume' : '' }}, débité du portefeuille de l'organisation.</div>
                 </ng-container>
                 <ng-template #scheduled>
                     <div class="mt-2 text-sm">
-                        {{ quote.occurrenceAmount | xaf }} par envoi ({{ quote.recipients }} destinataire(s) × {{ quote.unitPrice | xaf }})
+                        {{ quote.occurrenceAmount | xaf }} par envoi
+                        <span *ngIf="!quote.slices?.length">({{ quote.recipients }} destinataire(s) × {{ quote.unitPrice | xaf }})</span>
                     </div>
+                    <ul *ngIf="quote.slices?.length" class="mt-1 text-xs text-secondary flex flex-col gap-0.5">
+                        <li *ngFor="let slice of quote.slices">
+                            {{ slice.from === slice.to ? slice.from : slice.from + '–' + slice.to }}
+                            destinataire(s) × {{ slice.unitPrice | xaf }} = {{ slice.amount | xaf }}
+                        </li>
+                    </ul>
                     <div class="mt-1 text-2xl font-bold">{{ quote.amountDue | xaf }} <span class="text-base font-medium text-secondary">réservés maintenant</span></div>
                     <div class="text-xs text-secondary">
                         <ng-container *ngIf="quote.finiteOccurrences">{{ quote.finiteOccurrences }} envoi(s) programmé(s). </ng-container>

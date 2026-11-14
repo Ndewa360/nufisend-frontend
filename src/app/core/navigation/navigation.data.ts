@@ -77,14 +77,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
     },
     {
         id   : 'message',
-        title: 'Message',
+        title: 'Campagnes',
         type : 'group',
         icon : 'mat_outline:message',
         link : '/messagerie',
         children: [
             {
                 id   : 'direct_send',
-                title: 'Messagerie',
+                title: 'Toutes les campagnes',
                 type : 'basic',
                 icon : 'feather:send',
                 link : '/messagerie',
