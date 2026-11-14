@@ -16,9 +16,9 @@ export interface AdminOrganizationRow
     _id: string;
     name: string;
     plan: string;
+    maxMembers?: number | null;
     status: 'active' | 'suspended';
     createdAt: string;
-    subscription?: Organization['subscription'];
     whatsapp?: Partial<OrganizationWhatsapp>;
     membersCount: number;
     available: number;
@@ -39,7 +39,6 @@ export interface AdminOrganizationUpdate
     suspensionReason?: string;
     plan?: string;
     maxMembers?: number | null;
-    monthlyPrice?: number;
 }
 
 export interface ManualConnection

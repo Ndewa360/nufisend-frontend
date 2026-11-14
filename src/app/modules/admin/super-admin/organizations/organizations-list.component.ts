@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { readApiError } from 'app/core/organization/organization.service';
-import { PLAN_LABELS, SUBSCRIPTION_LABELS } from 'app/core/organization/organization.types';
+import { PLAN_LABELS } from 'app/core/organization/organization.types';
 import { ToastrService } from 'ngx-toastr';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AdminOrganizationRow, OrganizationsAdminService } from './organizations-admin.service';
@@ -53,7 +53,7 @@ import { AdminOrganizationRow, OrganizationsAdminService } from './organizations
                         <thead class="bg-gray-50 dark:bg-transparent text-secondary text-sm">
                             <tr>
                                 <th class="px-4 py-3">Organisation</th>
-                                <th class="px-4 py-3">Offre / abonnement</th>
+                                <th class="px-4 py-3">Offre</th>
                                 <th class="px-4 py-3">WhatsApp</th>
                                 <th class="px-4 py-3 text-right">Membres</th>
                                 <th class="px-4 py-3 text-right">Solde</th>
@@ -70,7 +70,7 @@ import { AdminOrganizationRow, OrganizationsAdminService } from './organizations
                                 </td>
                                 <td class="px-4 py-3">
                                     <div>{{ planLabels[row.plan] || row.plan }}</div>
-                                    <div class="text-sm text-secondary">{{ subscriptionLabels[row.subscription?.status] || '—' }}</div>
+                                    <div class="text-sm text-secondary">{{ row.maxMembers > 0 ? (row.maxMembers + ' membres max') : 'membres illimités' }}</div>
                                 </td>
                                 <td class="px-4 py-3">
                                     <span class="px-2 py-0.5 rounded-full text-xs font-semibold" [ngClass]="whatsappTone(row)">{{ whatsappLabel(row) }}</span>
@@ -104,7 +104,6 @@ export class OrganizationsListComponent implements OnInit, OnDestroy
     loading = false;
 
     readonly planLabels = PLAN_LABELS;
-    readonly subscriptionLabels = SUBSCRIPTION_LABELS;
     readonly search$ = new Subject<void>();
     private readonly _destroy$ = new Subject<void>();
 

@@ -136,13 +136,11 @@ export class NewMessageComponent implements OnInit{
       return !!this.membership;
     }
 
-    /** L'organisation peut envoyer (abonnement regle, numero raccorde). */
+    /** L'organisation peut envoyer (numero WhatsApp Business raccorde). */
     get cloudReady(): boolean
     {
       const org = this.membership?.organization;
       return !!org && org.status === 'active'
-        && org.subscription?.status !== 'pending_payment'
-        && org.subscription?.status !== 'suspended'
         && org.whatsapp?.status === 'connected';
     }
 

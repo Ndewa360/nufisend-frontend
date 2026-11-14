@@ -1,7 +1,5 @@
 export type OrgRole = 'owner' | 'admin' | 'member';
 
-export type SubscriptionStatus = 'pending_payment' | 'active' | 'past_due' | 'suspended';
-
 export type WhatsappConnectionStatus = 'not_connected' | 'connected' | 'error';
 
 export interface OrganizationWhatsapp
@@ -31,15 +29,6 @@ export interface Organization
     maxMembers?: number | null;
     suspensionReason?: string;
     whatsapp?: OrganizationWhatsapp;
-    subscription?: {
-        status: SubscriptionStatus;
-        monthlyPrice: number;
-        currentPeriodEnd?: string;
-        graceUntil?: string;
-        lastChargedAt?: string;
-        includedMessages?: number;
-        messagesUsed?: number;
-    };
     createdAt?: string;
 }
 
@@ -52,8 +41,7 @@ export interface Membership
     membersCount: number;
     pendingInvitations: number;
     maxMembers: number;
-    plan?: { id: string; price: number; maxMembers: number; monthlyMessages: number };
-    quota?: { includedMessages: number; messagesUsed: number; remainingMessages: number };
+    plan?: { id: string; maxMembers: number };
     wallet: { available: number; reserved: number };
 }
 
@@ -91,23 +79,6 @@ export interface InvitationPreview
     expired: boolean;
 }
 
-export interface OrganizationPlan
-{
-    id: string;
-    price: number;
-    maxMembers: number;
-    unlimitedMembers: boolean;
-    monthlyMessages: number;
-    onQuote: boolean;
-}
-
-export interface PlansCatalog
-{
-    currency: string;
-    plans: OrganizationPlan[];
-    cloudPrices: Record<string, number>;
-}
-
 export interface WhatsappTemplate
 {
     _id: string;
@@ -134,13 +105,6 @@ export const ORG_ROLE_LABELS: Record<OrgRole, string> = {
     owner : 'Propriétaire',
     admin : 'Administrateur',
     member: 'Membre',
-};
-
-export const SUBSCRIPTION_LABELS: Record<SubscriptionStatus, string> = {
-    pending_payment: 'En attente de paiement',
-    active         : 'Actif',
-    past_due       : 'Impayé (période de grâce)',
-    suspended      : 'Suspendu',
 };
 
 export const PLAN_LABELS: Record<string, string> = {

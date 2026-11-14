@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { ActivatedRoute } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { readApiError } from 'app/core/organization/organization.service';
-import { ORG_ROLE_LABELS, OrganizationWhatsapp, PLAN_LABELS, SUBSCRIPTION_LABELS } from 'app/core/organization/organization.types';
+import { ORG_ROLE_LABELS, OrganizationWhatsapp, PLAN_LABELS } from 'app/core/organization/organization.types';
 import { ToastrService } from 'ngx-toastr';
 import { AdminOrganizationDetails, OrganizationsAdminService } from './organizations-admin.service';
 
@@ -34,9 +34,8 @@ import { AdminOrganizationDetails, OrganizationsAdminService } from './organizat
                 </div>
                 <div class="text-secondary mt-1">
                     Offre {{ planLabels[d.organization.plan] || d.organization.plan }} ·
-                    abonnement {{ subscriptionLabels[d.organization.subscription?.status] || '—' }}
-                    ({{ (d.organization.subscription?.monthlyPrice || 0) | xaf }} / mois)
-                    <ng-container *ngIf="d.organization.subscription?.currentPeriodEnd"> · jusqu'au {{ d.organization.subscription.currentPeriodEnd | date:'dd/MM/yyyy' }}</ng-container>
+                    {{ d.maxMembers > 0 ? (d.maxMembers + ' membres max') : 'membres illimités' }} ·
+                    facturation des campagnes au volume
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
@@ -49,10 +48,6 @@ import { AdminOrganizationDetails, OrganizationsAdminService } from './organizat
                                 <mat-select [(ngModel)]="form.plan">
                                     <mat-option *ngFor="let plan of plans" [value]="plan">{{ planLabels[plan] }}</mat-option>
                                 </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Prix mensuel (FCFA)</mat-label>
-                                <input matInput type="number" min="0" [(ngModel)]="form.monthlyPrice">
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                 <mat-label>Nombre de membres max</mat-label>
@@ -160,14 +155,13 @@ export class OrganizationDetailsComponent implements OnInit
     whatsapp: OrganizationWhatsapp | null = null;
     saving = false;
     connecting = false;
-    form: { plan: string; monthlyPrice: number; maxMembers: number | null; status: 'active' | 'suspended'; suspensionReason: string } = {
-        plan: 'starter', monthlyPrice: 0, maxMembers: null, status: 'active', suspensionReason: '',
+    form: { plan: string; maxMembers: number | null; status: 'active' | 'suspended'; suspensionReason: string } = {
+        plan: 'starter', maxMembers: null, status: 'active', suspensionReason: '',
     };
     connection = { wabaId: '', phoneNumberId: '', accessToken: '', register: false, pin: '' };
 
     readonly plans = ['decouverte', 'starter', 'business', 'pro', 'enterprise'];
     readonly planLabels = PLAN_LABELS;
-    readonly subscriptionLabels = SUBSCRIPTION_LABELS;
     readonly roleLabels = ORG_ROLE_LABELS;
 
     constructor(
@@ -201,7 +195,6 @@ export class OrganizationDetailsComponent implements OnInit
                 const org = details.organization;
                 this.form = {
                     plan            : org.plan,
-                    monthlyPrice    : org.subscription?.monthlyPrice ?? 0,
                     maxMembers      : org.maxMembers ?? null,
                     status          : org.status,
                     suspensionReason: org.suspensionReason || '',
@@ -224,7 +217,6 @@ export class OrganizationDetailsComponent implements OnInit
         this.saving = true;
         this._admin.update(this.id, {
             plan            : this.form.plan,
-            monthlyPrice    : Number(this.form.monthlyPrice) || 0,
             maxMembers      : this.form.maxMembers ? Number(this.form.maxMembers) : null,
             status          : this.form.status,
             ...(this.form.status === 'suspended' ? { suspensionReason: this.form.suspensionReason.trim() } : {}),

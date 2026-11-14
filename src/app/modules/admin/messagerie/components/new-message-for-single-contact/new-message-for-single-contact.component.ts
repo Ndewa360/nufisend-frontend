@@ -119,8 +119,6 @@ export class NewMessageForSingleContactComponent {
     {
       const org = this.membership?.organization;
       return !!org && org.status === 'active'
-        && org.subscription?.status !== 'pending_payment'
-        && org.subscription?.status !== 'suspended'
         && org.whatsapp?.status === 'connected';
     }
 

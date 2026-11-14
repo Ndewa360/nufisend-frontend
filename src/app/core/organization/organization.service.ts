@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Observable, catchError, filter, map, of, shareReplay, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, map, of, tap } from 'rxjs';
 import {
     Conversation,
     InboxMessage,
@@ -11,7 +11,6 @@ import {
     OrganizationInvitation,
     OrganizationMember,
     OrganizationWhatsapp,
-    PlansCatalog,
     TemplateRef,
     WhatsappTemplate,
 } from './organization.types';
@@ -37,7 +36,6 @@ export class OrganizationService
 {
     private readonly _membership = new BehaviorSubject<Membership | null | undefined>(undefined);
     private readonly _baseUrl = `${environment.apiUrl}/organizations`;
-    private _plans$: Observable<PlansCatalog> | null = null;
 
     constructor(private _http: HttpClient) {}
 
@@ -96,19 +94,10 @@ export class OrganizationService
 
     // ------------------------------------------------------------ organisation
 
-    plans(): Observable<PlansCatalog>
-    {
-        this._plans$ ??= this._http.get<ApiResponse<PlansCatalog>>(`${this._baseUrl}/plans`).pipe(
-            data<PlansCatalog>(),
-            shareReplay(1),
-        );
-        return this._plans$;
-    }
-
-    create(name: string, plan: string): Observable<Membership>
+    create(name: string): Observable<Membership>
     {
         return this._http
-            .post<ApiResponse<Membership>>(this._baseUrl, { name, plan })
+            .post<ApiResponse<Membership>>(this._baseUrl, { name })
             .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
     }
 
@@ -116,20 +105,6 @@ export class OrganizationService
     {
         return this._http
             .patch<ApiResponse<Membership>>(`${this._baseUrl}/me`, { name })
-            .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
-    }
-
-    paySubscription(): Observable<Membership>
-    {
-        return this._http
-            .post<ApiResponse<Membership>>(`${this._baseUrl}/me/subscription/pay`, {})
-            .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
-    }
-
-    changePlan(plan: string): Observable<Membership>
-    {
-        return this._http
-            .post<ApiResponse<Membership>>(`${this._baseUrl}/me/subscription/plan`, { plan })
             .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
     }
 

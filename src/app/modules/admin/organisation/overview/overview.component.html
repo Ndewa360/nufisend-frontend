@@ -20,36 +20,12 @@
                 Vos messages programmés personnels sont arrêtés et vos contacts personnels ne sont pas partagés.
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
-                <button type="button"
-                        *ngFor="let plan of selfServicePlans"
-                        class="text-left bg-card rounded-2xl shadow p-6 border-2 transition-colors"
-                        [ngClass]="selectedPlan === plan.id ? 'border-primary' : 'border-transparent'"
-                        (click)="selectedPlan = plan.id">
-                    <div class="flex items-center justify-between">
-                        <div class="text-xl font-semibold">{{ planLabels[plan.id] || plan.id }}</div>
-                        <mat-icon *ngIf="selectedPlan === plan.id" class="text-primary" svgIcon="heroicons_solid:check-circle"></mat-icon>
-                    </div>
-                    <div class="mt-3 text-3xl font-bold">{{ plan.price | xaf }}<span class="text-base font-medium text-secondary"> / mois</span></div>
-                    <div class="mt-2 text-secondary">{{ membersLabel(plan) }}</div>
-                    <div class="text-sm text-secondary">{{ plan.monthlyMessages | number }} messages inclus</div>
-                </button>
-                <div *ngFor="let plan of quotePlans" class="bg-card rounded-2xl shadow p-6">
-                    <div class="text-xl font-semibold">{{ planLabels[plan.id] || plan.id }}</div>
-                    <div class="mt-3 text-3xl font-bold">Sur devis</div>
-                    <div class="mt-2 text-secondary">{{ membersLabel(plan) }} · contactez NufiSend</div>
+            <div class="mt-6 bg-card rounded-2xl shadow p-6 max-w-3xl">
+                <div class="font-semibold">Aucun abonnement</div>
+                <div class="mt-2 text-sm text-secondary">
+                    Vous ne payez que les messages livrés, au volume, depuis le portefeuille de l'organisation.
+                    Le prix unitaire baisse au-delà de 500 puis de 3 000 destinataires.
                 </div>
-            </div>
-
-            <div *ngIf="catalog" class="mt-6 bg-card rounded-2xl shadow p-6 max-w-3xl">
-                <div class="font-semibold">Prix par message livré (numéro WhatsApp Business)</div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3">
-                    <div *ngFor="let category of cloudCategories">
-                        <div class="text-sm text-secondary">{{ categoryLabels[category] }}</div>
-                        <div class="text-lg font-semibold">{{ (catalog.cloudPrices[category] || 0) | xaf }}</div>
-                    </div>
-                </div>
-                <div class="text-xs text-secondary mt-3">Seuls les messages livrés sont facturés, depuis le portefeuille de l'organisation.</div>
             </div>
 
             <div class="mt-6 bg-card rounded-2xl shadow p-6 max-w-3xl">
@@ -102,46 +78,11 @@
 
             <fuse-alert *ngIf="!canSend && membership.organization.status === 'active'" class="mt-6" type="warning" appearance="border">
                 <span fuseAlertTitle>Envois désactivés</span>
-                <ng-container *ngIf="membership.organization.subscription?.status === 'pending_payment' || membership.organization.subscription?.status === 'suspended'">
-                    L'abonnement n'est pas réglé : rechargez le portefeuille de l'organisation puis réglez l'abonnement.
-                </ng-container>
-                <ng-container *ngIf="membership.organization.subscription?.status !== 'pending_payment' && membership.organization.subscription?.status !== 'suspended'">
-                    Le numéro WhatsApp Business n'est pas raccordé.
-                    <a class="underline" routerLink="/organisation/whatsapp">Voir le raccordement</a>
-                </ng-container>
+                Le numéro WhatsApp Business n'est pas raccordé.
+                <a class="underline" routerLink="/organisation/whatsapp">Voir le raccordement</a>
             </fuse-alert>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
-                <!-- Abonnement -->
-                <div class="bg-card rounded-2xl shadow p-6 flex flex-col">
-                    <div class="text-secondary font-medium">Abonnement</div>
-                    <div class="mt-2">
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold" [ngClass]="subscriptionTone">
-                            {{ subscriptionLabels[membership.organization.subscription?.status] || '—' }}
-                        </span>
-                    </div>
-                    <div class="mt-3 text-2xl font-bold">{{ (membership.organization.subscription?.monthlyPrice || 0) | xaf }}<span class="text-sm font-medium text-secondary"> / mois</span></div>
-                    <div *ngIf="membership.organization.subscription?.currentPeriodEnd" class="text-sm text-secondary mt-1">
-                        Jusqu'au {{ membership.organization.subscription.currentPeriodEnd | date:'dd/MM/yyyy' }}
-                    </div>
-                    <div *ngIf="membership.organization.subscription?.status === 'past_due' && membership.organization.subscription?.graceUntil" class="text-sm text-amber-600 mt-1">
-                        Envois coupés le {{ membership.organization.subscription.graceUntil | date:'dd/MM/yyyy' }} sans paiement
-                    </div>
-                    <ng-container *ngIf="quota.includedMessages > 0">
-                        <div class="mt-3 text-sm text-secondary">
-                            Messages inclus : {{ quota.messagesUsed | number }} / {{ quota.includedMessages | number }}
-                        </div>
-                        <div class="mt-1 h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                            <div class="h-full rounded-full bg-primary" [style.width.%]="quotaPercent"></div>
-                        </div>
-                        <div class="text-xs text-secondary mt-1">{{ quota.remainingMessages | number }} restant(s) ce mois</div>
-                    </ng-container>
-                    <div class="flex-auto"></div>
-                    <button *ngIf="membership.isManager && needsPayment" class="mt-4" mat-flat-button color="primary" type="button" [disabled]="busy" (click)="pay()">
-                        Régler maintenant
-                    </button>
-                </div>
-
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                 <!-- Portefeuille -->
                 <div class="bg-card rounded-2xl shadow p-6 flex flex-col">
                     <div class="text-secondary font-medium">Portefeuille de l'organisation</div>
@@ -178,37 +119,6 @@
                     </ng-container>
                     <div class="flex-auto"></div>
                     <a class="mt-4" mat-stroked-button color="primary" routerLink="/organisation/whatsapp">Numéro et modèles</a>
-                </div>
-            </div>
-
-            <div *ngIf="membership.isManager && selfServicePlans.length" class="mt-6 bg-card rounded-2xl shadow p-6">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div>
-                        <div class="font-semibold">Offre et messages inclus</div>
-                        <div class="text-sm text-secondary">
-                            Offre actuelle : {{ planLabels[currentPlan.id] || currentPlan.id }}
-                            <ng-container *ngIf="currentPlan.monthlyMessages > 0">
-                                · {{ currentPlan.monthlyMessages | number }} messages par mois
-                            </ng-container>
-                        </div>
-                    </div>
-                    <div class="text-sm text-secondary">Le changement est facturé immédiatement pour un nouveau mois.</div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mt-4">
-                    <button type="button"
-                            *ngFor="let plan of selfServicePlans"
-                            class="text-left rounded-xl border-2 p-4 transition-colors disabled:opacity-60"
-                            [ngClass]="currentPlan.id === plan.id ? 'border-primary' : 'border-gray-200 dark:border-gray-700'"
-                            [disabled]="busy || currentPlan.id === plan.id"
-                            (click)="changePlan(plan)">
-                        <div class="flex items-center justify-between">
-                            <div class="font-semibold">{{ planLabels[plan.id] || plan.id }}</div>
-                            <mat-icon *ngIf="currentPlan.id === plan.id" class="text-primary icon-size-5" svgIcon="heroicons_solid:check-circle"></mat-icon>
-                        </div>
-                        <div class="mt-2 text-xl font-bold">{{ plan.price | xaf }}<span class="text-xs font-medium text-secondary"> / mois</span></div>
-                        <div class="text-sm text-secondary mt-1">{{ membersLabel(plan) }}</div>
-                        <div class="text-sm text-secondary">{{ plan.monthlyMessages | number }} messages inclus</div>
-                    </button>
                 </div>
             </div>
 

@@ -100,8 +100,6 @@ export class InboxComponent implements OnInit, OnDestroy
     {
         const org = this.membership?.organization;
         return !!org && org.status === 'active'
-            && org.subscription?.status !== 'pending_payment'
-            && org.subscription?.status !== 'suspended'
             && org.whatsapp?.status === 'connected';
     }
 
