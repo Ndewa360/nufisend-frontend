@@ -60,7 +60,7 @@ export interface MessageModel
     messageTemplateId?:string;
 
     /** Modele WhatsApp approuve (membres d'organisation, API Cloud). */
-    template?: { name: string; language?: string; variables?: string[]; headerMediaUrl?: string };
+    template?: { name: string; language?: string; variables?: string[]; headerMediaUrl?: string; urlVariableValue?: string };
 
     planification?:MessagePlanification[];
 

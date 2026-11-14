@@ -80,6 +80,11 @@ const MEDIA_HEADERS = ['IMAGE', 'VIDEO', 'DOCUMENT'];
                         <input matInput [(ngModel)]="headerMediaUrl" (ngModelChange)="emit()" placeholder="https://…">
                         <mat-hint>Ou joignez le fichier au message.</mat-hint>
                     </mat-form-field>
+                    <mat-form-field *ngIf="needsUrlVariable" class="w-full mt-3" appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Valeur du lien personnalisé ({{ '{{1}}' }})</mat-label>
+                        <input matInput [(ngModel)]="urlVariableValue" (ngModelChange)="emit()" placeholder="Ex. : ABC123 ou {{ '{{receiverFullName}}' }}">
+                        <mat-hint>Ce modèle contient un bouton URL avec une variable : Meta exige sa valeur à l'envoi.</mat-hint>
+                    </mat-form-field>
                 </ng-container>
             </ng-container>
         </ng-container>
@@ -99,6 +104,7 @@ export class CloudTemplatePickerComponent implements OnInit
     selected: WhatsappTemplate | null = null;
     variables: string[] = [];
     headerMediaUrl = '';
+    urlVariableValue = '';
 
     readonly categoryLabels = TEMPLATE_CATEGORY_LABELS;
 
@@ -131,6 +137,13 @@ export class CloudTemplatePickerComponent implements OnInit
         return !!this.selected && MEDIA_HEADERS.includes(String(this.selected.headerFormat || '')) && !this.hasAttachment;
     }
 
+    /** Vrai si le modele contient un bouton URL avec {{1}}. */
+    get needsUrlVariable(): boolean
+    {
+        const buttons: any = (this.selected?.components || []).find((component: any) => component.type === 'BUTTONS');
+        return !!buttons?.buttons?.some((button: any) => button.type === 'URL' && /\{\{\s*1\s*\}\}/.test(button.url || ''));
+    }
+
     get previewText(): string
     {
         return templateBody(this.selected).replace(/\{\{\s*(\d+)\s*\}\}/g, (match, index) => this.variables[Number(index) - 1] || match);
@@ -151,6 +164,7 @@ export class CloudTemplatePickerComponent implements OnInit
         this.selected = this.templates.find((template) => this.keyOf(template) === this.selectedKey) || null;
         this.variables = Array.from({ length: this.selected?.bodyVariables || 0 }, () => '');
         this.headerMediaUrl = '';
+        this.urlVariableValue = '';
         this.emit();
     }
 
@@ -166,13 +180,15 @@ export class CloudTemplatePickerComponent implements OnInit
             return;
         }
         const complete = this.variables.every((value) => !!value.trim())
-            && (!this.needsHeaderMedia || /^https?:\/\//.test(this.headerMediaUrl.trim()));
+            && (!this.needsHeaderMedia || /^https?:\/\//.test(this.headerMediaUrl.trim()))
+            && (!this.needsUrlVariable || !!this.urlVariableValue.trim());
         this.selectionChange.emit({
             template: {
                 name     : this.selected.name,
                 language : this.selected.language,
                 variables: this.variables.map((value) => value.trim()),
                 ...(this.needsHeaderMedia && this.headerMediaUrl.trim() ? { headerMediaUrl: this.headerMediaUrl.trim() } : {}),
+                ...(this.needsUrlVariable ? { urlVariableValue: this.urlVariableValue.trim() } : {}),
             },
             category: String(this.selected.category || 'marketing').toLowerCase(),
             preview : this.previewText,

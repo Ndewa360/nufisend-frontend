@@ -14,7 +14,10 @@
 
     <fuse-alert *ngIf="isCloud" class="m-4 sm:mx-8" [type]="cloudReady ? 'info' : 'warning'" [appearance]="'border'" [showIcon]="true">
         <span *ngIf="cloudReady">Envoi par le numéro WhatsApp Business de {{ membership.organization.name }}. Sans modèle, le contact doit vous avoir écrit dans les dernières 24 h.</span>
-        <span *ngIf="!cloudReady">L'organisation ne peut pas envoyer pour le moment (numéro WhatsApp Business ou ligne de crédit).</span>
+        <div *ngIf="!cloudReady" class="flex flex-col sm:flex-row sm:items-center gap-1">
+            <span>L'organisation ne peut pas envoyer pour le moment (numéro WhatsApp Business ou ligne de crédit).</span>
+            <a mat-button color="primary" routerLink="/organisation/whatsapp" (click)="saveAndClose()">Configurer WhatsApp Business</a>
+        </div>
     </fuse-alert>
 
     <fuse-alert *ngIf="!isCloud && !isWhatsAppSynced" class="m-4 sm:mx-8" [type]="'warning'" [appearance]="'border'" [showIcon]="true">

@@ -196,6 +196,25 @@ export class OrganizationService
             .pipe(data<OrganizationWhatsapp>());
     }
 
+    /** Raccordement manuel en autonomie avec ses propres identifiants Meta. */
+    connectManual(input: {
+        wabaId: string; phoneNumberId: string; accessToken: string;
+        register?: boolean; pin?: string; mode?: WhatsappConnectionMode;
+    }): Observable<OrganizationWhatsapp>
+    {
+        return this._http
+            .post<ApiResponse<OrganizationWhatsapp>>(`${this._baseUrl}/me/whatsapp/connect-manual`, input)
+            .pipe(data<OrganizationWhatsapp>(), tap(() => this.load().subscribe()));
+    }
+
+    /** Recommencer le raccordement depuis le debut. */
+    disconnectWhatsapp(): Observable<OrganizationWhatsapp>
+    {
+        return this._http
+            .delete<ApiResponse<OrganizationWhatsapp>>(`${this._baseUrl}/me/whatsapp`)
+            .pipe(data<OrganizationWhatsapp>(), tap(() => this.load().subscribe()));
+    }
+
     templates(approvedOnly = false): Observable<WhatsappTemplate[]>
     {
         const params = approvedOnly ? new HttpParams().set('approved', 'true') : undefined;
@@ -204,9 +223,9 @@ export class OrganizationService
             .pipe(data<WhatsappTemplate[]>());
     }
 
-    syncTemplates(): Observable<unknown>
+    syncTemplates(): Observable<WhatsappTemplate[]>
     {
-        return this._http.post<ApiResponse<unknown>>(`${this._baseUrl}/me/whatsapp/templates/sync`, {}).pipe(data<unknown>());
+        return this._http.post<ApiResponse<WhatsappTemplate[]>>(`${this._baseUrl}/me/whatsapp/templates/sync`, {}).pipe(data<WhatsappTemplate[]>());
     }
 
     createTemplate(input: {
@@ -215,8 +234,14 @@ export class OrganizationService
         category: string;
         body: string;
         bodyExamples?: string[];
+        headerFormat?: string;
         headerText?: string;
+        headerMediaUrl?: string;
         footer?: string;
+        buttons?: {
+            type: string; text: string; url?: string;
+            urlExample?: string; phoneNumber?: string;
+        }[];
     }): Observable<WhatsappTemplate>
     {
         return this._http

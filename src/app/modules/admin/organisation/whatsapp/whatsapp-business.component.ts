@@ -10,6 +10,7 @@ import {
     templateBody,
 } from 'app/core/organization/organization.types';
 import { ToastrService } from 'ngx-toastr';
+import { Socket } from 'ngx-socket-io';
 import { Subject, takeUntil } from 'rxjs';
 
 declare global
@@ -18,16 +19,29 @@ declare global
 }
 
 const TEMPLATE_STATUS: Record<string, { label: string; tone: string }> = {
-    APPROVED: { label: 'Approuvé', tone: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' },
-    PENDING : { label: 'En revue chez Meta', tone: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200' },
-    REJECTED: { label: 'Refusé', tone: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' },
-    PAUSED  : { label: 'En pause', tone: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' },
-    DISABLED: { label: 'Désactivé', tone: 'bg-gray-200 text-gray-700' },
+    APPROVED : { label: 'Approuvé', tone: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' },
+    PENDING  : { label: 'En revue chez Meta', tone: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200' },
+    REJECTED : { label: 'Refusé', tone: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' },
+    PAUSED   : { label: 'En pause', tone: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' },
+    DISABLED : { label: 'Désactivé', tone: 'bg-gray-200 text-gray-700' },
+    IN_APPEAL: { label: 'En appel', tone: 'bg-blue-100 text-blue-800' },
+    DELETED  : { label: 'Supprimé', tone: 'bg-gray-200 text-gray-700' },
 };
 
+interface ButtonDraft
+{
+    type: 'QUICK_REPLY' | 'URL' | 'PHONE_NUMBER' | 'OTP';
+    text: string;
+    url: string;
+    urlExample: string;
+    phoneNumber: string;
+}
+
 /**
- * Numero WhatsApp Business de l'organisation (raccordement via la connexion
- * Meta integree, sinon par le support NufiSend) et modeles de messages.
+ * Numero WhatsApp Business de l'organisation : raccordement autonome via la
+ * connexion Meta (Embedded Signup) ou avec ses propres identifiants, puis
+ * creation et suivi de l'approbation des modeles. Aucune intervention du
+ * support NufiSend n'est necessaire.
  */
 @Component({
     selector       : 'app-organisation-whatsapp',
@@ -45,6 +59,9 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
     syncing = false;
     creating = false;
     showCreate = false;
+    showManual = false;
+    showButtons = false;
+    manual = { wabaId: '', phoneNumberId: '', accessToken: '', pin: '', register: false, mode: 'standard' as WhatsappConnectionMode };
     draft = this._emptyDraft();
 
     readonly categoryLabels = TEMPLATE_CATEGORY_LABELS;
@@ -54,14 +71,30 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         { code: 'fr', label: 'Français' },
         { code: 'en', label: 'Anglais' },
         { code: 'en_US', label: 'Anglais (US)' },
+        { code: 'fr_FR', label: 'Français (France)' },
     ];
+    readonly headerFormats = [
+        { code: 'NONE', label: 'Aucun en-tête' },
+        { code: 'TEXT', label: 'Texte' },
+        { code: 'IMAGE', label: 'Image' },
+        { code: 'VIDEO', label: 'Vidéo' },
+        { code: 'DOCUMENT', label: 'Document' },
+    ];
+    readonly buttonTypes = [
+        { code: 'QUICK_REPLY', label: 'Réponse rapide' },
+        { code: 'URL', label: 'Lien (URL)' },
+        { code: 'PHONE_NUMBER', label: 'Appeler' },
+        { code: 'OTP', label: 'Code à copier (authentification)' },
+    ];
+    readonly mediaHeaders = ['IMAGE', 'VIDEO', 'DOCUMENT'];
+
+    /** Mode choisi avant la connexion Meta : numero neuf ou deja dans WhatsApp Business. */
+    signupMode: WhatsappConnectionMode = 'standard';
 
     private _signupSession: { wabaId?: string; phoneNumberId?: string } = {};
-
-    /** Mode choisi avant la connexion Meta : numero neuf ou numero deja utilise dans WhatsApp Business. */
-    signupMode: WhatsappConnectionMode = 'standard';
     private readonly _onMessage = (event: MessageEvent) => this._handleSignupMessage(event);
     private _unsubscribeAll = new Subject<void>();
+    private _pollTimer: ReturnType<typeof setInterval> | null = null;
 
     constructor(
         private _organizationService: OrganizationService,
@@ -69,6 +102,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         private _toastr: ToastrService,
         private _zone: NgZone,
         private _cdr: ChangeDetectorRef,
+        private _socket: Socket,
     )
     {
     }
@@ -80,12 +114,16 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
             this._cdr.markForCheck();
         });
         window.addEventListener('message', this._onMessage);
+        this._socket.fromEvent<any>('template-status')
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => this.refreshTemplates(true));
         this.reload();
     }
 
     ngOnDestroy(): void
     {
         window.removeEventListener('message', this._onMessage);
+        this._stopPolling();
         this._unsubscribeAll.next();
         this._unsubscribeAll.complete();
     }
@@ -95,10 +133,62 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         return !!this.membership?.isManager;
     }
 
+    get embeddedEnabled(): boolean
+    {
+        return !!this.whatsapp?.embeddedSignup?.enabled;
+    }
+
+    /** Indices des variables {{n}} du corps, dans l'ordre. */
+    get variableIndexes(): number[]
+    {
+        const indexes = new Set<number>();
+        for (const match of (this.draft.body || '').matchAll(/\{\{\s*(\d+)\s*\}\}/g))
+            indexes.add(Number(match[1]));
+        return [...indexes].sort((a, b) => a - b);
+    }
+
     get variablesCount(): number
     {
-        const matches = this.draft.body.match(/\{\{\s*(\d+)\s*\}\}/g) || [];
-        return new Set(matches.map((m) => m.replace(/\D/g, ''))).size;
+        return this.variableIndexes.length;
+    }
+
+    /** Erreur de numerotation des variables (Meta exige 1,2,3... sans trou). */
+    get variablesIssue(): string | null
+    {
+        const indexes = this.variableIndexes;
+        if (indexes.some((index, i) => index !== i + 1))
+            return 'Numérotez les variables {{1}}, {{2}}, {{3}}… sans sauter de numéro.';
+        if (/\{\{\s*\d+\s*\}\}\s*\{\{\s*\d+\s*\}\}/.test(this.draft.body || ''))
+            return 'Séparez les variables par du texte : Meta refuse {{1}}{{2}} collés.';
+        return null;
+    }
+
+    get hasPendingTemplates(): boolean
+    {
+        return this.templates.some((template) => template.status === 'PENDING' || template.status === 'IN_APPEAL');
+    }
+
+    /** Apercu du modele tel qu'il sera soumis a Meta. */
+    get preview(): string
+    {
+        const parts: string[] = [];
+        if (this.draft.headerFormat === 'TEXT' && this.draft.headerText.trim())
+            parts.push(this.draft.headerText.trim());
+        else if (this.mediaHeaders.includes(this.draft.headerFormat))
+            parts.push(`[${this.draft.headerFormat.toLowerCase()} : ${this.draft.headerMediaUrl.trim() || 'exemple à fournir'}]`);
+        let body = this.draft.body || '';
+        this.draft.bodyExamples.forEach((example, i) => {
+            body = body.split(new RegExp(`\\{\\{\\s*${i + 1}\\s*\\}\\}`, 'g')).join(example || `{{${i + 1}}}`);
+        });
+        if (body) parts.push(body);
+        if (this.draft.footer.trim()) parts.push(this.draft.footer.trim());
+        this.draft.buttons.forEach((button) => {
+            if (button.type === 'OTP') parts.push(`[Bouton : ${button.text || 'Copier le code'}]`);
+            else if (button.type === 'URL') parts.push(`[Lien : ${button.text || 'Ouvrir'}]`);
+            else if (button.type === 'PHONE_NUMBER') parts.push(`[Appel : ${button.text || 'Appeler'}]`);
+            else parts.push(`[Réponse : ${button.text || '...'}]`);
+        });
+        return parts.join('\n');
     }
 
     reload(): void
@@ -109,7 +199,8 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
                 this.whatsapp = whatsapp;
                 this.loading = false;
                 this._cdr.markForCheck();
-                if (whatsapp?.status === 'connected') this.loadTemplates();
+                if (whatsapp?.status === 'connected') this.refreshTemplates(true);
+                else this._stopPolling();
             },
             error: (error) => {
                 this.loading = false;
@@ -119,15 +210,48 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         });
     }
 
-    loadTemplates(): void
+    /** Relit les statuts chez Meta : filet de securite si un webhook est perdu. */
+    refreshTemplates(silent = false): void
     {
-        this._organizationService.templates().subscribe({
+        if (!silent) this.syncing = true;
+        this._organizationService.syncTemplates().subscribe({
             next : (templates) => {
-                this.templates = templates;
+                this.templates = templates || [];
+                this.syncing = false;
+                this._schedulePolling();
                 this._cdr.markForCheck();
             },
-            error: () => undefined,
+            error: (error) => {
+                this.syncing = false;
+                if (!silent) this._toastr.error(readApiError(error), 'Modèles');
+                this._organizationService.templates().subscribe({
+                    next : (templates) => {
+                        this.templates = templates;
+                        this._schedulePolling();
+                        this._cdr.markForCheck();
+                    },
+                    error: () => undefined,
+                });
+                this._cdr.markForCheck();
+            },
         });
+    }
+
+    private _schedulePolling(): void
+    {
+        if (this.hasPendingTemplates && !this._pollTimer) {
+            this._pollTimer = setInterval(() => this.refreshTemplates(true), 30_000);
+        } else if (!this.hasPendingTemplates) {
+            this._stopPolling();
+        }
+    }
+
+    private _stopPolling(): void
+    {
+        if (this._pollTimer) {
+            clearInterval(this._pollTimer);
+            this._pollTimer = null;
+        }
     }
 
     refresh(): void
@@ -139,6 +263,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
                 this.loading = false;
                 this._toastr.success('État du numéro mis à jour', 'WhatsApp Business');
                 this._organizationService.load().subscribe();
+                if (whatsapp?.status === 'connected') this.refreshTemplates(true);
                 this._cdr.markForCheck();
             },
             error: (error) => {
@@ -151,20 +276,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
 
     syncTemplates(): void
     {
-        this.syncing = true;
-        this._organizationService.syncTemplates().subscribe({
-            next : () => {
-                this.syncing = false;
-                this._toastr.success('Modèles synchronisés avec Meta', 'Modèles');
-                this.loadTemplates();
-                this._cdr.markForCheck();
-            },
-            error: (error) => {
-                this.syncing = false;
-                this._toastr.error(readApiError(error), 'Modèles');
-                this._cdr.markForCheck();
-            },
-        });
+        this.refreshTemplates(false);
     }
 
     // --------------------------------------------------------------- Embedded Signup
@@ -173,7 +285,11 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
     startEmbeddedSignup(): void
     {
         const config = this.whatsapp?.embeddedSignup;
-        if (!config?.enabled) return;
+        if (!config?.enabled) {
+            this._toastr.warning('La connexion Meta automatique n’est pas encore configurée : utilisez la connexion avec identifiants.', 'WhatsApp Business');
+            this.showManual = true;
+            return;
+        }
         this.connecting = true;
         this._signupSession = {};
         this._cdr.markForCheck();
@@ -212,9 +328,6 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         try {
             const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
             if (payload?.type !== 'WA_EMBEDDED_SIGNUP') return;
-            // Numero neuf : FINISH (numero inclus). Coexistence (application
-            // WhatsApp Business) : FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING, sans
-            // le numero, qui est lu par le serveur sur le compte.
             if (
                 payload.event === 'FINISH' ||
                 payload.event === 'FINISH_ONLY_WABA' ||
@@ -241,7 +354,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         const coexistence = this.signupMode === 'coexistence';
         if (!wabaId || (!phoneNumberId && !coexistence)) {
             this.connecting = false;
-            this._toastr.error("Aucun numéro n'a été sélectionné chez Meta : recommencez la connexion.", 'WhatsApp Business');
+            this._toastr.error("Les identifiants du compte Meta n'ont pas été reçus : recommencez la connexion.", 'WhatsApp Business');
             this._cdr.markForCheck();
             return;
         }
@@ -290,6 +403,75 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         });
     }
 
+    // --------------------------------------------------------------- connexion manuelle
+
+    openManual(): void
+    {
+        this.manual = { wabaId: '', phoneNumberId: '', accessToken: '', pin: '', register: false, mode: this.signupMode };
+        this.showManual = true;
+    }
+
+    connectManual(): void
+    {
+        const wabaId = this.manual.wabaId.trim();
+        const phoneNumberId = this.manual.phoneNumberId.trim();
+        const accessToken = this.manual.accessToken.trim();
+        if (!/^\d{5,25}$/.test(wabaId) || !/^\d{5,25}$/.test(phoneNumberId)) {
+            this._toastr.error('Identifiants Meta invalides (WABA et numéro : 5 à 25 chiffres)', 'WhatsApp Business');
+            return;
+        }
+        if (accessToken.length < 20) {
+            this._toastr.error('Jeton d’accès Meta invalide', 'WhatsApp Business');
+            return;
+        }
+        const pin = this.manual.pin.trim();
+        if (pin && !/^\d{6}$/.test(pin)) {
+            this._toastr.error('Le PIN de vérification en deux étapes doit contenir 6 chiffres', 'WhatsApp Business');
+            return;
+        }
+        this.connecting = true;
+        this._organizationService.connectManual({
+            wabaId, phoneNumberId, accessToken,
+            register: this.manual.mode === 'coexistence' ? false : this.manual.register,
+            mode    : this.manual.mode,
+            ...(pin ? { pin } : {}),
+        }).subscribe({
+            next : (whatsapp) => {
+                this.connecting = false;
+                this.showManual = false;
+                this.whatsapp = whatsapp;
+                this._toastr.success('Numéro WhatsApp Business raccordé', 'WhatsApp Business');
+                this.reload();
+            },
+            error: (error) => {
+                this.connecting = false;
+                this._toastr.error(readApiError(error), 'WhatsApp Business');
+                this._cdr.markForCheck();
+            },
+        });
+    }
+
+    restartConnection(): void
+    {
+        this._confirmation.open({
+            title  : 'Recommencer le raccordement',
+            message: 'Le numéro actuel sera déconnecté. Vous pourrez en raccorder un nouveau. Les modèles et l’historique restent conservés.',
+            actions: { confirm: { label: 'Recommencer' }, cancel: { label: 'Annuler' } },
+        }).afterClosed().subscribe((result) => {
+            if (result !== 'confirmed') return;
+            this._organizationService.disconnectWhatsapp().subscribe({
+                next : (whatsapp) => {
+                    this.whatsapp = whatsapp;
+                    this.templates = [];
+                    this._stopPolling();
+                    this._toastr.success('Numéro déconnecté : vous pouvez raccorder un nouveau numéro', 'WhatsApp Business');
+                    this._cdr.markForCheck();
+                },
+                error: (error) => this._toastr.error(readApiError(error), 'WhatsApp Business'),
+            });
+        });
+    }
+
     // --------------------------------------------------------------- modeles
 
     /** Saisie d'un exemple : garder le champ (et le focus) en place. */
@@ -302,6 +484,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
     {
         this.draft = this._emptyDraft();
         this.showCreate = true;
+        this.showButtons = false;
     }
 
     syncExamples(): void
@@ -310,42 +493,105 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         this.draft.bodyExamples = Array.from({ length: count }, (_, i) => this.draft.bodyExamples[i] || '');
     }
 
-    createTemplate(): void
+    addButton(): void
+    {
+        const type = this.draft.category === 'AUTHENTICATION' ? 'OTP' : 'QUICK_REPLY';
+        this.draft.buttons.push({ type: type as ButtonDraft['type'], text: '', url: '', urlExample: '', phoneNumber: '' });
+        this.showButtons = true;
+    }
+
+    removeButton(index: number): void
+    {
+        this.draft.buttons.splice(index, 1);
+    }
+
+    onCategoryChange(): void
+    {
+        if (this.draft.category === 'AUTHENTICATION' && !this.draft.buttons.some((button) => button.type === 'OTP')) {
+            this.draft.buttons = [{ type: 'OTP', text: 'Copier le code', url: '', urlExample: '', phoneNumber: '' }];
+            this.showButtons = true;
+        }
+    }
+
+    private _validateDraft(): string | null
     {
         const name = this.draft.name.trim().toLowerCase();
-        if (!/^[a-z0-9_]+$/.test(name)) {
-            this._toastr.error('Nom : lettres minuscules, chiffres et _ uniquement (ex. promo_noel)', 'Modèle');
-            return;
-        }
-        if (!this.draft.body.trim()) {
-            this._toastr.error('Le texte du modèle est requis', 'Modèle');
-            return;
-        }
+        if (!/^[a-z0-9_]+$/.test(name))
+            return 'Nom : lettres minuscules, chiffres et _ uniquement (ex. promo_noel).';
+        if (!this.draft.body.trim()) return 'Le texte du modèle est requis.';
+        if (this.variablesIssue) return this.variablesIssue;
         this.syncExamples();
-        if (this.draft.bodyExamples.some((value) => !value.trim())) {
-            this._toastr.error('Donnez un exemple pour chaque variable {{n}} : Meta les exige pour valider le modèle', 'Modèle');
+        if (this.draft.bodyExamples.some((value) => !value.trim()))
+            return 'Donnez un exemple pour chaque variable {{n}} : Meta les exige pour valider le modèle.';
+        if (this.draft.headerFormat === 'TEXT' && !this.draft.headerText.trim())
+            return 'Le texte de l’en-tête est requis.';
+        if (this.mediaHeaders.includes(this.draft.headerFormat) && !/^https:\/\//.test(this.draft.headerMediaUrl.trim()))
+            return 'Un lien public https vers un exemple de média est requis pour cet en-tête.';
+        const buttons = this.draft.buttons;
+        const hasOtp = buttons.some((button) => button.type === 'OTP');
+        const hasQuickReply = buttons.some((button) => button.type === 'QUICK_REPLY');
+        const hasCta = buttons.some((button) => button.type === 'URL' || button.type === 'PHONE_NUMBER');
+        if (buttons.some((button) => !button.text.trim() || button.text.length > 25))
+            return 'Chaque bouton doit avoir un texte de 1 à 25 caractères.';
+        if (hasOtp && buttons.length !== 1) return 'Un bouton OTP doit être le seul bouton du modèle.';
+        if (hasOtp && this.draft.category !== 'AUTHENTICATION') return 'Le bouton OTP est réservé aux modèles AUTHENTICATION.';
+        if (this.draft.category === 'AUTHENTICATION' && !hasOtp)
+            return 'Un modèle AUTHENTICATION doit contenir un bouton OTP.';
+        if (hasQuickReply && hasCta) return 'Meta interdit de mélanger réponses rapides et boutons URL / téléphone.';
+        if (hasCta && buttons.length > 3) return 'Au maximum 3 boutons URL / téléphone.';
+        if (!hasCta && buttons.length > 10) return 'Au maximum 10 boutons de réponse rapide.';
+        for (const button of buttons) {
+            if (button.type === 'URL') {
+                if (!/^https:\/\//.test(button.url.trim())) return 'Un bouton URL doit utiliser une adresse https.';
+                const hasVariable = /\{\{\s*1\s*\}\}/.test(button.url);
+                if (hasVariable && !button.urlExample.trim()) return 'Une URL contenant {{1}} doit fournir un exemple.';
+                if (!hasVariable && button.urlExample.trim()) return 'Un exemple d’URL n’est utile que si l’URL contient {{1}}.';
+            }
+            if (button.type === 'PHONE_NUMBER' && !/^\+?[\d\s-]{6,20}$/.test(button.phoneNumber.trim()))
+                return 'Numéro de téléphone du bouton invalide.';
+        }
+        return null;
+    }
+
+    createTemplate(): void
+    {
+        const error = this._validateDraft();
+        if (error) {
+            this._toastr.error(error, 'Modèle');
             return;
         }
+        const buttons = this.draft.buttons.map((button) => ({
+            type       : button.type,
+            text       : button.text.trim(),
+            ...(button.type === 'URL' ? {
+                url       : button.url.trim(),
+                ...(button.urlExample.trim() ? { urlExample: button.urlExample.trim() } : {}),
+            } : {}),
+            ...(button.type === 'PHONE_NUMBER' ? { phoneNumber: button.phoneNumber.trim() } : {}),
+        }));
         this.creating = true;
         this._organizationService.createTemplate({
-            name,
-            language    : this.draft.language,
-            category    : this.draft.category,
-            body        : this.draft.body.trim(),
-            bodyExamples: this.draft.bodyExamples.map((value) => value.trim()),
-            headerText  : this.draft.headerText.trim() || undefined,
-            footer      : this.draft.footer.trim() || undefined,
+            name          : this.draft.name.trim().toLowerCase(),
+            language      : this.draft.language,
+            category      : this.draft.category,
+            body          : this.draft.body.trim(),
+            bodyExamples  : this.draft.bodyExamples.map((value) => value.trim()),
+            headerFormat  : this.draft.headerFormat,
+            headerText    : this.draft.headerText.trim() || undefined,
+            headerMediaUrl: this.draft.headerMediaUrl.trim() || undefined,
+            footer        : this.draft.footer.trim() || undefined,
+            buttons       : buttons.length ? buttons : undefined,
         }).subscribe({
             next : () => {
                 this.creating = false;
                 this.showCreate = false;
-                this._toastr.success('Modèle soumis à Meta : la validation prend de quelques minutes à 24 h', 'Modèle');
-                this.loadTemplates();
+                this._toastr.success('Modèle soumis à Meta : la validation prend de quelques minutes à 24 h. Le statut se met à jour automatiquement.', 'Modèle');
+                this.refreshTemplates(true);
                 this._cdr.markForCheck();
             },
-            error: (error) => {
+            error: (errorResponse) => {
                 this.creating = false;
-                this._toastr.error(readApiError(error), 'Modèle');
+                this._toastr.error(readApiError(errorResponse), 'Modèle');
                 this._cdr.markForCheck();
             },
         });
@@ -362,7 +608,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
             this._organizationService.deleteTemplate(template.name).subscribe({
                 next : () => {
                     this._toastr.success('Modèle supprimé', 'Modèles');
-                    this.loadTemplates();
+                    this.refreshTemplates(true);
                 },
                 error: (error) => this._toastr.error(readApiError(error), 'Modèles'),
             });
@@ -372,13 +618,16 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
     private _emptyDraft()
     {
         return {
-            name        : '',
-            language    : 'fr',
-            category    : 'MARKETING',
-            body        : '',
-            bodyExamples: [] as string[],
-            headerText  : '',
-            footer      : '',
+            name          : '',
+            language      : 'fr',
+            category      : 'MARKETING',
+            body          : '',
+            bodyExamples  : [] as string[],
+            headerFormat  : 'NONE',
+            headerText    : '',
+            headerMediaUrl: '',
+            footer        : '',
+            buttons       : [] as ButtonDraft[],
         };
     }
 }

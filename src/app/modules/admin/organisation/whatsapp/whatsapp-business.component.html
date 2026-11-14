@@ -3,18 +3,31 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <div class="text-3xl font-bold tracking-tight">WhatsApp Business</div>
-                <div class="mt-1 text-secondary">Numéro officiel de l'organisation et modèles de messages validés par Meta.</div>
+                <div class="mt-1 text-secondary">Raccordez votre numéro, créez vos modèles et envoyez vos campagnes, sans passer par le support.</div>
             </div>
-            <button *ngIf="whatsapp?.status && whatsapp.status !== 'not_connected'" mat-stroked-button color="primary" type="button"
-                    (click)="refresh()" [disabled]="loading">
-                <mat-icon svgIcon="heroicons_outline:refresh"></mat-icon>
-                <span class="ml-2">Actualiser l'état</span>
-            </button>
+            <div class="flex gap-2">
+                <button *ngIf="whatsapp?.status && whatsapp.status !== 'not_connected'" mat-stroked-button color="primary" type="button"
+                        (click)="refresh()" [disabled]="loading">
+                    <mat-icon svgIcon="heroicons_outline:refresh"></mat-icon>
+                    <span class="ml-2">Actualiser l'état</span>
+                </button>
+                <button *ngIf="whatsapp?.status && whatsapp.status !== 'not_connected'" mat-stroked-button type="button"
+                        (click)="restartConnection()" [disabled]="loading">
+                    <mat-icon svgIcon="heroicons_outline:arrow-path"></mat-icon>
+                    <span class="ml-2">Recommencer</span>
+                </button>
+            </div>
         </div>
 
         <div *ngIf="loading && !whatsapp" class="flex justify-center py-12">
             <mat-progress-spinner [diameter]="36" mode="indeterminate"></mat-progress-spinner>
         </div>
+
+        <fuse-alert *ngIf="whatsapp?.status === 'not_connected'" class="mt-6" type="info" appearance="border">
+            <span fuseAlertTitle>Parcours en 3 étapes, en autonomie</span>
+            1. Raccordez votre numéro WhatsApp Business. 2. Créez un modèle et attendez la validation Meta (quelques minutes à 24 h).
+            3. Envoyez vos campagnes depuis la messagerie. Aucune intervention de NufiSend n'est nécessaire.
+        </fuse-alert>
 
         <!-- Numero -->
         <div *ngIf="whatsapp" class="bg-card rounded-2xl shadow p-6 mt-6">
@@ -31,7 +44,7 @@
                             <span *ngIf="whatsapp.messagingLimitTier" class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">Limite : {{ whatsapp.messagingLimitTier }}</span>
                             <span *ngIf="whatsapp.connectedAt" class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">Raccordé le {{ whatsapp.connectedAt | date:'dd/MM/yyyy' }}</span>
                             <span class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">
-                                {{ whatsapp.connectionMode === 'coexistence' ? 'Coexistence avec WhatsApp Business' : 'Numéro dédié à l'API' }}
+                                {{ whatsapp.connectionMode === 'coexistence' ? 'Coexistence avec WhatsApp Business' : 'Numéro dédié à l’API' }}
                             </span>
                         </div>
                         <fuse-alert *ngIf="whatsapp.coexistence?.syncError" class="mt-4" type="warning" appearance="border">
@@ -51,10 +64,12 @@
                         {{ whatsapp.lastError || 'La ligne de crédit NufiSend n’est pas encore partagée avec ce compte.' }}
                     </fuse-alert>
                     <div class="mt-4 text-secondary text-sm">
-                        Aucun message ne part tant que la ligne de crédit n'est pas partagée. Actualisez l'état pour relancer le partage.
+                        Votre numéro est bien connecté. Le partage de la ligne de crédit est automatique : cliquez pour le relancer.
+                        Si le problème persiste, le jeton système de NufiSend doit être renseigné côté plateforme.
                     </div>
-                    <button *ngIf="isManager" class="mt-4" mat-stroked-button color="primary" type="button"
-                            [disabled]="loading" (click)="refresh()">Relancer le partage</button>
+                    <button class="mt-4" mat-flat-button color="primary" type="button" [disabled]="loading" (click)="refresh()">
+                        Relancer l'activation des envois
+                    </button>
                 </div>
 
                 <div *ngSwitchCase="'error'">
@@ -62,13 +77,7 @@
                         <span fuseAlertTitle>Numéro en erreur : envois arrêtés</span>
                         {{ whatsapp.lastError || 'Le jeton Meta a été révoqué ou le compte est bloqué.' }}
                     </fuse-alert>
-                    <div class="mt-4 text-secondary text-sm">
-                        <ng-container *ngIf="whatsapp.embeddedSignup?.enabled && isManager; else contactSupport">
-                            Reconnectez le numéro pour reprendre les envois.
-                        </ng-container>
-                    </div>
-                    <button *ngIf="whatsapp.embeddedSignup?.enabled && isManager" class="mt-4" mat-flat-button color="primary" type="button"
-                            [disabled]="connecting" (click)="startEmbeddedSignup()">Reconnecter avec Meta</button>
+                    <div class="mt-4 text-secondary text-sm">Reconnectez le numéro ci-dessous pour reprendre les envois.</div>
                 </div>
 
                 <div *ngSwitchDefault class="flex flex-col md:flex-row md:items-center gap-6">
@@ -78,14 +87,18 @@
                     <div class="flex-auto">
                         <div class="text-xl font-semibold">Aucun numéro raccordé</div>
                         <div class="text-secondary text-sm mt-1">
-                            <ng-container *ngIf="whatsapp.embeddedSignup?.enabled; else contactSupport">
-                                Connectez-vous à Meta en quelques clics pour choisir (ou créer) le numéro WhatsApp Business de l'organisation.
-                            </ng-container>
+                            Choisissez le mode de raccordement ci-dessous. Avec la connexion Meta, vous sélectionnez ou créez
+                            votre numéro dans une fenêtre sécurisée ; avec les identifiants, vous saisissez ceux de votre compte
+                            WhatsApp Business.
                         </div>
                     </div>
                 </div>
-                <div *ngIf="whatsapp.status === 'not_connected' && whatsapp.embeddedSignup?.enabled && isManager" class="mt-6">
-                    <div class="text-sm font-semibold mb-2">Type de numéro</div>
+            </ng-container>
+
+            <!-- Raccordement : visible tant que le numero n'est pas connecte ou en erreur -->
+            <div *ngIf="whatsapp.status !== 'connected'" class="mt-6 flex flex-col gap-5">
+                <div>
+                    <div class="text-sm font-semibold mb-2">1. Type de numéro</div>
                     <div class="flex flex-col md:flex-row gap-3">
                         <button type="button" mat-stroked-button [color]="signupMode === 'standard' ? 'primary' : undefined"
                                 (click)="signupMode = 'standard'" class="flex-auto text-left whitespace-normal h-auto py-3">
@@ -95,20 +108,64 @@
                         <button type="button" mat-stroked-button [color]="signupMode === 'coexistence' ? 'primary' : undefined"
                                 (click)="signupMode = 'coexistence'" class="flex-auto text-left whitespace-normal h-auto py-3">
                             <span class="block font-semibold">Numéro déjà dans WhatsApp Business</span>
-                            <span class="block text-xs text-secondary mt-1">Garde l'application WhatsApp Business et ajoute l'API (version 2.24.17 ou plus).</span>
+                            <span class="block text-xs text-secondary mt-1">Garde l'application et ajoute l'API (version 2.24.17 ou plus).</span>
                         </button>
                     </div>
-                    <button mat-flat-button color="primary" type="button" class="mt-4"
-                            [disabled]="connecting" (click)="startEmbeddedSignup()">
-                        <mat-progress-spinner *ngIf="connecting; else connectLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
-                        <ng-template #connectLabel>Raccorder avec Meta</ng-template>
-                    </button>
                 </div>
-            </ng-container>
-            <ng-template #contactSupport>
-                Le raccordement du numéro est réalisé par l'équipe NufiSend : contactez le support en indiquant le nom de votre organisation
-                et le numéro à utiliser. Vous n'avez aucune démarche à faire chez Meta.
-            </ng-template>
+
+                <div>
+                    <div class="text-sm font-semibold mb-2">2. Raccorder</div>
+                    <div class="flex flex-wrap gap-3">
+                        <button mat-flat-button color="primary" type="button" [disabled]="connecting" (click)="startEmbeddedSignup()">
+                            <mat-progress-spinner *ngIf="connecting && !showManual; else connectLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                            <ng-template #connectLabel>Se connecter avec Meta</ng-template>
+                        </button>
+                        <button mat-stroked-button type="button" (click)="openManual()">Utiliser mes identifiants Meta</button>
+                    </div>
+                    <div *ngIf="!embeddedEnabled" class="text-xs text-secondary mt-2">
+                        La connexion automatique Meta n'est pas encore activée sur la plateforme : la connexion par identifiants reste disponible.
+                    </div>
+                </div>
+
+                <div *ngIf="showManual" class="rounded-2xl border p-5">
+                    <div class="font-semibold">Connexion avec vos identifiants Meta</div>
+                    <div class="text-sm text-secondary mt-1">
+                        Depuis le <em>Meta Business Suite → Paramètres d'entreprise → Utilisateurs système</em>, créez un jeton avec les
+                        permissions <em>whatsapp_business_management</em> et <em>whatsapp_business_messaging</em>, puis indiquez les identifiants ci-dessous.
+                        Le jeton est chiffré et n'est jamais affiché.
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>Identifiant du compte WhatsApp Business (WABA)</mat-label>
+                            <input matInput [(ngModel)]="manual.wabaId" placeholder="102290129340398">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>Identifiant du numéro de téléphone</mat-label>
+                            <input matInput [(ngModel)]="manual.phoneNumberId" placeholder="106540352242922">
+                        </mat-form-field>
+                        <mat-form-field class="md:col-span-2" appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>Jeton d'accès</mat-label>
+                            <input matInput type="password" [(ngModel)]="manual.accessToken" placeholder="EAAG…">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>PIN 2FA (6 chiffres, facultatif)</mat-label>
+                            <input matInput [(ngModel)]="manual.pin" maxlength="6">
+                        </mat-form-field>
+                        <div class="flex items-center gap-3">
+                            <mat-checkbox [(ngModel)]="manual.register" [disabled]="manual.mode === 'coexistence'">
+                                Enregistrer le numéro sur l'API Cloud
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-3">
+                        <button mat-button type="button" (click)="showManual = false">Annuler</button>
+                        <button mat-flat-button color="primary" type="button" [disabled]="connecting" (click)="connectManual()">
+                            <mat-progress-spinner *ngIf="connecting && showManual" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                            <span *ngIf="!(connecting && showManual)">Raccorder le numéro</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Modeles -->
@@ -120,8 +177,11 @@
                         Obligatoires pour les messages programmés et pour écrire à un client qui ne vous a pas écrit depuis 24 h.
                         Variables : {{ '{{1}}' }}, {{ '{{2}}' }}…
                     </div>
+                    <div *ngIf="hasPendingTemplates" class="text-xs text-secondary mt-1">
+                        Un modèle est en cours de validation : le statut est relu automatiquement toutes les 30 s et dès la notification Meta.
+                    </div>
                 </div>
-                <div *ngIf="isManager" class="flex gap-2">
+                <div class="flex gap-2">
                     <button mat-stroked-button type="button" (click)="syncTemplates()" [disabled]="syncing">
                         <mat-icon svgIcon="heroicons_outline:refresh"></mat-icon>
                         <span class="ml-2">Synchroniser</span>
@@ -140,10 +200,11 @@
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                         <mat-label>Nom (identifiant)</mat-label>
                         <input matInput [(ngModel)]="draft.name" placeholder="promo_noel" maxlength="512">
+                        <mat-hint>minuscules, chiffres et _ uniquement</mat-hint>
                     </mat-form-field>
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                         <mat-label>Catégorie</mat-label>
-                        <mat-select [(ngModel)]="draft.category">
+                        <mat-select [(ngModel)]="draft.category" (ngModelChange)="onCategoryChange()">
                             <mat-option value="MARKETING">Marketing (promotions, annonces)</mat-option>
                             <mat-option value="UTILITY">Utilitaire (commande, rendez-vous)</mat-option>
                             <mat-option value="AUTHENTICATION">Authentification (code)</mat-option>
@@ -156,25 +217,96 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <mat-form-field class="w-full mt-4" appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>En-tête (facultatif)</mat-label>
-                    <input matInput [(ngModel)]="draft.headerText" maxlength="60">
-                </mat-form-field>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>En-tête</mat-label>
+                        <mat-select [(ngModel)]="draft.headerFormat">
+                            <mat-option *ngFor="let format of headerFormats" [value]="format.code">{{ format.label }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="draft.headerFormat === 'TEXT'" appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Texte de l'en-tête</mat-label>
+                        <input matInput [(ngModel)]="draft.headerText" maxlength="60">
+                    </mat-form-field>
+                    <mat-form-field *ngIf="mediaHeaders.includes(draft.headerFormat)" appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>Lien https d'un exemple de média</mat-label>
+                        <input matInput [(ngModel)]="draft.headerMediaUrl" placeholder="https://…/exemple.jpg">
+                        <mat-hint>Meta exige un exemple public pour valider l'en-tête.</mat-hint>
+                    </mat-form-field>
+                </div>
+
                 <mat-form-field class="w-full mt-4" appearance="outline" subscriptSizing="dynamic">
                     <mat-label>Texte du message</mat-label>
                     <textarea matInput rows="4" [(ngModel)]="draft.body" (ngModelChange)="syncExamples()" maxlength="1024"
                               placeholder="Bonjour {{ '{{1}}' }}, profitez de -20 % ce week-end dans notre boutique."></textarea>
+                    <mat-hint>Utilisez {{ '{{1}}' }}, {{ '{{2}}' }}… sans sauter de numéro, jamais collés.</mat-hint>
                 </mat-form-field>
+                <fuse-alert *ngIf="variablesIssue" class="mt-2" type="warning" appearance="border">{{ variablesIssue }}</fuse-alert>
+
                 <div *ngIf="variablesCount" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <mat-form-field *ngFor="let example of draft.bodyExamples; let i = index; trackBy: trackByIndex" appearance="outline" subscriptSizing="dynamic">
                         <mat-label>Exemple pour {{ '{{' + (i + 1) + '}}' }}</mat-label>
                         <input matInput [(ngModel)]="draft.bodyExamples[i]">
                     </mat-form-field>
                 </div>
+
                 <mat-form-field class="w-full mt-4" appearance="outline" subscriptSizing="dynamic">
                     <mat-label>Pied de page (facultatif)</mat-label>
                     <input matInput [(ngModel)]="draft.footer" maxlength="60" placeholder="Répondez STOP pour ne plus recevoir nos offres">
                 </mat-form-field>
+
+                <!-- Boutons -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm font-semibold">Boutons (facultatif)</div>
+                        <button mat-stroked-button type="button" (click)="addButton()">Ajouter un bouton</button>
+                    </div>
+                    <div *ngIf="showButtons && draft.buttons.length" class="flex flex-col gap-3 mt-3">
+                        <div *ngFor="let button of draft.buttons; let i = index; trackBy: trackByIndex" class="rounded-xl border p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Type</mat-label>
+                                    <mat-select [(ngModel)]="button.type">
+                                        <mat-option *ngFor="let type of buttonTypes" [value]="type.code">{{ type.label }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Texte du bouton</mat-label>
+                                    <input matInput [(ngModel)]="button.text" maxlength="25">
+                                </mat-form-field>
+                                <div class="flex items-end">
+                                    <button mat-icon-button type="button" matTooltip="Retirer" (click)="removeButton(i)">
+                                        <mat-icon class="text-warn" svgIcon="heroicons_outline:trash"></mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            <ng-container *ngIf="button.type === 'URL'">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>URL (https)</mat-label>
+                                        <input matInput [(ngModel)]="button.url" placeholder="https://…/offre?ref={{ '{{1}}' }}">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Exemple si l'URL contient {{ '{{1}}' }}</mat-label>
+                                        <input matInput [(ngModel)]="button.urlExample" placeholder="https://…/offre?ref=ABC123">
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <mat-form-field *ngIf="button.type === 'PHONE_NUMBER'" class="w-full" appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Numéro de téléphone</mat-label>
+                                <input matInput [(ngModel)]="button.phoneNumber" placeholder="+237690000000">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apercu -->
+                <div class="mt-5">
+                    <div class="text-sm font-semibold mb-2">Aperçu</div>
+                    <div class="rounded-2xl bg-gray-50 dark:bg-gray-800 p-4 text-sm whitespace-pre-line">{{ preview }}</div>
+                </div>
+
                 <div class="flex justify-end gap-2 mt-4">
                     <button mat-button type="button" (click)="showCreate = false">Annuler</button>
                     <button mat-flat-button color="primary" type="button" [disabled]="creating" (click)="createTemplate()">
@@ -186,7 +318,7 @@
 
             <div class="bg-card rounded-2xl shadow overflow-hidden mt-4">
                 <div *ngIf="!templates.length" class="p-8 text-center text-secondary">
-                    Aucun modèle. {{ isManager ? 'Créez-en un ou synchronisez ceux déjà présents chez Meta.' : 'Un administrateur doit en créer un.' }}
+                    Aucun modèle. Créez-en un ou synchronisez ceux déjà présents chez Meta pour pouvoir envoyer vos campagnes.
                 </div>
                 <div *ngFor="let template of templates" class="flex flex-col md:flex-row md:items-start gap-3 px-6 py-4 border-b last:border-b-0">
                     <div class="flex-auto min-w-0">
@@ -206,7 +338,7 @@
                             Motif : {{ template.rejectedReason }}
                         </div>
                     </div>
-                    <button *ngIf="isManager" mat-icon-button type="button" matTooltip="Supprimer" (click)="deleteTemplate(template)">
+                    <button mat-icon-button type="button" matTooltip="Supprimer" (click)="deleteTemplate(template)">
                         <mat-icon class="text-warn" svgIcon="heroicons_outline:trash"></mat-icon>
                     </button>
                 </div>

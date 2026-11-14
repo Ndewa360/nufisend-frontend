@@ -20,7 +20,7 @@
                 facturé au portefeuille de l'organisation.
             </span>
             <span *ngIf="!cloudReady">L'organisation ne peut pas envoyer pour le moment (numéro WhatsApp Business ou ligne de crédit).</span>
-            <a *ngIf="!cloudReady" mat-button color="primary" routerLink="/organisation/overview" (click)="saveAndClose()">Voir l'organisation</a>
+            <a *ngIf="!cloudReady" mat-button color="primary" routerLink="/organisation/whatsapp" (click)="saveAndClose()">Configurer WhatsApp Business</a>
         </div>
     </fuse-alert>
 

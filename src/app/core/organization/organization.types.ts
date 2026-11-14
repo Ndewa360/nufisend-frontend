@@ -93,7 +93,10 @@ export interface WhatsappTemplate
     bodyVariables: number;
     headerFormat?: string | null;
     rejectedReason?: string;
-    components?: { type: string; text?: string; format?: string }[];
+    components?: {
+        type: string; text?: string; format?: string;
+        buttons?: { type: string; url?: string }[];
+    }[];
 }
 
 /** Reference a un modele approuve pour un envoi. */
@@ -103,6 +106,8 @@ export interface TemplateRef
     language?: string;
     variables?: string[];
     headerMediaUrl?: string;
+    /** Valeur de {{1}} pour un bouton URL dynamique. */
+    urlVariableValue?: string;
 }
 
 export const ORG_ROLE_LABELS: Record<OrgRole, string> = {
