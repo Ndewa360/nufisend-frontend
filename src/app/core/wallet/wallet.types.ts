@@ -155,7 +155,7 @@ export const LEDGER_LABELS: Record<string, string> = {
     write_off        : 'Non encaissé',
     adjustment_credit: 'Crédit (ajustement)',
     adjustment_debit : 'Débit (ajustement)',
-    subscription     : 'Abonnement organisation',
+    subscription     : 'Ancien abonnement (historique)',
     transfer_out     : 'Transfert vers l\'organisation',
     transfer_in      : 'Transfert reçu',
 };

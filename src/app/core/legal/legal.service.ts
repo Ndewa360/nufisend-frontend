@@ -42,6 +42,15 @@ export interface PrivacyRequest
     handledBy?: { email: string } | null;
 }
 
+export interface DataDeletionStatus
+{
+    reference: string;
+    status: PrivacyRequest['status'];
+    requestedAt: string;
+    dueAt: string;
+    completedAt: string | null;
+}
+
 export interface PrivacyOverview
 {
     documents: LegalDocumentsInfo['documents'];
@@ -126,6 +135,13 @@ export class LegalService
     {
         return this._http
             .post<ApiResponse<{ reference: string; dueAt: string }>>(`${environment.apiUrl}/legal/requests`, input)
+            .pipe(map((res) => res.data));
+    }
+
+    dataDeletionStatus(reference: string): Observable<DataDeletionStatus>
+    {
+        return this._http
+            .get<ApiResponse<DataDeletionStatus>>(`${environment.apiUrl}/legal/data-deletion/status/${encodeURIComponent(reference.trim())}`)
             .pipe(map((res) => res.data));
     }
 

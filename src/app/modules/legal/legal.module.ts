@@ -4,6 +4,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { LegalIndexComponent, LegalLayoutComponent } from './legal-layout.component';
 import {
     CookiesComponent,
+    DataDeletionComponent,
     ExerciseRightsComponent,
     LegalNoticeComponent,
     PrivacyPolicyComponent,
@@ -22,6 +23,7 @@ const routes: Routes = [
             { path: 'conditions-utilisation', component: TermsComponent, title: "Conditions générales d'utilisation - NufiSend" },
             { path: 'cookies', component: CookiesComponent, title: 'Cookies - NufiSend' },
             { path: 'sous-traitance', component: ProcessingAgreementComponent, title: 'Accord de sous-traitance - NufiSend' },
+            { path: 'suppression-donnees', component: DataDeletionComponent, title: 'Suppression des données - NufiSend' },
             { path: 'exercer-mes-droits', component: ExerciseRightsComponent, title: 'Exercer mes droits - NufiSend' },
             { path: '**', redirectTo: '' },
         ],
@@ -37,6 +39,7 @@ const routes: Routes = [
         TermsComponent,
         CookiesComponent,
         ProcessingAgreementComponent,
+        DataDeletionComponent,
         ExerciseRightsComponent,
     ],
     imports: [SharedModule, RouterModule.forChild(routes)],

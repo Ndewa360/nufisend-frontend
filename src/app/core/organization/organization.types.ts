@@ -1,6 +1,9 @@
 export type OrgRole = 'owner' | 'admin' | 'member';
 
-export type WhatsappConnectionStatus = 'not_connected' | 'connected' | 'error';
+export type WhatsappConnectionStatus = 'not_connected' | 'connected' | 'error' | 'credit_line_missing';
+
+/** standard : numero neuf ; coexistence : numero deja utilise dans WhatsApp Business. */
+export type WhatsappConnectionMode = 'standard' | 'coexistence';
 
 export interface OrganizationWhatsapp
 {
@@ -11,7 +14,8 @@ export interface OrganizationWhatsapp
     verifiedName?: string;
     qualityRating?: string;
     messagingLimitTier?: string;
-    connectionMode?: 'embedded' | 'manual';
+    connectionMode?: WhatsappConnectionMode | 'embedded' | 'manual';
+    coexistence?: { isOnBizApp?: boolean; platformType?: string; contactsSyncRequestedAt?: string; historySyncRequestedAt?: string; syncError?: string } | null;
     creditLineAttached?: boolean;
     lastError?: string;
     connectedAt?: string;
@@ -149,6 +153,8 @@ export interface InboxMessage
     text: string;
     media?: { id: string; mimeType?: string; filename?: string; caption?: string };
     waMessageId?: string;
+    /** cloud (API), business_app (WhatsApp Business, coexistence) ou history. */
+    source?: 'cloud' | 'business_app' | 'history';
     status?: string;
     error?: string;
     sentBy?: { _id: string; firstName?: string; lastName?: string; email?: string } | null;

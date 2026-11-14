@@ -141,7 +141,7 @@ export class NewMessageForSingleContactComponent {
     sendMessage()
     {
       if (this.isCloud && !this.cloudReady) {
-        this._toastrService.error("L'organisation ne peut pas envoyer : vérifiez l'abonnement et le numéro WhatsApp Business", 'Envoi impossible');
+        this._toastrService.error("L'organisation ne peut pas envoyer : vérifiez le numéro WhatsApp Business et la ligne de crédit", 'Envoi impossible');
         return;
       }
       if (this.isCloud && this.cloudSelection?.template && !this.cloudSelection.complete) {

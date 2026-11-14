@@ -240,7 +240,7 @@ export class NewMessageComponent implements OnInit{
     private sendCloudMessage()
     {
       if (!this.cloudReady) {
-        this._toastrService.error("L'organisation ne peut pas envoyer : vérifiez l'abonnement et le numéro WhatsApp Business", 'Envoi impossible');
+        this._toastrService.error("L'organisation ne peut pas envoyer : vérifiez le numéro WhatsApp Business et la ligne de crédit", 'Envoi impossible');
         return;
       }
       const title = (this.messageToSend.title || '').trim();

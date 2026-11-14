@@ -103,8 +103,16 @@ export interface BillingSettings
     freeMonthlyQuota: number;
     tiersEnabled: boolean;
     tiers: { minRecipients: number; discountPercent: number }[];
-    /** Grille au volume des campagnes WhatsApp Business (prix absolus). */
+    /** Paliers des campagnes marketing (prix par destinataire du palier atteint). */
     campaignPrices: { minRecipients: number; unitPrice: number }[];
+    /** Prix plat par message livre pour les catégories conversationnelles. */
+    cloudPrices?: Record<string, number> | null;
+    /** Coût Meta par conversation, en USD (facture Meta). */
+    metaCostsUsd?: Record<string, number> | null;
+    /** XAF pour 1 USD : suivi de marge uniquement. */
+    usdToXafRate?: number;
+    /** Marges calculées par le serveur (lecture seule). */
+    metaMargins?: Record<string, { usd: number; costXaf: number; sellingXaf: number; marginXaf: number; belowCost: boolean }>;
     minTopup: number;
     maxTopup: number;
     providerFeePercent: number;

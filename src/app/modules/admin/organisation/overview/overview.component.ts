@@ -12,8 +12,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Subject, takeUntil } from 'rxjs';
 
 /**
- * Organisation de l'utilisateur : creation (sans abonnement) ou tableau de
- * bord (portefeuille partage, membres, numero WhatsApp Business).
+ * Organisation de l'utilisateur : creation ou tableau de bord
+ * (portefeuille partage, membres, numero WhatsApp Business).
  */
 @Component({
     selector       : 'app-organisation-overview',

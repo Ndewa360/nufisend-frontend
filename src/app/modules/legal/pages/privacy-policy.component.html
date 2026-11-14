@@ -32,6 +32,7 @@
             <li><strong>Annuaire</strong> : contacts et groupes que vous créez ou importez (noms, numéros, emails, informations complémentaires).</li>
             <li><strong>Messages</strong> : titre, texte, pièces jointes, destinataires, programmation, statut d'envoi et de livraison.</li>
             <li><strong>WhatsApp</strong> : session de connexion à votre compte WhatsApp (conservée sur nos serveurs, dans un espace propre à votre compte, pour envoyer en votre nom ; supprimée lorsque vous déconnectez WhatsApp ou supprimez votre compte) et, pour les organisations, les identifiants du numéro WhatsApp Business et les messages reçus de vos clients (boîte de réception).</li>
+            <li><strong>Connexion Meta</strong> : lorsque vous raccordez un numéro WhatsApp Business, Meta nous transmet l'identifiant du compte WhatsApp Business, l'identifiant du numéro et un jeton d'accès, que nous chiffrons. Nous ne recevons pas votre mot de passe Facebook et n'accédons pas à votre profil personnel.</li>
             <li><strong>Paiements et portefeuille</strong> : montant, opérateur (MTN, Orange), numéro Mobile Money utilisé, référence et statut des transactions, mouvements du portefeuille.</li>
             <li><strong>Intégration</strong> : clés API (seule une empreinte est conservée) et journal de leur utilisation.</li>
             <li><strong>Consentements</strong> : documents acceptés, version, date, adresse IP tronquée et navigateur, à titre de preuve.</li>
@@ -124,6 +125,12 @@
             immédiat de vos données, suppression du compte et autres demandes. Sans compte, ou si vous êtes destinataire d'un message envoyé
             via {{ info.serviceName }} : la page <a routerLink="/legal/exercer-mes-droits">Exercer mes droits</a> ou
             <a [href]="'mailto:' + info.privacyEmail">{{ info.privacyEmail }}</a>.
+        </p>
+        <p>
+            <strong>Suppression via Meta.</strong> Si vous avez utilisé Facebook ou la connexion Meta pour raccorder un compte
+            WhatsApp Business, Meta peut nous transmettre une demande de suppression. Nous enregistrons cette demande et vous
+            pouvez suivre son traitement avec la référence fournie par Meta sur la page
+            <a routerLink="/legal/suppression-donnees">Suppression des données</a>.
         </p>
         <p>
             Nous répondons dans un délai de {{ responseDelay }} jours ; une pièce d'identité peut être demandée en cas de doute sur votre identité.

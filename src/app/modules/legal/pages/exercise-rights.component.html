@@ -5,7 +5,7 @@
         leur traitement ou en demander la limitation. Nous répondons dans un délai de {{ responseDelay }} jours.
     </p>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
         <div class="rounded-2xl border p-5">
             <div class="font-semibold">Vous avez un compte {{ info.serviceName }}</div>
             <p class="text-sm text-secondary mt-1">
@@ -20,6 +20,13 @@
                 Répondez <strong>STOP</strong> aux messages d'un numéro WhatsApp Business pour ne plus en recevoir, ou utilisez le formulaire
                 ci-dessous : nous transmettons votre demande à l'expéditeur et pouvons suspendre les envois abusifs.
             </p>
+        </div>
+        <div class="rounded-2xl border p-5">
+            <div class="font-semibold">Vous avez utilisé Meta ou Facebook</div>
+            <p class="text-sm text-secondary mt-1">
+                Suivez une demande de suppression transmise par Meta, ou retrouvez les explications sur les données supprimées.
+            </p>
+            <a class="mt-4" mat-stroked-button routerLink="/legal/suppression-donnees">Suppression des données</a>
         </div>
     </div>
 

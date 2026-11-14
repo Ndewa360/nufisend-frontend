@@ -10,7 +10,7 @@
             </div>
         </div>
         <fuse-alert *ngIf="membership && !canSend" class="mt-4" type="warning" appearance="border">
-            Les réponses sont désactivées : vérifiez l'abonnement et le numéro sur la page
+            Les réponses sont désactivées : vérifiez le numéro WhatsApp Business et la ligne de crédit sur la page
             <a class="underline" routerLink="/organisation/overview">Mon organisation</a>.
         </fuse-alert>
     </div>
@@ -105,6 +105,8 @@
                                 </div>
                                 <div class="whitespace-pre-line break-words">{{ message.text || (message.media?.id ? '' : '[' + message.type + ']') }}</div>
                                 <div class="flex items-center justify-end gap-1 mt-1 text-xs text-secondary">
+                                    <span *ngIf="message.source === 'business_app'">Depuis WhatsApp Business ·</span>
+                                    <span *ngIf="message.source === 'history'">Historique ·</span>
                                     <span *ngIf="message.direction === 'out' && senderName(message)">{{ senderName(message) }} ·</span>
                                     <span>{{ message.timestamp | date:'dd/MM HH:mm' }}</span>
                                     <mat-icon *ngIf="message.direction === 'out' && message.status" class="icon-size-4"

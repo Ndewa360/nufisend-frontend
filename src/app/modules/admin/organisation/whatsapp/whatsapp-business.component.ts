@@ -5,6 +5,7 @@ import {
     Membership,
     OrganizationWhatsapp,
     TEMPLATE_CATEGORY_LABELS,
+    WhatsappConnectionMode,
     WhatsappTemplate,
     templateBody,
 } from 'app/core/organization/organization.types';
@@ -56,6 +57,9 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
     ];
 
     private _signupSession: { wabaId?: string; phoneNumberId?: string } = {};
+
+    /** Mode choisi avant la connexion Meta : numero neuf ou numero deja utilise dans WhatsApp Business. */
+    signupMode: WhatsappConnectionMode = 'standard';
     private readonly _onMessage = (event: MessageEvent) => this._handleSignupMessage(event);
     private _unsubscribeAll = new Subject<void>();
 
@@ -191,7 +195,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
                         config_id                       : config.configId,
                         response_type                   : 'code',
                         override_default_response_type  : true,
-                        extras                          : { setup: {}, sessionInfoVersion: '3' },
+                        extras                          : this._signupExtras(),
                     },
                 );
             })
@@ -208,7 +212,14 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         try {
             const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
             if (payload?.type !== 'WA_EMBEDDED_SIGNUP') return;
-            if (payload.event === 'FINISH' || payload.event === 'FINISH_ONLY_WABA') {
+            // Numero neuf : FINISH (numero inclus). Coexistence (application
+            // WhatsApp Business) : FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING, sans
+            // le numero, qui est lu par le serveur sur le compte.
+            if (
+                payload.event === 'FINISH' ||
+                payload.event === 'FINISH_ONLY_WABA' ||
+                payload.event === 'FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING'
+            ) {
                 this._signupSession = {
                     wabaId       : payload.data?.waba_id,
                     phoneNumberId: payload.data?.phone_number_id,
@@ -227,13 +238,14 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
     private _finishSignup(code: string): void
     {
         const { wabaId, phoneNumberId } = this._signupSession;
-        if (!wabaId || !phoneNumberId) {
+        const coexistence = this.signupMode === 'coexistence';
+        if (!wabaId || (!phoneNumberId && !coexistence)) {
             this.connecting = false;
             this._toastr.error("Aucun numéro n'a été sélectionné chez Meta : recommencez la connexion.", 'WhatsApp Business');
             this._cdr.markForCheck();
             return;
         }
-        this._organizationService.connectEmbedded(code, wabaId, phoneNumberId).subscribe({
+        this._organizationService.connectEmbedded(code, wabaId, phoneNumberId ?? null, this.signupMode).subscribe({
             next : (whatsapp) => {
                 this.connecting = false;
                 this.whatsapp = whatsapp;
@@ -246,6 +258,18 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
                 this._cdr.markForCheck();
             },
         });
+    }
+
+    /**
+     * Parametres du lancement Embedded Signup. `sessionInfoVersion` 3 active la
+     * journalisation de session exigee par Meta ; `featureType` ouvre le
+     * raccordement d'un numero deja utilise dans l'application WhatsApp Business.
+     */
+    private _signupExtras(): Record<string, unknown>
+    {
+        return this.signupMode === 'coexistence'
+            ? { setup: {}, featureType: 'whatsapp_business_app_onboarding', sessionInfoVersion: '3' }
+            : { setup: {}, sessionInfoVersion: '3' };
     }
 
     private _loadFacebookSdk(appId: string, version: string): Promise<any>

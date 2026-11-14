@@ -2,10 +2,12 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Directive, OnIni
 import { isAnalyticsOptedOut, setAnalyticsOptOut } from 'app/core/analytics/analytics';
 import { LEGAL_INFO } from 'app/core/legal/legal.config';
 import {
+    DataDeletionStatus,
     LegalDocumentId,
     LegalDocumentsInfo,
     LegalService,
     PRIVACY_REQUEST_LABELS,
+    PRIVACY_STATUS_LABELS,
     PrivacyRequestType,
 } from 'app/core/legal/legal.service';
 
@@ -75,6 +77,41 @@ export class CookiesComponent extends LegalPageBase
 
 @Component({ selector: 'app-processing-agreement', templateUrl: './processing-agreement.component.html', changeDetection: ChangeDetectionStrategy.OnPush })
 export class ProcessingAgreementComponent extends LegalPageBase {}
+
+@Component({ selector: 'app-data-deletion', templateUrl: './data-deletion.component.html', changeDetection: ChangeDetectionStrategy.OnPush })
+export class DataDeletionComponent extends LegalPageBase
+{
+    readonly labels = PRIVACY_STATUS_LABELS;
+    reference = '';
+    status: DataDeletionStatus | null = null;
+    loading = false;
+    error = '';
+
+    lookup(): void
+    {
+        const reference = this.reference.trim();
+        if (!reference) return;
+        this.loading = true;
+        this.error = '';
+        this.status = null;
+        this._legalService.dataDeletionStatus(reference).subscribe({
+            next : (status) => {
+                this.status = status;
+                this.loading = false;
+                this._cdr.markForCheck();
+            },
+            error: (error) => {
+                this.loading = false;
+                this.error = error?.status === 404
+                    ? 'Aucune demande ne correspond à cette référence. Vérifiez le code reçu.'
+                    : error?.status === 429
+                        ? 'Trop de recherches : réessayez dans quelques minutes.'
+                        : 'La demande n’a pas pu être vérifiée. Réessayez plus tard.';
+                this._cdr.markForCheck();
+            },
+        });
+    }
+}
 
 @Component({ selector: 'app-exercise-rights', templateUrl: './exercise-rights.component.html', changeDetection: ChangeDetectionStrategy.OnPush })
 export class ExerciseRightsComponent extends LegalPageBase

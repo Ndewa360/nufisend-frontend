@@ -19,7 +19,7 @@
                 Envoi par le numéro WhatsApp Business de {{ membership.organization.name }}<ng-container *ngIf="membership.organization.whatsapp?.displayPhoneNumber"> ({{ membership.organization.whatsapp.displayPhoneNumber }})</ng-container>,
                 facturé au portefeuille de l'organisation.
             </span>
-            <span *ngIf="!cloudReady">L'organisation ne peut pas envoyer pour le moment (abonnement ou numéro WhatsApp Business).</span>
+            <span *ngIf="!cloudReady">L'organisation ne peut pas envoyer pour le moment (numéro WhatsApp Business ou ligne de crédit).</span>
             <a *ngIf="!cloudReady" mat-button color="primary" routerLink="/organisation/overview" (click)="saveAndClose()">Voir l'organisation</a>
         </div>
     </fuse-alert>

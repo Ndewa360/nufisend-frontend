@@ -5,8 +5,8 @@
             <div>
                 <div class="text-3xl font-bold tracking-tight">{{ isOrganization ? 'Portefeuille de ' + summary.organizationName : 'Mon portefeuille' }}</div>
                 <div class="mt-1 text-secondary">
-                    <ng-container *ngIf="!isOrganization">Rechargez par Mobile Money et suivez votre consommation. Seuls les messages livrés sont facturés.</ng-container>
-                    <ng-container *ngIf="isOrganization">Partagé par les membres : envois par le numéro WhatsApp Business et abonnement. Seuls les messages livrés sont facturés.</ng-container>
+                    <ng-container *ngIf="!isOrganization">Rechargez par Mobile Money et suivez votre consommation. Seuls les destinataires livrés sont facturés.</ng-container>
+                    <ng-container *ngIf="isOrganization">Partagé par les membres : campagnes envoyées par le numéro WhatsApp Business. Seuls les destinataires livrés sont facturés, au tarif du palier atteint.</ng-container>
                 </div>
             </div>
             <button *ngIf="canTopup" mat-flat-button color="primary" (click)="openTopup()" [disabled]="!summary || !summary.paymentAvailable"
@@ -89,7 +89,7 @@
                         <mat-button-toggle-group [value]="transactionsFilter" (change)="onTransactionsFilter($event.value)">
                             <mat-button-toggle value="">Tout</mat-button-toggle>
                             <mat-button-toggle value="topup,adjustment_credit">Crédits</mat-button-toggle>
-                            <mat-button-toggle value="capture,debit,subscription">Consommation</mat-button-toggle>
+                            <mat-button-toggle value="capture,debit">Consommation</mat-button-toggle>
                             <mat-button-toggle value="hold,release">Réservations</mat-button-toggle>
                             <mat-button-toggle value="free">Offerts</mat-button-toggle>
                         </mat-button-toggle-group>
@@ -179,7 +179,7 @@
                 <mat-tab label="Montants réservés">
                     <div class="p-4 text-sm text-secondary">
                         Les envois programmés réservent leur coût à l'avance (toutes les occurrences, ou la semaine en cours pour une récurrence).
-                        Chaque envoi est payé depuis cette réserve ; les messages non livrés et les montants non utilisés vous sont rendus.
+                        Chaque campagne est bloquée sur ce portefeuille ; les destinataires non livrés et les montants non utilisés vous sont rendus.
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">

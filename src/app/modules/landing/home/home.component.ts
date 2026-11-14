@@ -50,7 +50,7 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
         },
         {
             question: 'Quel est le prix des offres ?',
-            answer  : 'L\u2019offre D\u00e9couverte d\u00e9marre \u00e0 9 000 FCFA par mois et inclut 500 messages. La connexion par QR code de votre WhatsApp personnel reste disponible, factur\u00e9e 10 FCFA par message livr\u00e9, sans abonnement.'
+            answer  : 'Les campagnes WhatsApp Business se paient par campagne, sans abonnement : le pack Découverte coûte 9 000 FCFA pour 500 messages. Le prix par destinataire dépend du palier atteint par le nombre de contacts de la campagne. La connexion par QR code de votre WhatsApp personnel reste disponible, facturée 10 FCFA par message livré, sans abonnement.'
         },
         {
             question: 'Mes donn\u00e9es sont-elles prot\u00e9g\u00e9es ?',

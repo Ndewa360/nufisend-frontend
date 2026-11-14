@@ -12,6 +12,7 @@ import {
     OrganizationMember,
     OrganizationWhatsapp,
     TemplateRef,
+    WhatsappConnectionMode,
     WhatsappTemplate,
 } from './organization.types';
 
@@ -179,10 +180,12 @@ export class OrganizationService
         return this._http.get<ApiResponse<OrganizationWhatsapp>>(`${this._baseUrl}/me/whatsapp`).pipe(data<OrganizationWhatsapp>());
     }
 
-    connectEmbedded(code: string, wabaId: string, phoneNumberId: string): Observable<OrganizationWhatsapp>
+    connectEmbedded(code: string, wabaId: string, phoneNumberId: string | null, mode: WhatsappConnectionMode): Observable<OrganizationWhatsapp>
     {
+        const body: Record<string, string> = { code, wabaId, mode };
+        if (phoneNumberId) body['phoneNumberId'] = phoneNumberId;
         return this._http
-            .post<ApiResponse<OrganizationWhatsapp>>(`${this._baseUrl}/me/whatsapp/connect`, { code, wabaId, phoneNumberId })
+            .post<ApiResponse<OrganizationWhatsapp>>(`${this._baseUrl}/me/whatsapp/connect`, body)
             .pipe(data<OrganizationWhatsapp>(), tap(() => this.load().subscribe()));
     }
 

@@ -30,8 +30,31 @@
                             <span *ngIf="whatsapp.qualityRating" class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">Qualité : {{ whatsapp.qualityRating }}</span>
                             <span *ngIf="whatsapp.messagingLimitTier" class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">Limite : {{ whatsapp.messagingLimitTier }}</span>
                             <span *ngIf="whatsapp.connectedAt" class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">Raccordé le {{ whatsapp.connectedAt | date:'dd/MM/yyyy' }}</span>
+                            <span class="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">
+                                {{ whatsapp.connectionMode === 'coexistence' ? 'Coexistence avec WhatsApp Business' : 'Numéro dédié à l'API' }}
+                            </span>
                         </div>
+                        <fuse-alert *ngIf="whatsapp.coexistence?.syncError" class="mt-4" type="warning" appearance="border">
+                            <span fuseAlertTitle>Synchronisation incomplète</span>
+                            {{ whatsapp.coexistence?.syncError }}
+                        </fuse-alert>
+                        <p *ngIf="whatsapp.connectionMode === 'coexistence'" class="mt-3 text-sm text-secondary">
+                            Les messages envoyés depuis l'application WhatsApp Business restent disponibles. Les envois de campagnes
+                            passent par l'API et sont limités à 20 messages par seconde.
+                        </p>
                     </div>
+                </div>
+
+                <div *ngSwitchCase="'credit_line_missing'">
+                    <fuse-alert type="warning" appearance="border">
+                        <span fuseAlertTitle>Numéro raccordé, envois non activés</span>
+                        {{ whatsapp.lastError || 'La ligne de crédit NufiSend n’est pas encore partagée avec ce compte.' }}
+                    </fuse-alert>
+                    <div class="mt-4 text-secondary text-sm">
+                        Aucun message ne part tant que la ligne de crédit n'est pas partagée. Actualisez l'état pour relancer le partage.
+                    </div>
+                    <button *ngIf="isManager" class="mt-4" mat-stroked-button color="primary" type="button"
+                            [disabled]="loading" (click)="refresh()">Relancer le partage</button>
                 </div>
 
                 <div *ngSwitchCase="'error'">
@@ -57,11 +80,25 @@
                         <div class="text-secondary text-sm mt-1">
                             <ng-container *ngIf="whatsapp.embeddedSignup?.enabled; else contactSupport">
                                 Connectez-vous à Meta en quelques clics pour choisir (ou créer) le numéro WhatsApp Business de l'organisation.
-                                Il doit pouvoir recevoir un SMS ou un appel de vérification et ne pas être utilisé dans l'application WhatsApp.
                             </ng-container>
                         </div>
                     </div>
-                    <button *ngIf="whatsapp.embeddedSignup?.enabled && isManager" mat-flat-button color="primary" type="button"
+                </div>
+                <div *ngIf="whatsapp.status === 'not_connected' && whatsapp.embeddedSignup?.enabled && isManager" class="mt-6">
+                    <div class="text-sm font-semibold mb-2">Type de numéro</div>
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <button type="button" mat-stroked-button [color]="signupMode === 'standard' ? 'primary' : undefined"
+                                (click)="signupMode = 'standard'" class="flex-auto text-left whitespace-normal h-auto py-3">
+                            <span class="block font-semibold">Numéro neuf ou dédié à l'API</span>
+                            <span class="block text-xs text-secondary mt-1">Ce numéro n'est pas utilisé dans l'application WhatsApp Business.</span>
+                        </button>
+                        <button type="button" mat-stroked-button [color]="signupMode === 'coexistence' ? 'primary' : undefined"
+                                (click)="signupMode = 'coexistence'" class="flex-auto text-left whitespace-normal h-auto py-3">
+                            <span class="block font-semibold">Numéro déjà dans WhatsApp Business</span>
+                            <span class="block text-xs text-secondary mt-1">Garde l'application WhatsApp Business et ajoute l'API (version 2.24.17 ou plus).</span>
+                        </button>
+                    </div>
+                    <button mat-flat-button color="primary" type="button" class="mt-4"
                             [disabled]="connecting" (click)="startEmbeddedSignup()">
                         <mat-progress-spinner *ngIf="connecting; else connectLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
                         <ng-template #connectLabel>Raccorder avec Meta</ng-template>

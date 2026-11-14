@@ -15,7 +15,7 @@ import { AdminOrganizationRow, OrganizationsAdminService } from './organizations
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <div class="text-3xl font-bold tracking-tight">Organisations</div>
-                    <div class="mt-1 text-secondary">{{ total }} organisation(s) · WhatsApp Business, abonnements et portefeuilles.</div>
+                    <div class="mt-1 text-secondary">{{ total }} organisation(s) · WhatsApp Business et portefeuilles.</div>
                 </div>
                 <a mat-stroked-button routerLink="/super-admin/dashboard">
                     <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon><span class="ml-2">Administration</span>

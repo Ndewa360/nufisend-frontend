@@ -37,40 +37,22 @@ interface QuoteRequest
 
             <ng-container *ngIf="quote">
                 <ng-container *ngIf="!isScheduled; else scheduled">
-                    <ng-container *ngIf="quote.slices?.length; else flatPrice">
-                        <div class="mt-2 text-sm">
-                            {{ quote.recipients }} destinataire(s), facturés par tranches
-                            <span *ngIf="quote.freeUnits"> · {{ quote.freeUnits }} offert(s)</span>
-                        </div>
-                        <ul class="mt-1 text-xs text-secondary flex flex-col gap-0.5">
-                            <li *ngFor="let slice of quote.slices">
-                                {{ slice.from === slice.to ? slice.from : slice.from + '–' + slice.to }}
-                                destinataire(s) × {{ slice.unitPrice | xaf }} = {{ slice.amount | xaf }}
-                            </li>
-                        </ul>
-                    </ng-container>
-                    <ng-template #flatPrice>
-                        <div class="mt-2 text-sm">
-                            {{ quote.recipients }} destinataire(s) × {{ quote.unitPrice | xaf }}
-                            <span *ngIf="quote.discountPercent"> (remise {{ quote.discountPercent }} %)</span>
-                            <span *ngIf="quote.freeUnits"> · {{ quote.freeUnits }} offert(s)</span>
-                        </div>
-                    </ng-template>
+                    <div class="mt-2 text-sm">
+                        <ng-container *ngIf="quote.recipients > 1; else directSend">
+                            Campagne de {{ quote.recipients }} destinataire(s) · {{ tierPrice | xaf }} par destinataire
+                        </ng-container>
+                        <ng-template #directSend>Envoi direct · {{ tierPrice | xaf }}</ng-template>
+                        <span *ngIf="quote.freeUnits"> · {{ quote.freeUnits }} offert(s)</span>
+                    </div>
                     <div class="mt-1 text-2xl font-bold">{{ quote.amountDue | xaf }}</div>
-                    <div class="text-xs text-secondary">Montant maximal réservé : seuls les messages livrés seront facturés, le reste vous est rendu.</div>
+                    <div class="text-xs text-secondary">Montant bloqué : seuls les destinataires livrés sont facturés, le reste vous est rendu.</div>
                     <div *ngIf="category" class="text-xs text-secondary">Tarif WhatsApp Business ({{ category }}){{ quote.slices?.length ? ' au volume' : '' }}, débité du portefeuille de l'organisation.</div>
                 </ng-container>
                 <ng-template #scheduled>
                     <div class="mt-2 text-sm">
-                        {{ quote.occurrenceAmount | xaf }} par envoi
-                        <span *ngIf="!quote.slices?.length">({{ quote.recipients }} destinataire(s) × {{ quote.unitPrice | xaf }})</span>
+                        {{ quote.occurrenceAmount | xaf }} par campagne
+                        <span>({{ quote.recipients }} destinataire(s) · {{ tierPrice | xaf }} par destinataire)</span>
                     </div>
-                    <ul *ngIf="quote.slices?.length" class="mt-1 text-xs text-secondary flex flex-col gap-0.5">
-                        <li *ngFor="let slice of quote.slices">
-                            {{ slice.from === slice.to ? slice.from : slice.from + '–' + slice.to }}
-                            destinataire(s) × {{ slice.unitPrice | xaf }} = {{ slice.amount | xaf }}
-                        </li>
-                    </ul>
                     <div class="mt-1 text-2xl font-bold">{{ quote.amountDue | xaf }} <span class="text-base font-medium text-secondary">réservés maintenant</span></div>
                     <div class="text-xs text-secondary">
                         <ng-container *ngIf="quote.finiteOccurrences">{{ quote.finiteOccurrences }} envoi(s) programmé(s). </ng-container>
@@ -106,6 +88,13 @@ export class MessageCostEstimateComponent implements OnChanges, OnDestroy
 
     quote: SendQuote | null = null;
     loading = false;
+
+    /** Prix par destinataire du palier atteint par le nombre de destinataires. */
+    get tierPrice(): number
+    {
+        const slices = this.quote?.slices;
+        return slices?.length ? slices[slices.length - 1].unitPrice : (this.quote?.unitPrice ?? 0);
+    }
     error = '';
 
     private readonly _requests = new Subject<QuoteRequest>();
