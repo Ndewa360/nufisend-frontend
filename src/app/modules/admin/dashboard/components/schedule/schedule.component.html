@@ -1,32 +1,49 @@
-<!-- Calendrier des envois de la semaine -->
+<!-- Calendrier des envois : semaine ou mois -->
 <div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-    <div class="flex flex-col sm:flex-row items-start justify-between">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div class="text-lg font-medium tracking-tight leading-6 truncate">Activités planifiées</div>
-        <div class="mt-3 sm:mt-0 sm:ml-2 flex items-center">
-            <button mat-button (click)="prevWeekData()">
-                <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:chevron-left'" [title]="'Précédent'"></mat-icon>
-                Précédent
+
+        <div class="flex flex-wrap items-center gap-2">
+            <!-- Semaine / mois -->
+            <div class="inline-flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 overflow-hidden">
+                <button type="button" (click)="setMode('week')"
+                    [ngClass]="isWeek ? 'bg-green-800 text-white' : 'bg-transparent'"
+                    class="px-3 py-1.5 text-sm font-semibold">Semaine</button>
+                <button type="button" (click)="setMode('month')"
+                    [ngClass]="!isWeek ? 'bg-green-800 text-white' : 'bg-transparent'"
+                    class="px-3 py-1.5 text-sm font-semibold">Mois</button>
+            </div>
+
+            <button mat-stroked-button type="button" (click)="goToToday()">Aujourd'hui</button>
+            <button mat-icon-button type="button" (click)="prev()" [attr.aria-label]="isWeek ? 'Semaine précédente' : 'Mois précédent'">
+                <mat-icon [svgIcon]="'heroicons_outline:chevron-left'"></mat-icon>
             </button>
-            <span class="mx-2">{{weekStart | date : "dd MMM yyyy"}} – {{weekEnd | date : "dd MMM yyyy"}}</span>
-            <button mat-button (click)="nextWeekData()">
-                Suivant
-                <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:chevron-right'" [title]="'Suivant'" iconPositionEnd></mat-icon>
+            <span class="text-sm font-medium min-w-[12rem] text-center capitalize">
+                <ng-container *ngIf="isWeek; else monthLabel">
+                    {{rangeStart | date : "dd MMM yyyy"}} – {{rangeEnd | date : "dd MMM yyyy"}}
+                </ng-container>
+                <ng-template #monthLabel>{{periodLabel}}</ng-template>
+            </span>
+            <button mat-icon-button type="button" (click)="next()" [attr.aria-label]="isWeek ? 'Semaine suivante' : 'Mois suivant'">
+                <mat-icon [svgIcon]="'heroicons_outline:chevron-right'"></mat-icon>
             </button>
         </div>
     </div>
 
     <mat-progress-bar *ngIf="loading" class="mt-4" [mode]="'indeterminate'"></mat-progress-bar>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-6 w-full mt-8 sm:mt-4">
-        <!-- Envois par jour de la semaine -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-6 w-full mt-8">
+        <!-- Vue : graphique (semaine) ou grille (mois) -->
         <div class="flex flex-col flex-auto">
-            <div class="font-medium text-secondary">Envois par jour de la semaine</div>
-            <div class="flex flex-col flex-auto">
-                <div *ngIf="loadError" class="h-80 flex items-center justify-center text-sm text-amber-700 dark:text-amber-400">
-                    Impossible de charger le calendrier pour le moment.
-                </div>
+            <div class="font-medium text-secondary">{{isWeek ? 'Envois par jour de la semaine' : 'Envois du mois'}}</div>
+
+            <div *ngIf="loadError" class="h-80 flex items-center justify-center text-sm text-amber-700 dark:text-amber-400">
+                Impossible de charger le calendrier pour le moment.
+            </div>
+
+            <ng-container *ngIf="!loadError">
                 <apx-chart
-                    *ngIf="!loadError"
+                    *ngIf="isWeek; else monthGrid"
                     class="flex-auto w-full h-80"
                     [chart]="chartOptions.chart"
                     [colors]="chartOptions.colors"
@@ -41,25 +58,54 @@
                     [tooltip]="chartOptions.tooltip"
                     [xaxis]="chartOptions.xaxis"
                     [yaxis]="chartOptions.yaxis"></apx-chart>
-            </div>
+
+                <ng-template #monthGrid>
+                    <div class="grid grid-cols-7 gap-1 mt-3 text-center text-xs font-semibold text-secondary">
+                        <div *ngFor="let label of dayLabels">{{label.slice(0, 3)}}</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 mt-1">
+                        <ng-container *ngFor="let cell of monthCells">
+                            <div *ngIf="!cell" class="h-16 rounded"></div>
+                            <button *ngIf="cell" type="button" (click)="selectDate(cell.ymd)"
+                                [ngClass]="cell.ymd === selectedYmd ? 'ring-2 ring-green-700' : 'ring-1 ring-gray-200 dark:ring-gray-700'"
+                                class="h-16 rounded flex flex-col items-center justify-between p-1 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <span class="text-sm font-medium">{{cell.day}}</span>
+                                <span class="flex items-center gap-1 text-xs">
+                                    <ng-container *ngIf="dayCounts[cell.ymd] as counts">
+                                        <span *ngIf="counts.missed" class="w-2 h-2 rounded-full bg-red-500" title="Non lancés"></span>
+                                        <span *ngIf="counts.upcoming" class="w-2 h-2 rounded-full bg-emerald-500" title="Prévus"></span>
+                                        <span *ngIf="counts.launched" class="w-2 h-2 rounded-full bg-blue-500" title="Lancés"></span>
+                                        <span *ngIf="counts.notSent" class="w-2 h-2 rounded-full bg-amber-500" title="Non envoyés"></span>
+                                    </ng-container>
+                                </span>
+                            </button>
+                        </ng-container>
+                    </div>
+                    <div class="flex flex-wrap gap-3 mt-3 text-xs text-secondary">
+                        <span><span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1"></span>Prévus</span>
+                        <span><span class="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span>Lancés</span>
+                        <span><span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span>Non lancés</span>
+                        <span><span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-1"></span>Non envoyés</span>
+                    </div>
+                </ng-template>
+            </ng-container>
         </div>
 
-        <!-- Detail du jour -->
+        <!-- Detail du jour selectionne -->
         <div class="flex flex-col">
-            <div class="font-medium text-secondary">Détail du {{selectedDayLabel.toLowerCase()}}</div>
-            <div class="flex flex-col sm:flex-row items-start justify-between mt-3">
-                <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm">
-                    <a *ngFor="let day of dayLabels; let i=index" (click)="selectDay(i)"
-                        [ngClass]="{'rounded-l-md':i==0,'rounded-r-md':i==6,'z-10 bg-green-800 text-white':i==selectedDayIndex}"
-                        class="relative inline-flex items-center px-3 py-2 text-sm font-semibold cursor-pointer ring-1 ring-inset ring-gray-300 hover:bg-emerald-900 hover:text-white focus:z-20">
-                        {{day}}
-                    </a>
-                </nav>
-            </div>
+            <div class="font-medium text-secondary capitalize">{{selectedDayLabel}}</div>
+            <nav *ngIf="isWeek" class="isolate inline-flex -space-x-px rounded-md shadow-sm mt-3">
+                <a *ngFor="let day of dayLabels; let i=index" (click)="selectDay(i)"
+                    [ngClass]="{'rounded-l-md':i==0,'rounded-r-md':i==6,'z-10 bg-green-800 text-white':i==selectedDayIndex}"
+                    class="relative inline-flex items-center px-3 py-2 text-sm font-semibold cursor-pointer ring-1 ring-inset ring-gray-300 hover:bg-emerald-900 hover:text-white focus:z-20">
+                    {{day}}
+                </a>
+            </nav>
             <app-schedule-list-day
                 [entries]="selectedDayEntries"
                 [loading]="loading"
                 [loadError]="loadError"
+                [dayLabel]="selectedDayLabel"
                 (retry)="retry()"></app-schedule-list-day>
         </div>
     </div>

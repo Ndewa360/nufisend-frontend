@@ -45,6 +45,8 @@ export interface PlanificationOccurrence
     type:string;
     /** Deja passee dans le fuseau de la planification. */
     past:boolean;
+    /** true : execution lancee. false : pas lancee. null : trace inconnue (anterieure a la mise en service du suivi). */
+    launched:boolean|null;
 }
 
 /** Occurrences d'une planification sur une plage de jours, telles que calculees par le serveur. */

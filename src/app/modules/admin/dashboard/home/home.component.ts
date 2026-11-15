@@ -5,6 +5,20 @@ import { PlanificationModel, PlanificationState } from 'app/shared/store/planifc
 import { OrganizationService } from 'app/core/organization/organization.service';
 import { Membership } from 'app/core/organization/organization.types';
 import { Observable, Subject, combineLatest, takeUntil } from 'rxjs';
+import { PlanificationService } from 'app/shared/store/planifcation/planification.service';
+import { WalletService } from 'app/core/wallet/wallet.service';
+import { WalletSummary } from 'app/core/wallet/wallet.types';
+import { addDays, toYmd } from '../components/schedule/schedule.component';
+
+/** Prochain envoi prevu, pour les 7 prochains jours. */
+export interface UpcomingSend {
+  planificationId: string;
+  title: string;
+  /** Date ymd (tri) et date locale (affichage). */
+  date: string;
+  day: Date;
+  time: string;
+}
 
 /** Repartition des planifications selon ce qui leur arrive reellement. */
 export interface PlanificationBreakdown {
@@ -45,13 +59,34 @@ export class HomeComponent implements OnInit, OnDestroy {
   templatesError = false;
   planificationsError = false;
   breakdown: PlanificationBreakdown = { inProgress: 0, inactive: 0, suspended: 0, ended: 0 };
+  upcomingSends: UpcomingSend[] = [];
+  upcomingError = false;
+  walletSummary: WalletSummary | null = null;
+  walletError = false;
 
   /** Adhesion : undefined = non chargee, null = compte personnel, objet = membre. */
   membership: Membership | null | undefined = undefined;
 
   private _unsubscribeAll = new Subject<void>();
 
-  constructor(private _organizationService: OrganizationService){}
+  constructor(
+    private _organizationService: OrganizationService,
+    private _planificationService: PlanificationService,
+    private _walletService: WalletService,
+  ){}
+
+  /** Vrai si la solde affiche est celui de l'organisation (membre). */
+  get walletIsOrganization(): boolean
+  {
+    return this.walletSummary?.accountType === 'organization';
+  }
+
+  /** Solde disponible sous le seuil d'alerte. */
+  get lowBalance(): boolean
+  {
+    const summary = this.walletSummary;
+    return !!summary && summary.available <= summary.lowBalanceThreshold;
+  }
 
   /**
    * Portee des contacts, groupes et modeles : annuaire de l'organisation pour un membre,
@@ -85,6 +120,45 @@ export class HomeComponent implements OnInit, OnDestroy {
     this._organizationService.membership$
       .pipe(takeUntil(this._unsubscribeAll))
       .subscribe((membership) => this.membership = membership);
+
+    this._walletService.summary$
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((summary) => this.walletSummary = summary);
+    this._walletService.refresh()
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe({ error: () => this.walletError = true });
+
+    // Les prochains envois suivent les planifications : rechargés à chaque changement.
+    this.planification$
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe(() => this._loadUpcomingSends());
+  }
+
+  /** Envois prevus dans les 7 prochains jours (occurrences futures des planifications qui partiront). */
+  private _loadUpcomingSends(): void
+  {
+    const today = new Date();
+    this._planificationService.getOccurrences(toYmd(today), toYmd(addDays(today, 6)))
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe({
+        next: (result) => {
+          this.upcomingError = false;
+          this.upcomingSends = (result?.data || [])
+            .filter((item) => item.willRun)
+            .flatMap((item) => item.occurrences
+              .filter((occurrence) => !occurrence.past)
+              .map((occurrence) => {
+                const [year, month, day] = occurrence.date.split('-').map(Number);
+                return { planificationId: item._id, title: item.title, date: occurrence.date, day: new Date(year, month - 1, day), time: occurrence.time };
+              }))
+            .sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)))
+            .slice(0, 8);
+        },
+        error: () => {
+          this.upcomingSends = [];
+          this.upcomingError = true;
+        }
+      });
   }
 
   ngOnDestroy(): void {

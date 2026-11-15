@@ -11,7 +11,7 @@ describe('ScheduleListDayComponent', () => {
     _id: 'p1',
     title: 'Relance clients',
     status: { label: 'Active', tone: 'ok' },
-    times: [{ time: '09:00', past: true }, { time: '18:00', past: false }],
+    times: [{ time: '09:00', state: 'launched' }, { time: '18:00', state: 'upcoming' }],
   };
 
   beforeEach(async () => {
@@ -31,6 +31,12 @@ describe('ScheduleListDayComponent', () => {
     expect(element.textContent).toContain('Aucune planification ce jour.');
   });
 
+  it('labels a missed occurrence as not launched', () => {
+    component.entries = [{ ...entry, times: [{ time: '12:00', state: 'missed' }] }];
+    fixture.detectChanges();
+    expect(element.textContent).toContain('Non lancé');
+  });
+
   it('shows the title, the status and only the times of the day', () => {
     component.entries = [entry];
     fixture.detectChanges();
@@ -39,7 +45,8 @@ describe('ScheduleListDayComponent', () => {
     expect(text).toContain('Active');
     expect(text).toContain('09:00');
     expect(text).toContain('18:00');
-    expect(text).toContain('(passé)');
+    expect(text).toContain('Lancé');
+    expect(text).toContain('Prévu');
   });
 
   it('shows the error state with a retry action instead of an empty list', () => {

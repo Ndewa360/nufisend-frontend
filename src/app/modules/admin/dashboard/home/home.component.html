@@ -4,56 +4,104 @@
         <div class="w-full max-w-screen-xl mx-auto p-4">
             <mat-progress-bar *ngIf="loading else hasLoading;" [mode]="'indeterminate'"></mat-progress-bar>
             <ng-template #hasLoading>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full min-w-0">
+
+                <!-- Alertes -->
+                <div class="flex flex-col gap-3 mb-6" *ngIf="(breakdown.suspended > 0) || lowBalance">
+                    <div *ngIf="breakdown.suspended > 0" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 p-4 text-amber-800 dark:text-amber-300">
+                        <span>{{breakdown.suspended}} planification{{breakdown.suspended > 1 ? 's' : ''}} suspendue{{breakdown.suspended > 1 ? 's' : ''}} : solde insuffisant pour les envois.</span>
+                        <a routerLink="/wallet" class="font-semibold underline">Recharger le portefeuille</a>
+                    </div>
+                    <div *ngIf="lowBalance" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 p-4 text-amber-800 dark:text-amber-300">
+                        <span>Solde bas : {{walletSummary?.available | number}} {{walletSummary?.currency}} disponibles.</span>
+                        <a routerLink="/wallet" class="font-semibold underline">Voir le portefeuille</a>
+                    </div>
+                </div>
+
+                <!-- Indicateurs -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 w-full min-w-0">
 
                     <!-- Groupes -->
-                    <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                    <a routerLink="/annuaire/groups" class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="flex items-start justify-between">
                             <div class="text-lg font-medium tracking-tight leading-6 truncate">Groupes</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-blue-500">{{groupsError ? '—' : groupsCount}}</div>
+                            <div class="text-6xl font-bold tracking-tight leading-none text-blue-500">{{groupsError ? '—' : groupsCount}}</div>
                             <div class="text-lg font-medium text-blue-600 dark:text-blue-500">{{groupsError ? 'Indisponible' : annuaireScopeLabel}}</div>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Contacts -->
-                    <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                    <a routerLink="/annuaire/contacts" class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="flex items-start justify-between">
                             <div class="text-lg font-medium tracking-tight leading-6 truncate">Contacts</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-green-500">{{contactsError ? '—' : contactsCount}}</div>
+                            <div class="text-6xl font-bold tracking-tight leading-none text-green-500">{{contactsError ? '—' : contactsCount}}</div>
                             <div class="text-lg font-medium text-green-600 dark:text-green-500">{{contactsError ? 'Indisponible' : annuaireScopeLabel}}</div>
                         </div>
-                    </div>
+                    </a>
 
-                    <!-- Modèles de message -->
-                    <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                    <!-- Modeles de message -->
+                    <a routerLink="/message-template" class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="flex items-start justify-between">
                             <div class="text-lg font-medium tracking-tight leading-6 truncate">Modèles de message</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{templatesError ? '—' : templatesCount}}</div>
+                            <div class="text-6xl font-bold tracking-tight leading-none text-amber-500">{{templatesError ? '—' : templatesCount}}</div>
                             <div class="text-lg font-medium text-amber-600 dark:text-amber-500">{{templatesError ? 'Indisponible' : annuaireScopeLabel}}</div>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Planifications en cours -->
-                    <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                    <a routerLink="/messagerie" class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="flex items-start justify-between">
                             <div class="text-lg font-medium tracking-tight leading-6 truncate">Planifications en cours</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{planificationsError ? '—' : breakdown.inProgress}}</div>
+                            <div class="text-6xl font-bold tracking-tight leading-none text-amber-500">{{planificationsError ? '—' : breakdown.inProgress}}</div>
                             <div *ngIf="!planificationsError" class="text-sm text-center font-medium text-amber-600 dark:text-amber-500">
                                 {{breakdown.inactive}} désactivée{{breakdown.inactive > 1 ? 's' : ''}} ·
                                 {{breakdown.suspended}} suspendue{{breakdown.suspended > 1 ? 's' : ''}} ·
                                 {{breakdown.ended}} terminée{{breakdown.ended > 1 ? 's' : ''}}
                             </div>
+                            <div *ngIf="membership && !planificationsError" class="text-xs text-secondary mt-1">Mes planifications personnelles</div>
                             <div *ngIf="planificationsError" class="text-lg font-medium text-amber-600 dark:text-amber-500">Indisponible</div>
                         </div>
+                    </a>
+
+                    <!-- Solde -->
+                    <a routerLink="/wallet" class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
+                        <div class="flex items-start justify-between">
+                            <div class="text-lg font-medium tracking-tight leading-6 truncate">Solde disponible</div>
+                        </div>
+                        <div class="flex flex-col items-center mt-2">
+                            <ng-container *ngIf="walletSummary; else walletPending">
+                                <div class="text-4xl font-bold tracking-tight leading-none" [ngClass]="lowBalance ? 'text-red-600' : 'text-emerald-600'">{{walletSummary.available | number}}</div>
+                                <div class="text-sm font-medium text-secondary mt-1">{{walletSummary.currency}} · {{walletIsOrganization ? 'Organisation' : 'Personnel'}}</div>
+                                <div class="text-xs text-secondary">Réservé : {{walletSummary.reserved | number}} {{walletSummary.currency}}</div>
+                            </ng-container>
+                            <ng-template #walletPending>
+                                <div class="text-lg font-medium text-secondary">{{walletError ? 'Indisponible' : '—'}}</div>
+                            </ng-template>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Prochains envois -->
+                <div class="mt-8 flex flex-col p-6 bg-card shadow rounded-2xl">
+                    <div class="flex items-center justify-between">
+                        <div class="text-lg font-medium tracking-tight">Prochains envois (7 jours)</div>
+                        <a routerLink="/messagerie" class="text-sm font-semibold text-primary">Voir les campagnes</a>
                     </div>
+                    <div *ngIf="upcomingError" class="mt-4 text-sm text-amber-700 dark:text-amber-400">Impossible de charger les prochains envois.</div>
+                    <div *ngIf="!upcomingError && upcomingSends.length === 0" class="mt-4 text-sm text-secondary">Aucun envoi prévu dans les 7 prochains jours.</div>
+                    <ul *ngIf="!upcomingError && upcomingSends.length > 0" class="mt-4 divide-y">
+                        <li *ngFor="let send of upcomingSends" class="flex items-center justify-between py-3">
+                            <span class="font-medium truncate">{{send.title || 'Sans titre'}}</span>
+                            <span class="text-sm text-secondary whitespace-nowrap">{{send.day | date : 'EEE dd MMM'}} · {{send.time}}</span>
+                        </li>
+                    </ul>
                 </div>
 
                 <div class="grid grid-cols-1 gap-8 w-full mt-8">
