@@ -138,9 +138,9 @@
                                             (click)="openModelForMessageTo($event,contact)"
                                             mat-button
                                             class="icon-size-6"
-                                            [ngClass]="isWhatsAppReady ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 opacity-50 cursor-not-allowed'"
+                                            [ngClass]="canSend ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 opacity-50 cursor-not-allowed'"
                                             [svgIcon]="'mat_outline:chat'"
-                                            [matTooltip]="isWhatsAppReady ? 'Envoyer un message à '+contact.fullName : (isWhatsAppSyncing ? 'Synchronisation WhatsApp en cours...' : 'Synchronisez votre compte WhatsApp pour envoyer un message')"></mat-icon>
+                                            [matTooltip]="canSend ? 'Envoyer un message à '+contact.fullName : sendBlockedReason"></mat-icon>
                                     </div> 
                                 </a>
                             </ng-container>

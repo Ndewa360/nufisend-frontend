@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Select } from "@ngxs/store";
-import { UserProfileModel, UserProfileState } from "app/shared/store/user-profile";
 import { PreferencesService, WorkspacePreferences } from "app/shared/services/preferences/preferences.service";
+import { OrganizationService } from "app/core/organization/organization.service";
+import { Membership, WhatsappConnectionStatus } from "app/core/organization/organization.types";
 import { ToastrService } from "ngx-toastr";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { Subject, takeUntil } from "rxjs";
 
 @Component({
     selector: "app-organisation-settings",
@@ -15,9 +15,7 @@ import { Observable, Subject, takeUntil } from "rxjs";
 })
 export class OrganisationSettingsComponent implements OnInit, OnDestroy
 {
-    @Select(UserProfileState.selectStateData) profile$: Observable<UserProfileModel>;
-
-    profile: UserProfileModel = null;
+    membership: Membership | null | undefined = undefined;
     preferences: WorkspacePreferences;
     preferencesForm: UntypedFormGroup;
     timezones = [
@@ -36,7 +34,8 @@ export class OrganisationSettingsComponent implements OnInit, OnDestroy
         private _preferencesService: PreferencesService,
         private _toastrService: ToastrService,
         private _router: Router,
-        private _changeDetectorRef: ChangeDetectorRef
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _organizationService: OrganizationService
     )
     {
     }
@@ -53,12 +52,35 @@ export class OrganisationSettingsComponent implements OnInit, OnDestroy
             defaultCountry: [this.preferences.defaultCountry]
         });
 
-        this.profile$
+        this._organizationService.membership$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((profile) => {
-                this.profile = profile;
+            .subscribe((membership) => {
+                this.membership = membership;
                 this._changeDetectorRef.markForCheck();
             });
+    }
+
+    /** Etat du numero WhatsApp Business de l'organisation (affiche dans la carte WhatsApp). */
+    get whatsappStatus(): WhatsappConnectionStatus | null
+    {
+        return this.membership?.organization?.whatsapp?.status ?? null;
+    }
+
+    get whatsappStatusLabel(): string
+    {
+        if (this.membership === undefined) return 'Chargement...';
+        if (!this.membership?.organization) return 'Aucune organisation';
+        switch (this.whatsappStatus) {
+            case 'connected': return 'Connecté';
+            case 'credit_line_missing': return 'Ligne de crédit manquante';
+            case 'error': return 'Erreur de connexion';
+            default: return 'Non connecté';
+        }
+    }
+
+    get whatsappStatusClass(): string
+    {
+        return this.whatsappStatus === 'connected' ? 'bg-green-500' : 'bg-amber-500';
     }
 
     ngOnDestroy(): void
@@ -80,6 +102,6 @@ export class OrganisationSettingsComponent implements OnInit, OnDestroy
 
     goToWhatsappSync(): void
     {
-        this._router.navigate(["/sync_whatsapp"]);
+        this._router.navigate(["/organisation/whatsapp"]);
     }
 }

@@ -5,6 +5,7 @@ import { SuperAdminGuard } from 'app/core/auth/guards/super-admin.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 import { InitialDataResolver } from 'app/app.resolvers';
 import { InitialLoadingDataResolver } from './shared/services/loading-data';
+import { personalAccountGuard } from 'app/core/organization/organization.guard';
 
 export const appRoutes: Route[] = [
 
@@ -99,7 +100,7 @@ export const appRoutes: Route[] = [
 
     {
         path: 'sync_whatsapp',
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, personalAccountGuard],
         component: LayoutComponent,
         resolve: {
             initialData: InitialDataResolver,

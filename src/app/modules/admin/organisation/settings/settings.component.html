@@ -35,16 +35,16 @@
 
             <div class="flex flex-col gap-6">
                 <div class="bg-card rounded-2xl shadow p-6">
-                    <div class="text-lg font-semibold">WhatsApp</div>
+                    <div class="text-lg font-semibold">WhatsApp Business</div>
                     <div class="flex items-center gap-3 mt-4">
-                        <span class="w-3 h-3 rounded-full" [ngClass]="profile?.hasSyncWhatsApp ? 'bg-green-500' : 'bg-amber-500'"></span>
-                        <span class="font-medium">{{ profile?.hasSyncWhatsApp ? 'Connecté' : 'Non connecté' }}</span>
+                        <span class="w-3 h-3 rounded-full" [ngClass]="whatsappStatusClass"></span>
+                        <span class="font-medium">{{ whatsappStatusLabel }}</span>
                     </div>
                     <div class="text-secondary text-sm mt-2">
-                        Un compte WhatsApp connecté est requis pour envoyer des messages depuis cet espace.
+                        Les messages de l'organisation sont envoyés depuis son numéro WhatsApp Business.
                     </div>
                     <button mat-stroked-button color="primary" class="mt-4 w-full" type="button" (click)="goToWhatsappSync()">
-                        Gérer la connexion
+                        Gérer WhatsApp Business
                     </button>
                 </div>
 

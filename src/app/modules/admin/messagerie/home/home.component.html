@@ -26,7 +26,7 @@
                 <!-- Actions -->
                 <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
 
-                    <button (click)="newMessage()" [disabled]="!isWhatsAppReady" [matTooltip]="isWhatsAppReady?'':'La synchronisation WhatsApp doit être terminée pour envoyer un message'" mat-flat-button [color]="'primary'">
+                    <button (click)="newMessage()" [disabled]="!canSend" [matTooltip]="sendBlockedReason" mat-flat-button [color]="'primary'">
                         <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:mail'"></mat-icon>
                         <span class="ml-2">Nouvelle campagne</span>
                     </button>
@@ -52,7 +52,8 @@
     <!-- Main -->
     <div class="flex-auto border-t -mt-px pt-4 sm:pt-6">
         <div class="w-full max-w-screen-xl mx-auto p-4">
-            <fuse-alert *ngIf="!isWhatsAppReady" class="mb-6" [type]="(whatsappSync$ | async)?.status === 'syncing' || (whatsappSync$ | async)?.status === 'connecting' ? 'info' : 'warning'" [appearance]="'border'" [showIcon]="true">
+            <!-- Compte personnel : synchronisation WhatsApp Web -->
+            <fuse-alert *ngIf="channel === 'personal' && !isWhatsAppReady" class="mb-6" [type]="(whatsappSync$ | async)?.status === 'syncing' || (whatsappSync$ | async)?.status === 'connecting' ? 'info' : 'warning'" [appearance]="'border'" [showIcon]="true">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2">
                     <ng-container *ngIf="(whatsappSync$ | async) as sync">
                         <span *ngIf="sync.status === 'syncing' || sync.status === 'connecting'">
@@ -63,6 +64,21 @@
                         </span>
                     </ng-container>
                     <a mat-button color="primary" routerLink="/sync_whatsapp">Synchroniser maintenant</a>
+                </div>
+            </fuse-alert>
+
+            <!-- Membre d'organisation : envoi par le numero WhatsApp Business de l'organisation -->
+            <fuse-alert *ngIf="channel === 'cloud' && !cloudReady" class="mb-6" [type]="'warning'" [appearance]="'border'" [showIcon]="true">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <span>L'organisation ne peut pas envoyer pour le moment (numéro WhatsApp Business non raccordé, ligne de crédit ou compte suspendu).</span>
+                    <a mat-button color="primary" routerLink="/organisation/whatsapp">Configurer WhatsApp Business</a>
+                </div>
+            </fuse-alert>
+
+            <!-- Adhesion non chargee : aucun envoi tant que le canal n'est pas connu -->
+            <fuse-alert *ngIf="channel === 'unknown'" class="mb-6" [type]="'warning'" [appearance]="'border'" [showIcon]="true">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <span>Impossible de charger votre espace d'envoi. Rechargez la page pour pouvoir envoyer des messages.</span>
                 </div>
             </fuse-alert>
 

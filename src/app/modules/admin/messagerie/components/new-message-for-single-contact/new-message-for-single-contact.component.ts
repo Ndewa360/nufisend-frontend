@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { OrganizationService } from 'app/core/organization/organization.service';
 import { Membership } from 'app/core/organization/organization.types';
+import { isChannelReady, isOrganizationCloudReady, resolveMessagingChannel } from 'app/core/organization/messaging-channel';
 import { TemplateSelection } from 'app/shared/components/cloud-template-picker/cloud-template-picker.component';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -29,8 +30,8 @@ export class NewMessageForSingleContactComponent {
   @Select(GlobalState.isWhatsAppReady) isWhatsAppReady$:Observable<boolean>;
   isWhatsAppSynced:boolean=false;
   isWhatsAppReady:boolean=false;
-  /** Membre d'une organisation : envoi par le numero WhatsApp Business. */
-  membership: Membership | null = null;
+  /** Adhesion : undefined = non chargee, null = compte personnel, objet = membre. */
+  membership: Membership | null | undefined = undefined;
   cloudSelection: TemplateSelection | null = null;
 
   constructor(
@@ -73,7 +74,7 @@ export class NewMessageForSingleContactComponent {
           this._changeDetectorRef.markForCheck();
         });
 
-      this._organizationService.loadedMembership$.pipe(takeUntil(this._unsubscribeAll)).subscribe((membership) => {
+      this._organizationService.membership$.pipe(takeUntil(this._unsubscribeAll)).subscribe((membership) => {
         this.membership = membership;
         this._changeDetectorRef.markForCheck();
       });
@@ -115,16 +116,34 @@ export class NewMessageForSingleContactComponent {
       return !!this.membership;
     }
 
+    get isPersonal(): boolean
+    {
+      return this.membership === null;
+    }
+
+    get channelUnknown(): boolean
+    {
+      return resolveMessagingChannel(this.membership) === 'unknown';
+    }
+
     get cloudReady(): boolean
     {
-      const org = this.membership?.organization;
-      return !!org && org.status === 'active'
-        && org.whatsapp?.status === 'connected';
+      return isOrganizationCloudReady(this.membership);
     }
 
     get channelReady(): boolean
     {
-      return this.isCloud ? this.cloudReady : this.isWhatsAppReady;
+      return isChannelReady(this.membership, this.isWhatsAppReady);
+    }
+
+    get sendBlockedReason(): string
+    {
+      if (this.channelReady) return '';
+      if (this.channelUnknown) return "Espace d'envoi en cours de chargement";
+      if (this.isCloud) return "L'organisation ne peut pas envoyer pour le moment";
+      return this.isWhatsAppSynced
+        ? 'La synchronisation WhatsApp est en cours'
+        : 'Synchronisez votre compte WhatsApp pour envoyer';
     }
 
     get usesCloudTemplate(): boolean
@@ -140,6 +159,10 @@ export class NewMessageForSingleContactComponent {
 
     sendMessage()
     {
+      if (this.channelUnknown) {
+        this._toastrService.error("Espace d'envoi en cours de chargement. Rechargez la page.", 'Envoi impossible');
+        return;
+      }
       if (this.isCloud && !this.cloudReady) {
         this._toastrService.error("L'organisation ne peut pas envoyer : vérifiez le numéro WhatsApp Business et la ligne de crédit", 'Envoi impossible');
         return;
@@ -148,7 +171,7 @@ export class NewMessageForSingleContactComponent {
         this._toastrService.error('Renseignez toutes les variables du modèle', 'Validation');
         return;
       }
-      if (!this.isCloud && !this.isWhatsAppReady) {
+      if (this.isPersonal && !this.isWhatsAppReady) {
         this._toastrService.error(
           this.isWhatsAppSynced
             ? "La synchronisation WhatsApp est en cours. Veuillez patienter avant d'envoyer un message."

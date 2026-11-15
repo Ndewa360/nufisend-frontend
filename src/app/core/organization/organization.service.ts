@@ -75,16 +75,17 @@ export class OrganizationService
         return this._http.post<ApiResponse<any>>(`${this._baseUrl}/me/personal-data/transfer`, {}).pipe(data());
     }
 
-    load(): Observable<Membership | null>
+    /**
+     * Charge l'adhesion. En cas d'erreur, l'etat reste "inconnu" (undefined) : on ne
+     * bascule jamais silencieusement sur le compte personnel. Un nouvel appel retente.
+     */
+    load(): Observable<Membership | null | undefined>
     {
         return this._http.get<ApiResponse<Membership | null>>(`${this._baseUrl}/me`).pipe(
             data<Membership | null>(),
             tap((membership) => this._membership.next(membership)),
-            catchError(() => {
-                // En cas d'erreur, on ne bloque pas l'application (compte personnel).
-                if (this._membership.value === undefined) this._membership.next(null);
-                return of(this._membership.value ?? null);
-            }),
+            map((membership) => membership as Membership | null),
+            catchError(() => of(undefined)),
         );
     }
 

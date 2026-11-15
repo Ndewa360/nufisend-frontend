@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { combineLatest, distinctUntilChanged, filter, map, skip, Subject, takeUntil } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Subject, takeUntil } from 'rxjs';
 import { FuseConfigService } from '@fuse/services/config';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FusePlatformService } from '@fuse/services/platform';
@@ -89,7 +89,6 @@ export class LayoutComponent implements OnInit, OnDestroy
             .pipe(
                 map((membership) => !!membership),
                 distinctUntilChanged(),
-                skip(1),
                 takeUntil(this._unsubscribeAll)
             )
             .subscribe((isMember) => {

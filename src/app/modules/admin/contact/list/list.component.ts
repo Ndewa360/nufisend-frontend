@@ -13,6 +13,9 @@ import { ToastrService } from 'ngx-toastr';
 import { NewMessageForSingleContactComponent } from '../../messagerie/components/new-message-for-single-contact/new-message-for-single-contact.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UploadFileComponent } from '../components/upload-file/upload-file.component';
+import { OrganizationService } from 'app/core/organization/organization.service';
+import { Membership } from 'app/core/organization/organization.types';
+import { isChannelReady, resolveMessagingChannel } from 'app/core/organization/messaging-channel';
 
 @Component({
   selector: 'app-contact-list',
@@ -43,6 +46,8 @@ export class ListComponent implements OnInit, OnDestroy{
     hasWhatsAppConnected:boolean=false;
     isWhatsAppReady:boolean=false;
     isWhatsAppSyncing:boolean=false;
+    /** Adhesion : undefined = non chargee, null = compte personnel, objet = membre. */
+    membership: Membership | null | undefined = undefined;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -59,8 +64,27 @@ export class ListComponent implements OnInit, OnDestroy{
         private _fuseConfirmationService: FuseConfirmationService,
         private _toastrService:ToastrService,
         private _matDialog: MatDialog, 
+        private _organizationService: OrganizationService,
     )
     {
+    }
+
+    /** Vrai si l'utilisateur peut envoyer un message a un contact (canal organisation ou personnel). */
+    get canSend(): boolean
+    {
+        return isChannelReady(this.membership, this.isWhatsAppReady);
+    }
+
+    get sendBlockedReason(): string
+    {
+        switch (resolveMessagingChannel(this.membership)) {
+            case 'cloud': return "L'organisation ne peut pas envoyer pour le moment (numéro WhatsApp Business ou ligne de crédit)";
+            case 'personal':
+                return this.isWhatsAppSyncing
+                    ? 'Synchronisation WhatsApp en cours...'
+                    : 'Synchronisez votre compte WhatsApp pour envoyer un message';
+            default: return "Espace d'envoi en cours de chargement";
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -79,10 +103,22 @@ export class ListComponent implements OnInit, OnDestroy{
             .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>this.hasWhatsAppConnected=value)
 
         this.isWhatsAppReady$
-            .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>this.isWhatsAppReady=!!value)
+            .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>{
+                this.isWhatsAppReady=!!value;
+                this._changeDetectorRef.markForCheck();
+            })
 
         this.isWhatsAppSyncing$
-            .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>this.isWhatsAppSyncing=!!value)
+            .pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>{
+                this.isWhatsAppSyncing=!!value;
+                this._changeDetectorRef.markForCheck();
+            })
+
+        this._organizationService.membership$
+            .pipe(takeUntil(this._unsubscribeAll)).subscribe((membership)=>{
+                this.membership=membership;
+                this._changeDetectorRef.markForCheck();
+            })
 
         this.contacts$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -170,13 +206,8 @@ export class ListComponent implements OnInit, OnDestroy{
     openModelForMessageTo(event,contact)
     {
         event.stopPropagation();
-        if (!this.isWhatsAppReady) {
-            this._toastrService.warning(
-                this.isWhatsAppSyncing
-                    ? "La synchronisation WhatsApp est en cours. Veuillez patienter avant d'envoyer un message."
-                    : "Synchronisez votre compte WhatsApp avant d'envoyer un message.",
-                'WhatsApp indisponible'
-            );
+        if (!this.canSend) {
+            this._toastrService.warning(this.sendBlockedReason, 'Envoi indisponible');
             return;
         }
         const dialogRef = this._matDialog.open(NewMessageForSingleContactComponent,
