@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { environment } from "environments/environment";
-import { PlanificationModel } from "./planification.model";
-import { HttpClient } from "@angular/common/http";
+import { PlanificationModel, PlanificationOccurrencesItem } from "./planification.model";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { ApiResultFormat } from "../global";
 
@@ -21,6 +21,15 @@ export class PlanificationService
     getPlanifications(): Observable<ApiResultFormat<PlanificationModel[]>>
     {
         return this._httpClient.get<ApiResultFormat<PlanificationModel[]>>(`${environment.apiUrl}/planifications`)
+    }
+
+    /**
+     * Occurrences des planifications entre deux jours (YYYY-MM-DD, bornes incluses).
+     */
+    getOccurrences(from:string, to:string): Observable<ApiResultFormat<PlanificationOccurrencesItem[]>>
+    {
+        const params = new HttpParams().set('from', from).set('to', to);
+        return this._httpClient.get<ApiResultFormat<PlanificationOccurrencesItem[]>>(`${environment.apiUrl}/planifications/occurrences`, { params })
     }
 
     /**

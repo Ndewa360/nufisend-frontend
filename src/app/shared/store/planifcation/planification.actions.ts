@@ -19,6 +19,8 @@ export namespace PlanificationAction
     export class FetchAllPlanification
     {
         static readonly type = '[Planification] Fectch All Planification'
+        /** force : recharger meme si les planifications sont deja en memoire. */
+        constructor(public force:boolean = false){}
     }
 
     //Delete planification

@@ -5,53 +5,60 @@
             <mat-progress-bar *ngIf="loading else hasLoading;" [mode]="'indeterminate'"></mat-progress-bar>
             <ng-template #hasLoading>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full min-w-0">
+
                     <!-- Groupes -->
-                   <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                       <div class="flex items-start justify-between">
-                           <div class="text-lg font-medium tracking-tight leading-6 truncate">Groupes</div>
-                       </div>
-                       <div class="flex flex-col items-center mt-2">
-                           <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-blue-500">{{(groups$ | async)?.length || 0}}</div>
-                           <div class="text-lg font-medium text-blue-600 dark:text-blue-500">Privés</div>
-                       </div>
-                   </div>
-    
-                   <!-- En cours -->
-                   <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                    <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                        <div class="flex items-start justify-between">
+                            <div class="text-lg font-medium tracking-tight leading-6 truncate">Groupes</div>
+                        </div>
+                        <div class="flex flex-col items-center mt-2">
+                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-blue-500">{{groupsError ? '—' : groupsCount}}</div>
+                            <div class="text-lg font-medium text-blue-600 dark:text-blue-500">{{groupsError ? 'Indisponible' : annuaireScopeLabel}}</div>
+                        </div>
+                    </div>
+
+                    <!-- Contacts -->
+                    <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
                         <div class="flex items-start justify-between">
                             <div class="text-lg font-medium tracking-tight leading-6 truncate">Contacts</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-green-500">{{(contacts$ | async)?.length || 0}}</div>
-                            <div class="text-lg font-medium text-green-600 dark:text-green-500">Privés</div>                      
+                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-green-500">{{contactsError ? '—' : contactsCount}}</div>
+                            <div class="text-lg font-medium text-green-600 dark:text-green-500">{{contactsError ? 'Indisponible' : annuaireScopeLabel}}</div>
                         </div>
                     </div>
-    
-                    <!-- En Desactivé -->
-                   <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+
+                    <!-- Modèles de message -->
+                    <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
                         <div class="flex items-start justify-between">
-                            <div class="text-lg font-medium tracking-tight leading-6 truncate">Template de message</div>
+                            <div class="text-lg font-medium tracking-tight leading-6 truncate">Modèles de message</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{(templateMessage$ | async)?.length || 0}}</div>
-                            <div class="text-lg font-medium text-amber-600 dark:text-amber-500">Privés</div>                      
+                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{templatesError ? '—' : templatesCount}}</div>
+                            <div class="text-lg font-medium text-amber-600 dark:text-amber-500">{{templatesError ? 'Indisponible' : annuaireScopeLabel}}</div>
                         </div>
                     </div>
-    
-                     <!-- En Desactivé -->
-                   <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+
+                    <!-- Planifications en cours -->
+                    <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
                         <div class="flex items-start justify-between">
-                            <div class="text-lg font-medium tracking-tight leading-6 truncate">Tâches planifiées</div>
+                            <div class="text-lg font-medium tracking-tight leading-6 truncate">Planifications en cours</div>
                         </div>
                         <div class="flex flex-col items-center mt-2">
-                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{(planification$ | async)?.length || 0}}</div>
-                            <div class="text-lg font-medium text-amber-600 dark:text-amber-500">Privés</div>                      
+                            <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{planificationsError ? '—' : breakdown.inProgress}}</div>
+                            <div *ngIf="!planificationsError" class="text-sm text-center font-medium text-amber-600 dark:text-amber-500">
+                                {{breakdown.inactive}} désactivée{{breakdown.inactive > 1 ? 's' : ''}} ·
+                                {{breakdown.suspended}} suspendue{{breakdown.suspended > 1 ? 's' : ''}} ·
+                                {{breakdown.ended}} terminée{{breakdown.ended > 1 ? 's' : ''}}
+                            </div>
+                            <div *ngIf="planificationsError" class="text-lg font-medium text-amber-600 dark:text-amber-500">Indisponible</div>
                         </div>
-                    </div>                    
-               </div>
-               <div class="grid grid-cols-1  gap-8 w-full mt-8">
-                <app-schedule></app-schedule>
-               </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-8 w-full mt-8">
+                    <app-schedule></app-schedule>
+                </div>
             </ng-template>
         </div>
     </div>

@@ -154,7 +154,7 @@ export class AuthService
             whatsapp_contacts:{ contacts: [], startLoading: false, percentLoading: 0, syncError: null },
             messageTemplates: { messageTemplates: [], loadingMessageTemplates: false, initLoadingState: 'NO_LOADED' },
             message:          { sendingMessage: false },
-            planifications:   { planifications: [], loadingPlanifications: false, initLoadingState: 'NO_LOADED' },
+            planifications:   { planifications: [], loadingPlanifications: false, initLoadingState: 'NO_LOADED', loadError: false },
         });
         return of(true);
     }

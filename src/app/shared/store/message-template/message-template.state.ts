@@ -10,6 +10,8 @@ export class MessageTemplateStateModel {
     messageTemplates:MessageTemplateModel[]
     loadingMessageTemplates:boolean;
     initLoadingState:'NO_LOADED'|'LOADING'|'LOADED';
+    /** Vrai si le dernier chargement a echoue (ne pas confondre avec une liste vide). */
+    loadError?:boolean;
 }
 
 
@@ -18,7 +20,8 @@ export class MessageTemplateStateModel {
     defaults:{
         loadingMessageTemplates:false,
         initLoadingState:'NO_LOADED',
-        messageTemplates:[]
+        messageTemplates:[],
+        loadError:false
     }
 })
 @Injectable()
@@ -32,6 +35,12 @@ export class MessageTemplateState{
     static selectStateLoading(state:MessageTemplateStateModel)
     {
         return state.loadingMessageTemplates
+    }
+
+    @Selector()
+    static selectStateLoadError(state:MessageTemplateStateModel)
+    {
+        return !!state.loadError
     }
 
     @Selector()
@@ -160,7 +169,8 @@ export class MessageTemplateState{
                     ctx.setState({
                         loadingMessageTemplates:false,
                         messageTemplates:result.data,
-                        initLoadingState:"LOADED"
+                        initLoadingState:"LOADED",
+                        loadError:false
 
                     })
                 }
@@ -169,7 +179,8 @@ export class MessageTemplateState{
                 this._toastrService.error(error?.error?.message || "Impossible de charger les templates", 'Erreur');
                 ctx.patchState({
                     loadingMessageTemplates: false,
-                    initLoadingState: "LOADED"
+                    initLoadingState: "LOADED",
+                    loadError:true
                 })
                 return throwError(error);
             })

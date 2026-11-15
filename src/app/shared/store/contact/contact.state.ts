@@ -12,6 +12,8 @@ export class ContactStateModel {
     contacts:ContactModel[]
     loadingContacts:boolean;
     initLoadingState:'NO_LOADED'|'LOADING'|'LOADED';
+    /** Vrai si le dernier chargement a echoue (ne pas confondre avec une liste vide). */
+    loadError?:boolean;
 
 }
 
@@ -21,7 +23,8 @@ export class ContactStateModel {
     defaults:{
         loadingContacts:false,
         initLoadingState:'NO_LOADED',
-        contacts:[]
+        contacts:[],
+        loadError:false
     }
 })
 @Injectable()
@@ -36,6 +39,12 @@ export class ContactState{
     static selectStateLoading(state:ContactStateModel)
     {
         return state.loadingContacts
+    }
+
+    @Selector()
+    static selectStateLoadError(state:ContactStateModel)
+    {
+        return !!state.loadError
     }
 
     @Selector()
@@ -256,14 +265,16 @@ export class ContactState{
                     ctx.setState({
                         loadingContacts:false,
                         contacts:result.data,
-                        initLoadingState:"LOADED"
+                        initLoadingState:"LOADED",
+                        loadError:false
                     })
                 }
             ),
             catchError((error) => {
                 ctx.patchState({
                     loadingContacts: false,
-                    initLoadingState:"LOADED"
+                    initLoadingState:"LOADED",
+                    loadError:true
                 })
                 return throwError(error);
                 

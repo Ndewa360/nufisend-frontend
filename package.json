@@ -31,7 +31,6 @@
         "@vercel/analytics": "2.0.1",
         "angularx-qrcode": "17.0.1",
         "apexcharts": "3.49.0",
-        "cron-parser": "^4.9.0",
         "file-saver": "^2.0.5",
         "highlight.js": "11.7.0",
         "lodash-es": "4.17.21",

@@ -1,27 +1,32 @@
-<!-- Schedule -->
+<!-- Planifications du jour selectionne -->
+<div class="flex flex-col mt-2">
+    <div *ngIf="loading" class="py-6 text-secondary text-sm">Chargement du calendrier...</div>
 
-<div class="flex flex-col mt-2 divide-y">
-    <ng-container *ngFor="let planing of planingList">
-        <div class="flex flex-row items-center justify-between py-4 px-0.5">
-            <div class="flex flex-col">
-                <div class="font-medium">{{planing.title}}</div>
-                <div class="flex flex-col sm:flex-row sm:items-center -ml-0.5 mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3">
-                    <ng-container *ngFor="let plan of planing.planning">
-                        <div class="flex items-center">
-                            <mat-icon
-                                class="icon-size-5 text-hint"
-                                [svgIcon]="'heroicons_solid:clock'"></mat-icon>
-                            <div class="ml-1.5 text-md text-secondary">{{plan.time}}</div>
+    <div *ngIf="!loading && loadError" class="py-6 flex flex-col items-start gap-2">
+        <span class="text-sm text-amber-700 dark:text-amber-400">Impossible de charger le calendrier pour le moment.</span>
+        <button mat-stroked-button color="primary" type="button" (click)="retry.emit()">Réessayer</button>
+    </div>
+
+    <div *ngIf="!loading && !loadError && entries.length === 0" class="py-6 text-secondary text-sm">
+        Aucune planification ce jour.
+    </div>
+
+    <div *ngIf="!loading && !loadError && entries.length > 0" class="flex flex-col divide-y">
+        <div *ngFor="let entry of entries" class="flex flex-row items-center justify-between py-4 px-0.5 gap-4">
+            <div class="flex flex-col min-w-0">
+                <div class="font-medium truncate">{{entry.title || 'Sans titre'}}</div>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                    <div *ngFor="let slot of entry.times" class="flex items-center" [class.opacity-50]="slot.past">
+                        <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                        <div class="ml-1.5 text-md text-secondary">
+                            {{slot.time}}<span *ngIf="slot.past" class="ml-1 text-xs">(passé)</span>
                         </div>
-                    </ng-container>
+                    </div>
                 </div>
             </div>
-            <!-- <button mat-icon-button>
-            </button> -->
-            <mat-icon *ngIf="planing.isActive; else iconNoActive" [svgIcon]="'heroicons_outline:check-circle'" class="text-emerald-600 dark:text-emerald-400" ></mat-icon>
-            <ng-template #iconNoActive>
-                <mat-icon [svgIcon]="'heroicons_outline:exclamation-circle'" class="text-amber-600 dark:text-amber-400" ></mat-icon>
-            </ng-template>
+            <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold" [ngClass]="toneClasses[entry.status.tone]">
+                {{entry.status.label}}
+            </span>
         </div>
-    </ng-container>
+    </div>
 </div>

@@ -10,7 +10,8 @@ export class PlanificationStateModel {
     planifications:PlanificationModel[]
     loadingPlanifications:boolean
     initLoadingState:'NO_LOADED'|'LOADING'|'LOADED';
-
+    /** Vrai si le dernier chargement a echoue (ne pas confondre avec une liste vide). */
+    loadError:boolean;
 }
 
 
@@ -20,7 +21,7 @@ export class PlanificationStateModel {
         loadingPlanifications:false,
         planifications:[],
         initLoadingState:'NO_LOADED',
-        
+        loadError:false,
     }
 })
 @Injectable()
@@ -40,6 +41,12 @@ export class PlanificationState{
     static selectStateData(state:PlanificationStateModel)
     {
         return state.planifications
+    }
+
+    @Selector()
+    static selectStateLoadError(state:PlanificationStateModel)
+    {
+        return state.loadError
     }
 
     @Selector()
@@ -133,10 +140,10 @@ export class PlanificationState{
     }
 
     @Action(PlanificationAction.FetchAllPlanification)
-    fetchAllPlanifications(ctx:StateContext<PlanificationStateModel>)
+    fetchAllPlanifications(ctx:StateContext<PlanificationStateModel>, {force}:PlanificationAction.FetchAllPlanification)
     {
         const state = ctx.getState();
-        if(state.planifications.length>0) {
+        if(state.planifications.length>0 && !force) {
             if(state.initLoadingState !== "LOADED") ctx.patchState({initLoadingState:"LOADED"});
             return of(true);
         }
@@ -151,14 +158,16 @@ export class PlanificationState{
                     ctx.setState({
                         loadingPlanifications:false,
                         planifications:result.data,
-                        initLoadingState:"LOADED"
+                        initLoadingState:"LOADED",
+                        loadError:false
                     })
                 }
             ),
             catchError((error) => {
                 ctx.patchState({
                     loadingPlanifications: false,
-                    initLoadingState:"LOADED"
+                    initLoadingState:"LOADED",
+                    loadError:true
                 })
                 return throwError(error);
                 

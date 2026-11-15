@@ -10,6 +10,8 @@ export class GroupStateModel {
     groups:GroupModel[]
     loadingGroups:boolean
     initLoadingState:'NO_LOADED'|'LOADING'|'LOADED';
+    /** Vrai si le dernier chargement a echoue (ne pas confondre avec une liste vide). */
+    loadError?:boolean;
 
 }
 
@@ -19,7 +21,8 @@ export class GroupStateModel {
     defaults:{
         loadingGroups:false,
         initLoadingState:'NO_LOADED',
-        groups:[]
+        groups:[],
+        loadError:false
     }
 })
 @Injectable()
@@ -33,6 +36,12 @@ export class GroupState{
     static selectStateLoading(state:GroupStateModel)
     {
         return state.loadingGroups
+    }
+
+    @Selector()
+    static selectStateLoadError(state:GroupStateModel)
+    {
+        return !!state.loadError
     }
 
     @Selector()
@@ -170,15 +179,16 @@ export class GroupState{
                     ctx.setState({
                         loadingGroups:false,
                         groups:result.data,
-                        initLoadingState:"LOADED"
+                        initLoadingState:"LOADED",
+                        loadError:false
                     })
                 }
             ),
             catchError((error) => {
                 ctx.patchState({
                     loadingGroups: false,
-                    initLoadingState:"LOADED"
-
+                    initLoadingState:"LOADED",
+                    loadError:true
                 })
                 return throwError(error);
                 

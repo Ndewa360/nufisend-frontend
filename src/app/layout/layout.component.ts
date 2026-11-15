@@ -11,6 +11,9 @@ import { AppConfig } from 'app/core/config/app.config';
 import { AuthService } from 'app/core/auth/auth.service';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { OrganizationService } from 'app/core/organization/organization.service';
+import { Store } from '@ngxs/store';
+import { ContactAction, GroupAction, MessageTemplateAction } from 'app/shared/store';
+import { PlanificationAction } from 'app/shared/store/planifcation';
 
 @Component({
     selector     : 'layout',
@@ -36,7 +39,8 @@ export class LayoutComponent implements OnInit, OnDestroy
         private _fusePlatformService: FusePlatformService,
         private _authService: AuthService,
         private _navigationService: NavigationService,
-        private _organizationService: OrganizationService
+        private _organizationService: OrganizationService,
+        private _store: Store
     )
     {
     }
@@ -97,6 +101,19 @@ export class LayoutComponent implements OnInit, OnDestroy
                     isSuperAdmin: !!(user && user['role'] === 'ADMIN'),
                     isMember,
                 });
+            });
+
+        // Changement d'organisation : les donnees de l'annuaire (contacts, groupes, modeles)
+        // et les planifications sont recharges pour afficher la portee de la nouvelle adhesion.
+        this._organizationService.membershipChanged$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => {
+                this._store.dispatch([
+                    new ContactAction.FetchAllContact(true),
+                    new GroupAction.FetchAllGroup(true),
+                    new MessageTemplateAction.FetchAllMessageTemplate(true),
+                    new PlanificationAction.FetchAllPlanification(true),
+                ]);
             });
 
         // Set the app version

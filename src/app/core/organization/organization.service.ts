@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Observable, catchError, filter, map, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, catchError, filter, map, of, tap } from 'rxjs';
 import {
     Conversation,
     InboxMessage,
@@ -36,6 +36,13 @@ const data = <T>() => map((res: ApiResponse<T>) => res.data);
 export class OrganizationService
 {
     private readonly _membership = new BehaviorSubject<Membership | null | undefined>(undefined);
+    private readonly _membershipChanged = new Subject<void>();
+
+    /** Emis quand l'utilisateur change d'organisation (rejoint, cree, quitte). Pas au premier chargement. */
+    get membershipChanged$(): Observable<void>
+    {
+        return this._membershipChanged.asObservable();
+    }
     private readonly _baseUrl = `${environment.apiUrl}/organizations`;
 
     constructor(private _http: HttpClient) {}
@@ -83,7 +90,7 @@ export class OrganizationService
     {
         return this._http.get<ApiResponse<Membership | null>>(`${this._baseUrl}/me`).pipe(
             data<Membership | null>(),
-            tap((membership) => this._membership.next(membership)),
+            tap((membership) => this._setMembership(membership)),
             map((membership) => membership as Membership | null),
             catchError(() => of(undefined)),
         );
@@ -94,27 +101,37 @@ export class OrganizationService
         this._membership.next(undefined);
     }
 
+    /** Met a jour l'adhesion et signale tout changement d'organisation. */
+    private _setMembership(next: Membership | null | undefined): void
+    {
+        const previous = this._membership.value;
+        this._membership.next(next);
+        const previousOrg = previous?.organization?._id ?? null;
+        const nextOrg = next?.organization?._id ?? null;
+        if (previous !== undefined && previousOrg !== nextOrg) this._membershipChanged.next();
+    }
+
     // ------------------------------------------------------------ organisation
 
     create(name: string): Observable<Membership>
     {
         return this._http
             .post<ApiResponse<Membership>>(this._baseUrl, { name })
-            .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
+            .pipe(data<Membership>(), tap((membership) => this._setMembership(membership)));
     }
 
     rename(name: string): Observable<Membership>
     {
         return this._http
             .patch<ApiResponse<Membership>>(`${this._baseUrl}/me`, { name })
-            .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
+            .pipe(data<Membership>(), tap((membership) => this._setMembership(membership)));
     }
 
     leave(): Observable<unknown>
     {
         return this._http
             .post<ApiResponse<unknown>>(`${this._baseUrl}/me/leave`, {})
-            .pipe(data<unknown>(), tap(() => this._membership.next(null)));
+            .pipe(data<unknown>(), tap(() => this._setMembership(null)));
     }
 
     // ------------------------------------------------------------ membres
@@ -171,7 +188,7 @@ export class OrganizationService
     {
         return this._http
             .post<ApiResponse<Membership>>(`${environment.apiUrl}/invitations/${encodeURIComponent(token)}/accept`, {})
-            .pipe(data<Membership>(), tap((membership) => this._membership.next(membership)));
+            .pipe(data<Membership>(), tap((membership) => this._setMembership(membership)));
     }
 
     // ------------------------------------------------------------ WhatsApp Business
