@@ -77,7 +77,8 @@ export class DetailComponent {
   .subscribe(
     (value:any)=>{
       this.toggleEditMode(false)
-      this.updateSelectedGroup(value.group)
+      // L'action porte l'id : le formulaire envoye n'en a pas (sinon /groups/undefined)
+      this.updateSelectedGroup({ ...value.group, _id: value.id })
     }
   );
 
@@ -127,6 +128,12 @@ export class DetailComponent {
   
   // Mark for check
   this._changeDetectorRef.markForCheck();
+  }
+
+  /** Ecriture de l'annuaire autorisee (fourni par la liste parente) */
+  get canWriteDirectory(): boolean
+  {
+    return this._groupsListComponent.canWriteDirectory;
   }
 
   updateSelectedGroup(group:GroupModel){

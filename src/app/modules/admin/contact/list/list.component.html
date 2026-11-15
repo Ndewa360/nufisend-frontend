@@ -66,6 +66,7 @@
                             class="ml-4"
                             mat-flat-button
                             [color]="'primary'"
+                            *ngIf="canWriteDirectory"
                             (click)="createContact()"
                             [matTooltip]="'Ajouter un contact'">
                             <mat-icon [svgIcon]="'feather:user-plus'"></mat-icon>
@@ -73,6 +74,7 @@
 
                         <!-- Import contacts button -->
                         <button
+                            *ngIf="canWriteDirectory"
                             class="ml-4"
                             mat-stroked-button
                             [color]="'primary'"
@@ -83,14 +85,14 @@
                         </button>
 
                         <!-- export contact button -->
-                        <!-- <button
+                        <button
                             class="ml-4 text-yellow-500 hidden md:block"
                             mat-stroked-button
                             (click)="exportContact()"
                             >
                             <mat-icon [svgIcon]="'mat_outline:download'" class="text-yellow-500"></mat-icon>
                             <span class="ml-2 mr-1">Export</span>
-                        </button> -->
+                        </button>
                     </div>
                 </div>
 
@@ -101,9 +103,9 @@
                 <div class="relative">
                     <ng-container *ngIf="!(loading$ | async); else waitForLoadingData">
                         <ng-container *ngIf="contactsFiltered.length; else noContacts">
-                            <ng-container *ngFor="let contact of contactsFiltered; let i = index; trackBy: trackByFn">
+                            <ng-container *ngFor="let contact of visibleContacts; let i = index; trackBy: trackByFn">
                                 <!-- Group -->
-                                <ng-container *ngIf="i === 0 || contact.fullName.charAt(0).toUpperCase() !== contactsFiltered[i - 1].fullName.charAt(0).toUpperCase()">
+                                <ng-container *ngIf="i === 0 || contact.fullName.charAt(0).toUpperCase() !== visibleContacts[i - 1].fullName.charAt(0).toUpperCase()">
                                     <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
                                         {{contact.fullName.charAt(0).toUpperCase()}}
                                     </div>
@@ -144,6 +146,12 @@
                                     </div> 
                                 </a>
                             </ng-container>
+                            <!-- Pagination : affichage progressif de l'annuaire -->
+                            <div *ngIf="hasMoreContacts" class="flex justify-center px-6 py-4">
+                                <button mat-stroked-button (click)="showMoreContacts()">
+                                    Afficher plus ({{contactsFiltered.length - visibleContacts.length}} restants)
+                                </button>
+                            </div>
                         </ng-container>
 
                          <!-- No contacts -->

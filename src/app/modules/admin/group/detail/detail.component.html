@@ -40,6 +40,7 @@
 
                         <div class="flex items-center ml-auto mb-1 mt-8">
                             <button
+                                *ngIf="canWriteDirectory"
                                 mat-stroked-button
                                 (click)="toggleEditMode(true)">
                                 <mat-icon
@@ -49,7 +50,7 @@
                             </button>
 
                             <button
-                                *ngIf="!groupModel.isDefault"
+                                *ngIf="!groupModel.isDefault && canWriteDirectory"
                                 mat-stroked-button
                                 (click)="deleteGroup()" 
                                 [color]="'warn'"

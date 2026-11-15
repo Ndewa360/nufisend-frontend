@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { UploadFileComponent } from '../components/upload-file/upload-file.component';
 import { OrganizationService } from 'app/core/organization/organization.service';
 import { Membership } from 'app/core/organization/organization.types';
+import { canWriteDirectory as canWriteDirectoryFor } from 'app/core/organization/directory-access';
 import { isChannelReady, resolveMessagingChannel } from 'app/core/organization/messaging-channel';
 
 @Component({
@@ -37,6 +38,27 @@ export class ListComponent implements OnInit, OnDestroy{
 
     contactsCount: number = 0;
     contactsFiltered:ContactModel[]=[]
+
+    /** Taille d'une page d'affichage de l'annuaire */
+    readonly contactsPageSize = 100;
+    contactsLimit = this.contactsPageSize;
+
+    /** Contacts effectivement rendus (affichage progressif) */
+    get visibleContacts(): ContactModel[]
+    {
+        return this.contactsFiltered.slice(0, this.contactsLimit);
+    }
+
+    get hasMoreContacts(): boolean
+    {
+        return this.contactsFiltered.length > this.contactsLimit;
+    }
+
+    showMoreContacts(): void
+    {
+        this.contactsLimit += this.contactsPageSize;
+        this._changeDetectorRef.markForCheck();
+    }
     contacts:ContactModel[]=[]
     contactsTableColumns: string[] = ['name', 'email', 'phoneNumber', 'job'];
     countries: [];//Country
@@ -48,6 +70,8 @@ export class ListComponent implements OnInit, OnDestroy{
     isWhatsAppSyncing:boolean=false;
     /** Adhesion : undefined = non chargee, null = compte personnel, objet = membre. */
     membership: Membership | null | undefined = undefined;
+    /** Ecriture de l'annuaire autorisee (gestionnaire ou compte personnel) */
+    canWriteDirectory = false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -117,6 +141,7 @@ export class ListComponent implements OnInit, OnDestroy{
         this._organizationService.membership$
             .pipe(takeUntil(this._unsubscribeAll)).subscribe((membership)=>{
                 this.membership=membership;
+                this.canWriteDirectory = canWriteDirectoryFor(membership);
                 this._changeDetectorRef.markForCheck();
             })
 
@@ -280,15 +305,17 @@ export class ListComponent implements OnInit, OnDestroy{
      */
     exportContact(): void
     {
-        // Create the contact
-
-            // Go to the new contact
-            // this._router.navigate(['./import'], {relativeTo: this._activatedRoute});
-
-            // Mark for check
-            // this._changeDetectorRef.markForCheck();
-
-            this._toastrService.warning("Fonctionnalité d'import non encore supporté", 'Contact');
+        this._contactsService.exportContacts().subscribe({
+            next: (blob: Blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = this._document.createElement('a');
+                link.href = url;
+                link.download = `contacts-${new Date().toISOString().slice(0, 10)}.csv`;
+                link.click();
+                URL.revokeObjectURL(url);
+            },
+            error: () => this._toastrService.error("Impossible d'exporter les contacts", 'Contact'),
+        });
     }
 
     /**
@@ -309,6 +336,8 @@ export class ListComponent implements OnInit, OnDestroy{
     private _filterContacts(query: string): void
     {
         const normalizedQuery = this._normalize(query);
+        // Nouvelle recherche : on repart de la premiere page
+        this.contactsLimit = this.contactsPageSize;
 
         if ( !normalizedQuery )
         {

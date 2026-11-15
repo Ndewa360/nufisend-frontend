@@ -122,6 +122,8 @@ export class ContactState{
                         contacts
                     })
                     this._toastrService.success(`Contact ${result.data?.fullName ?? contact.fullName} modifié avec success`, 'Contact');
+                    // Les appartenances aux groupes ont pu changer : on resynchronise les groupes
+                    ctx.dispatch(new GroupAction.FetchAllGroup(true));
                 }
             ),
             catchError((error) => {
@@ -178,6 +180,7 @@ export class ContactState{
             tap(
                 ()=>{
                     this._toastrService.success(`Contact synchronisé avec success`, 'Contact');
+                    ctx.dispatch(new GroupAction.FetchAllGroup(true));
                     this._notificationsService.create({
                         icon: 'feather:refresh-cw',
                         title: 'Contacts WhatsApp synchronisés',

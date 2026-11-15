@@ -9,6 +9,8 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { DateTime } from 'luxon';
 import { NewMessageForSingleContactComponent } from '../../messagerie/components/new-message-for-single-contact/new-message-for-single-contact.component';
 import { AddComponent } from '../add/add.component';
+import { OrganizationService } from 'app/core/organization/organization.service';
+import { canWriteDirectory as canWriteDirectoryFor } from 'app/core/organization/directory-access';
 
 
 @Component({
@@ -33,9 +35,12 @@ export class ListComponent implements OnInit, OnDestroy{
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _matDialog: MatDialog, 
-    private _store:Store
-
+    private _store:Store,
+    private _organizationService: OrganizationService,
   ){}
+
+  /** Ecriture de l'annuaire autorisee (gestionnaire ou compte personnel) */
+  canWriteDirectory = false;
       // -----------------------------------------------------------------------------------------------------
     // @ Lifecycle hooks
     // -----------------------------------------------------------------------------------------------------
@@ -45,6 +50,13 @@ export class ListComponent implements OnInit, OnDestroy{
      */
     ngOnInit(): void
     {
+      this._organizationService.membership$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((membership) => {
+          this.canWriteDirectory = canWriteDirectoryFor(membership);
+          this._changeDetectorRef.markForCheck();
+        });
+
       // Subscribe to MatDrawer opened change
       this.matDrawer.openedChange.subscribe((opened) => {
         if ( !opened )

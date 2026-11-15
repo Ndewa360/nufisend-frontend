@@ -120,7 +120,7 @@ export class AddComponent implements OnInit, OnDestroy {
         // Create a phone number form group
         phoneNumbersFormGroups.push(
           this._formBuilder.group({
-              country    : [this._preferencesService.get().defaultCountry || 'cm'],
+              country    : [this._preferencesService.get().defaultCountry || 'CM'],
               phoneNumber: ['',Validators.required],
               label      : [{value:'whatsapp',disabled:true}]
           })
@@ -287,7 +287,8 @@ export class AddComponent implements OnInit, OnDestroy {
         // Create an empty email form group
         const emailFormGroup = this._formBuilder.group({
             email: [''],
-            label: ['']
+            // Libelle par defaut : le backend exige un libelle non vide
+            label: ['default']
         });
 
         // Add the email form group to the emails form array
@@ -336,9 +337,10 @@ export class AddComponent implements OnInit, OnDestroy {
     {
         // Create an empty phone number form group
         const phoneNumberFormGroup = this._formBuilder.group({
-            country    : [this._preferencesService.get().defaultCountry || 'cm'],
+            country    : [this._preferencesService.get().defaultCountry || 'CM'],
             phoneNumber: [''],
-            label      : ['']
+            // Libelle par defaut : le backend exige un libelle non vide
+            label      : ['whatsapp']
         });
 
         // Add the phone number form group to the phoneNumbers form array
@@ -392,7 +394,8 @@ export class AddComponent implements OnInit, OnDestroy {
      */
     getCountryByIso(iso: string): CountryModel
     {
-        return this.countries.find(country => country.iso === iso);
+        // Comparaison insensible a la casse ('cm' des preferences, 'CM' de la liste)
+        return this.countries.find(country => country.iso?.toUpperCase() === String(iso || '').toUpperCase());
     }
 
     /**

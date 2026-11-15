@@ -2,6 +2,7 @@ import { Action, Selector, State, StateContext, createSelector } from "@ngxs/sto
 import { GroupModel } from "./group.model";
 import { Injectable } from "@angular/core";
 import { GroupAction } from "./group.actions";
+import { ContactAction } from "../contact/contact.actions";
 import { GroupService } from "./group.service";
 import { ToastrService } from "ngx-toastr";
 import { catchError, of, tap, throwError } from "rxjs";
@@ -114,6 +115,8 @@ export class GroupState{
                         groups
                     })
                     this._toastrService.success(`Group ${group.name} modifié avec success`, 'Group');
+                    // Les membres ont pu changer : on resynchronise les contacts
+                    ctx.dispatch(new ContactAction.FetchAllContact(true));
                 }
             ),
             catchError((error) => {
@@ -141,6 +144,7 @@ export class GroupState{
                     let groupIndex = state.groups.findIndex((c)=>c._id==id),groups = [...state.groups];
                     const deletedGroup = groupIndex > -1 ? groups[groupIndex] : null;
                     this._toastrService.success(`Group ${deletedGroup?.name || ""} supprimé avec success`, 'Group');
+                    ctx.dispatch(new ContactAction.FetchAllContact(true));
                     if (groupIndex > -1) groups.splice(groupIndex,1);
                     ctx.patchState({
                         loadingGroups:false,

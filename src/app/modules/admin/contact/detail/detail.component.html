@@ -43,6 +43,7 @@
                             <!-- Actions -->
                             <div class="flex items-center ml-auto mb-1">
                                 <button
+                                    *ngIf="canWriteDirectory"
                                     mat-stroked-button
                                     (click)="toggleEditMode(true)">
                                     <mat-icon
@@ -52,6 +53,7 @@
                                 </button>
 
                                 <button
+                                    *ngIf="canWriteDirectory"
                                     mat-stroked-button
                                     (click)="deleteContact()" 
                                     [color]="'warn'"

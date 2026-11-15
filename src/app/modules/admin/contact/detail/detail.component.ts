@@ -108,7 +108,8 @@ export class DetailComponent {
     .subscribe(
       (value:any)=>{
         this.toggleEditMode(false)
-        this.updateSelectedContact(value.contact)
+        // L'action porte l'id : le formulaire envoye n'en a pas (sinon /contacts/undefined)
+        this.updateSelectedContact({ ...value.contact, _id: value.id })
       }
     );
 
@@ -158,6 +159,12 @@ export class DetailComponent {
     
     // Mark for check
     this._changeDetectorRef.markForCheck();
+  }
+
+  /** Ecriture de l'annuaire autorisee (fourni par la liste parente) */
+  get canWriteDirectory(): boolean
+  {
+    return this._contactsListComponent.canWriteDirectory;
   }
 
   updateSelectedContact(contact:ContactModel){
@@ -514,7 +521,8 @@ export class DetailComponent {
    */
   getCountryByIso(iso: string): CountryModel
   {
-      return this.countries.find(country => country.iso === iso);
+      // Comparaison insensible a la casse ('cm' des preferences, 'CM' de la liste)
+      return this.countries.find(country => country.iso?.toUpperCase() === String(iso || '').toUpperCase());
   }
 
   /**

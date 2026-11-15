@@ -25,6 +25,14 @@ export class ContactService
     /**
      * Get contacts
      */
+    /**
+     * Export CSV des contacts (blob : le jeton d'authentification doit etre envoye)
+     */
+    exportContacts(): Observable<Blob>
+    {
+        return this._httpClient.get(`${environment.apiUrl}/contacts/export`, { responseType: 'blob' });
+    }
+
     getContacts(): Observable<ApiResultFormat<ContactModel[]>>
     {
         return this._httpClient.get<ApiResultFormat<ContactModel[]>>(`${environment.apiUrl}/contacts`)

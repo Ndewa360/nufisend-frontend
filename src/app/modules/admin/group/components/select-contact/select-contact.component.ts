@@ -79,6 +79,9 @@ export class SelectContactComponent {
     if(!this.isNewGroup)
     {
       this.contactLoading$.subscribe((loading)=>{
+        // Store contacts en erreur : les membres ne sont pas connus, on ne doit pas
+        // emettre une liste vide (elle effacerait les membres du groupe a la sauvegarde).
+        if(!loading && this._store.selectSnapshot(ContactState.selectStateLoadError)) return;
         if(!loading) this._store.select(ContactState.selectStateByContactsId(this.selectedGroup?.contacts || [])).subscribe((values)=>{
           this.selectedContactList=[...values];
           values.forEach((value)=>this.selectectContacts.set(value._id,true))
