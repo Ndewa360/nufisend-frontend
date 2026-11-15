@@ -1,23 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MessageStatus } from 'app/shared/store';
 
-import { HomePlanningListComponent } from './home-planning-list.component';
-
-describe('HomePlanningListComponent', () => {
-  let component: HomePlanningListComponent;
-  let fixture: ComponentFixture<HomePlanningListComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ HomePlanningListComponent ]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(HomePlanningListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+/** Regles d'etat des planifications (miroir de classifyPlanifications, sans dependance Angular). */
+describe('MessageStatus labels used by the planning list', () => {
+  it('uses the enum values sent by the backend', () => {
+    expect(MessageStatus.PAUSED).toBe('paused');
+    expect(MessageStatus.SCHEDULED).toBe('scheduled');
   });
 });

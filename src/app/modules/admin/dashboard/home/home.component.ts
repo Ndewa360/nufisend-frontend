@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Select } from '@ngxs/store';
 import { ContactModel, ContactState, GroupModel, GroupState, MessageTemplateModel, MessageTemplateState } from 'app/shared/store';
-import { PlanificationModel, PlanificationState } from 'app/shared/store/planifcation';
+import { classifyPlanifications, PlanificationBreakdown, PlanificationModel, PlanificationState } from 'app/shared/store/planifcation';
 import { OrganizationService } from 'app/core/organization/organization.service';
 import { Membership } from 'app/core/organization/organization.types';
 import { Observable, Subject, combineLatest, takeUntil } from 'rxjs';
@@ -20,13 +20,6 @@ export interface UpcomingSend {
   time: string;
 }
 
-/** Repartition des planifications selon ce qui leur arrive reellement. */
-export interface PlanificationBreakdown {
-  inProgress: number;
-  inactive: number;
-  suspended: number;
-  ended: number;
-}
 
 @Component({
   selector: 'app-home',
@@ -170,20 +163,4 @@ export class HomeComponent implements OnInit, OnDestroy {
   {
     return classifyPlanifications(plans);
   }
-}
-
-/**
- * Une planification est "en cours" si elle est active, que son solde couvre les envois
- * et qu'elle n'est pas epuisee. Chaque autre cas est compte a part.
- */
-export function classifyPlanifications(plans: PlanificationModel[]): PlanificationBreakdown
-{
-  const breakdown: PlanificationBreakdown = { inProgress: 0, inactive: 0, suspended: 0, ended: 0 };
-  plans.forEach((plan) => {
-    if (!plan.isActive) breakdown.inactive++;
-    else if (plan.billingStatus && plan.billingStatus !== 'ok') breakdown.suspended++;
-    else if (plan.isExhausted) breakdown.ended++;
-    else breakdown.inProgress++;
-  });
-  return breakdown;
 }

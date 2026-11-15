@@ -114,7 +114,7 @@
                     </mat-step>
                   
                     <mat-step [completed]="isSendingMessage | async">
-                        <ng-template matStepLabel>Rediger & Soumettre</ng-template>
+                        <ng-template matStepLabel>Rédiger et envoyer</ng-template>
                         <div *ngIf="isCloud" class="mb-6">
                             <div class="font-medium mb-2">Modèle WhatsApp Business</div>
                             <div class="text-sm text-secondary mb-3">
@@ -126,7 +126,7 @@
                                 [hasAttachment]="hasAttachment"
                                 (selectionChange)="setCloudTemplate($event)"></app-cloud-template-picker>
                         </div>
-                        <app-rediger-message-direct [cloudTemplateMode]="usesCloudTemplate" (sendMessageData)="setMessage($event)"></app-rediger-message-direct>
+                        <app-rediger-message-direct [cloudTemplateMode]="usesCloudTemplate" [cloudMode]="isCloud" (sendMessageData)="setMessage($event)"></app-rediger-message-direct>
                         <app-message-cost-estimate
                             [recipients]="recipientsCount"
                             [category]="costCategory"

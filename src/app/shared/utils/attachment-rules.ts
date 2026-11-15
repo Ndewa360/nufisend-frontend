@@ -79,3 +79,53 @@ export const validateAttachments = (current: File[], added: File[]): { accepted:
     }
     return { accepted, errors };
 };
+
+/**
+ * Formats et tailles acceptes par l'API WhatsApp Cloud (miroir de
+ * backend/src/message/utils/attachment-rules.ts : CLOUD_MEDIA_RULES).
+ */
+const MB_CLOUD = 1024 * 1024;
+const CLOUD_MEDIA_RULES: Record<string, { label: string; maxBytes: number }> = {
+    'image/jpeg': { label: 'JPEG', maxBytes: 5 * MB_CLOUD },
+    'image/png': { label: 'PNG', maxBytes: 5 * MB_CLOUD },
+    'video/mp4': { label: 'MP4', maxBytes: 16 * MB_CLOUD },
+    'video/3gpp': { label: '3GPP', maxBytes: 16 * MB_CLOUD },
+    'audio/aac': { label: 'AAC', maxBytes: 16 * MB_CLOUD },
+    'audio/amr': { label: 'AMR', maxBytes: 16 * MB_CLOUD },
+    'audio/mpeg': { label: 'MP3', maxBytes: 16 * MB_CLOUD },
+    'audio/mp4': { label: 'M4A', maxBytes: 16 * MB_CLOUD },
+    'audio/ogg': { label: 'OGG (Opus)', maxBytes: 16 * MB_CLOUD },
+    'application/pdf': { label: 'PDF', maxBytes: 100 * MB_CLOUD },
+    'application/msword': { label: 'Word', maxBytes: 100 * MB_CLOUD },
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { label: 'Word', maxBytes: 100 * MB_CLOUD },
+    'application/vnd.ms-excel': { label: 'Excel', maxBytes: 100 * MB_CLOUD },
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { label: 'Excel', maxBytes: 100 * MB_CLOUD },
+    'application/vnd.ms-powerpoint': { label: 'PowerPoint', maxBytes: 100 * MB_CLOUD },
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': { label: 'PowerPoint', maxBytes: 100 * MB_CLOUD },
+    'text/plain': { label: 'Texte', maxBytes: 100 * MB_CLOUD },
+};
+
+/** MIME envoye a WhatsApp pour un fichier (d'apres l'extension), ou '' si inconnu. */
+const MIME_BY_EXTENSION: Record<string, string> = {
+    '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp',
+    '.mp4': 'video/mp4', '.3gp': 'video/3gpp',
+    '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.opus': 'audio/ogg', '.m4a': 'audio/mp4', '.aac': 'audio/aac', '.amr': 'audio/amr',
+    '.pdf': 'application/pdf', '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.xls': 'application/vnd.ms-excel',
+    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    '.ppt': 'application/vnd.ms-powerpoint',
+    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    '.txt': 'text/plain', '.csv': 'text/csv',
+};
+
+/** Message d'erreur si le fichier ne peut pas partir par WhatsApp Business, sinon null. */
+export const cloudAttachmentErrorOf = (file: File): string | null => {
+    const name = file?.name || 'fichier';
+    const dot = name.lastIndexOf('.');
+    const mimetype = dot >= 0 ? MIME_BY_EXTENSION[name.slice(dot).toLowerCase()] : undefined;
+    const rule = mimetype ? CLOUD_MEDIA_RULES[mimetype] : undefined;
+    if (!rule) return `${name} : format non pris en charge par le numéro WhatsApp Business.`;
+    if (file.size > rule.maxBytes) return `${name} : ${rule.label} trop volumineux pour WhatsApp Business (maximum ${Math.round(rule.maxBytes / MB_CLOUD)} Mo).`;
+    return null;
+};

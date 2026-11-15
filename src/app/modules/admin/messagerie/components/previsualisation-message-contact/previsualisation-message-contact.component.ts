@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Actions, Store, ofActionSuccessful } from '@ngxs/store';
@@ -14,7 +14,7 @@ import { debugLog } from 'app/shared/utils/debug-log';
   templateUrl: './previsualisation-message-contact.component.html',
   styleUrls: ['./previsualisation-message-contact.component.scss']
 })
-export class PrevisualisationMessageContactComponent {
+export class PrevisualisationMessageContactComponent implements OnInit, OnDestroy {
   destinationContacts:ContactModel[]=[]
   filteredContacts:ContactModel[] = []
   selectedContact:ContactModel = null;
@@ -39,7 +39,8 @@ export class PrevisualisationMessageContactComponent {
     this.destinationContacts = [...data.destinationContact];
     this.filteredContacts = [...data.destinationContact]
     this.messageToSend = data.message;
-    this.initMessage = data.message.message?data.message.message:data.message.messageTemplate.content;
+    // Un message "fichier seul" n'a ni texte ni modele : apercu vide, pas d'exception.
+    this.initMessage = data.message.message || data.message.messageTemplate?.content || '';
     debugLog(data.message)
   }
 
@@ -52,7 +53,7 @@ export class PrevisualisationMessageContactComponent {
    */
   ngOnInit(): void
   {
-    this.userService.user$.subscribe((value)=>this.sender=value);
+    this.userService.user$.pipe(takeUntil(this._unsubscribeAll)).subscribe((value)=>this.sender=value);
     // Mark for check
     this._changeDetectorRef.markForCheck();      
   }

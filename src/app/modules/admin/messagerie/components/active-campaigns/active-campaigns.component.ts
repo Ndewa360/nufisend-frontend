@@ -9,22 +9,30 @@ import { environment } from 'environments/environment';
 import { Socket } from 'ngx-socket-io';
 import { ToastrService } from 'ngx-toastr';
 
-interface ActiveCampaign
-{
+/** Campagne en cours ou en pause : WhatsApp Business (cloud) ou WhatsApp Web. */
+export interface ActiveCampaign {
     messageId: string;
     title: string;
+    channel: 'cloud' | 'whatsapp_web';
+    /** immediate : envoi unique. scheduled : une occurrence de planification. */
+    kind: 'immediate' | 'scheduled' | 'reply' | string;
     state: 'running' | 'paused';
     processed: number;
     total: number;
+    sent: number;
     delivered: number;
+    /** Envoyes sans accuse de reception : l'envoi est fait, la livraison n'est pas confirmee. */
+    unconfirmed: number;
+    /** Echecs francs. */
     failed: number;
     pausedReason: string | null;
     autoResumeAt: string | null;
+    canAct: boolean;
 }
 
 /**
- * Envois WhatsApp en cours ou en pause (WhatsApp deconnecte) : avancement,
- * reprise et arret. Mis a jour en temps reel par le WebSocket.
+ * Envois WhatsApp en cours ou en pause : avancement, pause, reprise et arret.
+ * Mis a jour en temps reel par le WebSocket.
  */
 @Component({
     selector       : 'app-active-campaigns',
@@ -36,7 +44,7 @@ interface ActiveCampaign
             <div *ngFor="let campaign of campaigns; trackBy: trackById" class="bg-card rounded-2xl shadow p-5">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                     <div class="flex-auto min-w-0">
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <span class="font-semibold truncate">{{ campaign.title || 'Message' }}</span>
                             <span class="px-2 py-0.5 rounded-full text-xs font-medium"
                                   [ngClass]="campaign.state === 'paused'
@@ -44,17 +52,26 @@ interface ActiveCampaign
                                     : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'">
                                 {{ campaign.state === 'paused' ? 'En pause' : 'Envoi en cours' }}
                             </span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700/40 dark:text-gray-300">
+                                {{ campaign.channel === 'cloud' ? 'WhatsApp Business' : 'WhatsApp Web' }}
+                            </span>
                         </div>
                         <div class="mt-1 text-sm text-secondary">
-                            {{ campaign.processed }} / {{ campaign.total }} destinataire(s) traité(s) · {{ campaign.delivered }} livré(s)
-                            <ng-container *ngIf="campaign.failed"> · {{ campaign.failed }} non livré(s)</ng-container>
+                            {{ campaign.processed }} / {{ campaign.total }} destinataire(s) traité(s) ·
+                            {{ campaign.sent }} envoyé(s)
+                            <ng-container *ngIf="campaign.unconfirmed"> · {{ campaign.unconfirmed }} sans accusé de réception</ng-container>
+                            <ng-container *ngIf="campaign.failed"> · {{ campaign.failed }} échec(s)</ng-container>
                         </div>
                         <div *ngIf="campaign.state === 'paused' && campaign.pausedReason" class="mt-1 text-sm text-amber-700 dark:text-amber-400">
                             {{ campaign.pausedReason }}
                             <ng-container *ngIf="campaign.autoResumeAt"> Nouvelle tentative vers {{ campaign.autoResumeAt | date:'HH:mm' }}.</ng-container>
                         </div>
                     </div>
-                    <div class="flex gap-2 shrink-0">
+                    <div *ngIf="campaign.canAct" class="flex flex-wrap gap-2 shrink-0">
+                        <button *ngIf="campaign.channel === 'cloud' && campaign.state === 'running'" mat-stroked-button color="primary" type="button"
+                                [disabled]="busy.has(campaign.messageId)" (click)="pause(campaign)">
+                            Mettre en pause
+                        </button>
                         <button *ngIf="campaign.state === 'paused'" mat-flat-button color="primary" type="button"
                                 [disabled]="busy.has(campaign.messageId)" (click)="resume(campaign)">
                             Reprendre
@@ -115,8 +132,13 @@ export class ActiveCampaignsComponent implements OnInit, OnDestroy
                 this.campaigns = response?.data || [];
                 this._cdr.markForCheck();
             },
-            error: () => undefined,
+            error: () => this._cdr.markForCheck(),
         });
+    }
+
+    pause(campaign: ActiveCampaign): void
+    {
+        this.act(campaign, 'pause', 'Campagne mise en pause');
     }
 
     resume(campaign: ActiveCampaign): void
@@ -127,9 +149,13 @@ export class ActiveCampaignsComponent implements OnInit, OnDestroy
     cancel(campaign: ActiveCampaign): void
     {
         const remaining = campaign.total - campaign.processed;
+        // Une occurrence programmee : seule l'occurrence en cours s'arrete, les suivantes restent programmees.
+        const scope = campaign.kind === 'scheduled'
+            ? 'Seule cette occurrence est arrêtée : les suivantes restent programmées.'
+            : '';
         this._confirmation.open({
             title  : 'Arrêter la campagne ?',
-            message: `Les ${remaining} destinataire(s) restant(s) ne recevront pas le message et ne seront pas facturés. Un envoi en cours s'arrête à la fin du lot en cours.`,
+            message: `Les ${remaining} destinataire(s) restant(s) ne recevront pas le message et ne seront pas facturés. ${scope}`.trim(),
             actions: { confirm: { label: 'Arrêter' }, cancel: { label: 'Continuer l’envoi' } },
         }).afterClosed().subscribe((answer) =>
         {
@@ -137,7 +163,7 @@ export class ActiveCampaignsComponent implements OnInit, OnDestroy
         });
     }
 
-    private act(campaign: ActiveCampaign, action: 'resume' | 'cancel', success: string): void
+    private act(campaign: ActiveCampaign, action: 'pause' | 'resume' | 'cancel', success: string): void
     {
         this.busy.add(campaign.messageId);
         this._cdr.markForCheck();
@@ -167,11 +193,13 @@ export class ActiveCampaignsComponent implements OnInit, OnDestroy
             return;
         }
         Object.assign(campaign, {
-            state    : 'running',
-            processed: event.processed ?? campaign.processed,
-            total    : event.total ?? campaign.total,
-            delivered: event.delivered ?? campaign.delivered,
-            failed   : event.failed ?? campaign.failed,
+            state      : event.state ?? 'running',
+            processed  : event.processed ?? campaign.processed,
+            total      : event.total ?? campaign.total,
+            sent       : event.sent ?? campaign.sent,
+            delivered  : event.delivered ?? campaign.delivered,
+            unconfirmed: event.unconfirmed ?? campaign.unconfirmed,
+            failed     : event.failed ?? campaign.failed,
         });
         this.campaigns = [...this.campaigns];
         this._cdr.markForCheck();

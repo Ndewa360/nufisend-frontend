@@ -50,12 +50,6 @@ export class PlanificationState{
     }
 
     @Selector()
-    static selectStateDataByState(state:boolean)
-    {
-        return createSelector([PlanificationState],(state)=>{
-           return state.planifications.filter((planification)=>planification.isActive==state)
-        })    
-    }
 
     static selectStateByPlanificationId(planificationId:string)
     {
@@ -79,7 +73,6 @@ export class PlanificationState{
     @Action(PlanificationAction.UpdatePlanification)
     updatePlanification(ctx:StateContext<PlanificationStateModel>, {planification,id}:PlanificationAction.UpdatePlanification)
     {
-        const state = ctx.getState();
         ctx.patchState({
             loadingPlanifications: true
         })
@@ -87,14 +80,14 @@ export class PlanificationState{
         return this._planificationsService.updatePlanification(planification,id).pipe(
             tap(
                 (result)=>{
-                    
-                    let planificationIndex = state.planifications.findIndex((c)=>c._id==id),planifications = [...state.planifications];
-                    planifications[planificationIndex]=result.data
+                    // Remplacement par identifiant (jamais par index : une ligne absente ne doit pas
+                    // ecraser une autre planification).
+                    const planifications = ctx.getState().planifications.map((item)=> item._id==id ? result.data : item);
                     ctx.patchState({
                         loadingPlanifications:false,
                         planifications
                     })
-                    this._toastrService.success(`Planification modifié avec success`, 'Planification');
+                    this._toastrService.success('Planification modifiée avec succès', 'Planification');
                 }
             ),
             catchError((error) => {
@@ -111,20 +104,17 @@ export class PlanificationState{
     @Action(PlanificationAction.DeletePlanification)
     deletePlanification(ctx:StateContext<PlanificationStateModel>, {id}:PlanificationAction.DeletePlanification)
     {
-        const state = ctx.getState();
         ctx.patchState({
             loadingPlanifications: true
         })
 
         return this._planificationsService.deletePlanification(id).pipe(
             tap(
-                (result)=>{                    
-                    let planificationIndex = state.planifications.findIndex((c)=>c._id==id),planifications = [...state.planifications];
-                    this._toastrService.success(`Planification  supprimé avec success`, 'Planification');
-                    planifications.splice(planificationIndex,1);
+                ()=>{
+                    this._toastrService.success('Planification supprimée avec succès', 'Planification');
                     ctx.patchState({
                         loadingPlanifications:false,
-                        planifications:[...planifications]
+                        planifications: ctx.getState().planifications.filter((item)=> item._id!=id)
                     })
                 }
             ),

@@ -28,7 +28,7 @@
                         <div class="mt-4">
                             <mat-form-field class="fuse-mat-rounded fuse-mat-dense w-full" [subscriptSizing]="'dynamic'">
                                 <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:search'"></mat-icon>
-                                <input matInput [autocomplete]="'off'" [placeholder]="'Search or start new chat'" (input)="filterContacts(searchField.value)" #searchField>
+                                <input matInput [autocomplete]="'off'" [placeholder]="'Rechercher une conversation'" (input)="filterContacts(searchField.value)" #searchField>
                             </mat-form-field>
                         </div>
                     </div>
@@ -77,23 +77,6 @@
                 </div>  
 
             
-                <ng-template #noMessageToShow>
-                    <div class="flex-auto border-l" [ngClass]="{'z-20 absolute inset-0 lg:static lg:inset-auto flex': selectedChat && selectedChat.id,
-                                    'hidden lg:flex': !selectedChat || !selectedChat.id}">
-                        <ng-container>
-                            <div class="flex flex-col flex-auto overflow-y-auto lg:overflow-hidden bg-card dark:bg-default">
-                                <!-- Select chat or start new -->
-                                <div class="flex flex-col flex-auto items-center justify-center bg-gray-100 dark:bg-transparent">
-                                    <mat-icon
-                                        class="icon-size-24"
-                                        [svgIcon]="'heroicons_outline:chat'"></mat-icon>
-                                    <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Select a conversation or start a new chat</div>
-                                </div>
-                            
-                            </div>
-                        </ng-container>
-                    </div>
-                </ng-template>
 
                 <ng-container >
                     <div class="flex-auto border-l" [ngClass]="{'z-20 absolute inset-0 lg:static lg:inset-auto flex': selectedContact && selectedContact._id,
@@ -131,8 +114,8 @@
                                                             </ng-container>
                                                         </div>
                                                         <div class="ml-4 text-lg font-medium leading-5 truncate">{{selectedContact.fullName}}</div>
-                                                        <div *ngIf="selectContact.groupName" class="leading-5 truncate text-secondary">
-                                                            {{selectContact.groupName}}
+                                                        <div *ngIf="selectedContact.groupName" class="leading-5 truncate text-secondary">
+                                                            {{selectedContact.groupName}}
                                                         </div>
                                                     </div>    
                                                 </div>
@@ -171,15 +154,6 @@
                                 
                                     </ng-container>
                                 
-                                    <!-- Select chat or start new template -->
-                                    <ng-template #selectChatOrStartNew>
-                                        <div class="flex flex-col flex-auto items-center justify-center bg-gray-100 dark:bg-transparent">
-                                            <mat-icon
-                                                class="icon-size-24"
-                                                [svgIcon]="'heroicons_outline:chat'"></mat-icon>
-                                            <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Select a conversation or start a new chat</div>
-                                        </div>
-                                    </ng-template>
                                 
                                     <!-- Speech bubble tail SVG -->
                                     <!-- @formatter:off -->
@@ -202,16 +176,6 @@
                     </div>
                 </ng-container>
 
-                <!-- Speech bubble tail SVG -->
-                <!-- @formatter:off -->
-                <ng-template #speechBubbleExtension>
-                    <svg width="100%" height="100%" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <path d="M1.01522827,0.516204834 C-8.83532715,54.3062744 61.7609863,70.5215302 64.8009949,64.3061218 C68.8074951,54.8859711 30.1663208,52.9997559 37.5036011,0.516204834 L1.01522827,0.516204834 Z" fill="currentColor" fill-rule="nonzero"></path>
-                        </g>
-                    </svg>
-                </ng-template>
-                <!-- @formatter:on -->
 
 
             </mat-drawer-content>

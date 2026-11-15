@@ -1,0 +1,106 @@
+import { buildSendPayload, SendInput } from './message-payload.builder';
+
+const file = (name: string) => new File(['x'], name);
+
+const base = (overrides: Partial<SendInput> = {}): SendInput => ({
+  channel: 'personal',
+  isSentToNow: true,
+  target: { contactIds: ['c1'], groupIds: [] },
+  composition: { title: 'Campagne', message: '<p>Bonjour</p>', files: [] },
+  costSufficient: true,
+  ...overrides,
+});
+
+describe('buildSendPayload', () => {
+  it('builds an immediate personal send with the body converted to WhatsApp text', () => {
+    const result = buildSendPayload(base());
+    expect(result.ok).toBe(true);
+    if (result.ok === true) {
+      expect(result.payload.bodyText).toBe('Bonjour');
+      expect(result.payload.contactsID).toEqual(['c1']);
+      expect(result.payload.isSentToNow).toBe(true);
+      expect(result.payload.planification).toBeUndefined();
+    }
+  });
+
+  it('requires a title', () => {
+    const result = buildSendPayload(base({ composition: { title: '  ', message: 'x', files: [] } }));
+    expect(result.ok).toBe(false);
+  });
+
+  it('requires at least one recipient', () => {
+    const result = buildSendPayload(base({ target: { contactIds: [], groupIds: [] } }));
+    expect(result.ok).toBe(false);
+  });
+
+  it('requires a planification for a scheduled send', () => {
+    const result = buildSendPayload(base({ isSentToNow: false, planification: null }));
+    expect(result.ok).toBe(false);
+  });
+
+  it('requires an approved WhatsApp template for a scheduled Cloud send', () => {
+    const result = buildSendPayload(
+      base({ channel: 'cloud', isSentToNow: false, planification: [{ type: 'isRandom', dates: ['2026-12-01'], time: '09:00' }] }),
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok === false) expect(result.error.message).toContain('modèle WhatsApp approuvé');
+  });
+
+  it('refuses several attachments on the Cloud channel', () => {
+    const result = buildSendPayload(
+      base({ channel: 'cloud', composition: { title: 'T', message: null, files: [file('a.pdf'), file('b.pdf')] } }),
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  it('refuses the composer error reported for a Cloud text + audio combination', () => {
+    const result = buildSendPayload(
+      base({ channel: 'cloud', composeError: "WhatsApp n'accepte pas de texte avec un audio" }),
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  it('sends a Cloud template instead of free text when one is selected', () => {
+    const result = buildSendPayload(
+      base({
+        channel: 'cloud',
+        cloudTemplate: { name: 'promo', language: 'fr', variables: ['Ada'] },
+        cloudTemplateComplete: true,
+        composition: { title: 'T', message: null, files: [] },
+      }),
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok === true) {
+      expect(result.payload.template?.name).toBe('promo');
+      expect(result.payload.bodyText).toBeUndefined();
+    }
+  });
+
+  it('refuses a template with missing variables', () => {
+    const result = buildSendPayload(
+      base({ channel: 'cloud', cloudTemplate: { name: 'promo' }, cloudTemplateComplete: false, composition: { title: 'T', message: null, files: [] } }),
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  it('refuses text longer than the WhatsApp limit', () => {
+    const result = buildSendPayload(base({ composition: { title: 'T', message: 'a'.repeat(4097), files: [] } }));
+    expect(result.ok).toBe(false);
+  });
+
+  it('warns (not an error) when the balance does not cover the cost', () => {
+    const result = buildSendPayload(base({ costSufficient: false }));
+    expect(result.ok).toBe(false);
+    if (result.ok === false) expect(result.error.level).toBe('warning');
+  });
+
+  it('keeps a scheduled planification and never sends a body with an empty message', () => {
+    const planif = [{ type: 'isRandom', dates: ['2026-12-01'], time: '09:00' }];
+    const result = buildSendPayload(base({ isSentToNow: false, planification: planif, composition: { title: 'T', message: null, files: [file('a.pdf')] } }));
+    expect(result.ok).toBe(true);
+    if (result.ok === true) {
+      expect(result.payload.planification).toEqual(planif);
+      expect(result.payload.bodyText).toBeUndefined();
+    }
+  });
+});

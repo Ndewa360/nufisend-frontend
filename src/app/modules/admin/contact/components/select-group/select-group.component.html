@@ -58,7 +58,7 @@
 
                 <mat-option *ngIf="!(loading$ | async) && groupsFiltered.length==0" [value]="''">
                     <div class="p-3 sm:p-10 border-t text-4xl font-semibold tracking-tight text-center">
-                        <img class="mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 4rem;">
+                        <img class="mx-auto" src="assets/images/sorry.svg" alt="" style="width: 4rem;">
                             <p class="mb-0">Aucun group trouvé</p>
                     </div>
                 </mat-option>
@@ -100,7 +100,7 @@
                                 mat-button
                                     class="icon-size-6 text-red-600 dark:text-red-400"
                                     [svgIcon]="'heroicons_outline:trash'"
-                                    [matTooltip]="'Rétirer le group'"></mat-icon>
+                                    [matTooltip]="'Retirer le group'"></mat-icon>
                             </div> 
                         </a>
                         </ng-container>
@@ -112,7 +112,7 @@
                             <mat-icon
                                 class="icon-size-16"
                                 [svgIcon]="'mat_outline:person'"></mat-icon>
-                            <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Aucun group séléctionné</div>
+                            <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Aucun group sélectionné</div>
                         </div>
                     </ng-template>
                 </div>

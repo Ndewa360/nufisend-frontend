@@ -35,14 +35,14 @@ export class MessageState{
    
 
     @Action(MessageAction.SendMessage)
-    sendMessage(ctx:StateContext<MessageStateModel>, {message}:MessageAction.SendMessage)
+    sendMessage(ctx:StateContext<MessageStateModel>, {message, idempotencyKey}:MessageAction.SendMessage)
     {
         const state = ctx.getState();
         ctx.patchState({
             sendingMessage: true
         })
 
-        return this._messageService.sendMessage(message).pipe(
+        return this._messageService.sendMessage(message, idempotencyKey).pipe(
             tap(
                 (result)=>{
                     ctx.patchState({

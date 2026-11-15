@@ -5,6 +5,8 @@ export interface WorkspacePreferences {
     defaultCountry: string;
 }
 
+export const DEFAULT_TIMEZONE = "Africa/Douala";
+
 const STORAGE_KEY = "nufisend.workspace.preferences";
 
 @Injectable({
@@ -15,7 +17,9 @@ export class PreferencesService
     get(): WorkspacePreferences
     {
         const fallback: WorkspacePreferences = {
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Douala",
+            // Fuseau du produit par defaut : les planifications s'executent dans ce fuseau,
+            // quel que soit le reglage du navigateur (le backend utilise le meme defaut).
+            timezone: DEFAULT_TIMEZONE,
             defaultCountry: "cm"
         };
 

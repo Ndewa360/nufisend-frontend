@@ -180,7 +180,7 @@ export class CloudTemplatePickerComponent implements OnInit
             return;
         }
         const complete = this.variables.every((value) => !!value.trim())
-            && (!this.needsHeaderMedia || /^https?:\/\//.test(this.headerMediaUrl.trim()))
+            && (!this.needsHeaderMedia || /^https:\/\//.test(this.headerMediaUrl.trim()))
             && (!this.needsUrlVariable || !!this.urlVariableValue.trim());
         this.selectionChange.emit({
             template: {

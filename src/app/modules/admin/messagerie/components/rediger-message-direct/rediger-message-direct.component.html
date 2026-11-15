@@ -1,89 +1,61 @@
-<div class="flex flex-col  -m-6">
-    <!-- Compose form *ngIf="!(loadingMessageTemplate$ | async); else toLoading"-->
-    <form 
-        class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto"
-        [formGroup]="composeForm">
+<div class="flex flex-col -m-6">
+    <form class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto" [formGroup]="composeForm">
 
-        <div *ngIf="!cloudTemplateMode" class="sm:col-span-3 mb-6">
-            <fuse-alert
-                [appearance]="'outline'"
-                [type]="'info'">
-                Vous pouvez sélectionner un template afin de rédiger le message sous la forme proposé par le template. Dans ce cas, le contenu du message n'est plus obligatoire!
+        <div *ngIf="showBody" class="mb-6">
+            <fuse-alert [appearance]="'outline'" [type]="'info'">
+                Choisissez un modèle pour pré-remplir le message : son texte reste modifiable avant l'envoi.
             </fuse-alert>
         </div>
-         <!-- Subject -->
-         <mat-form-field >
+
+        <!-- Titre -->
+        <mat-form-field>
             <mat-label>Titre du message</mat-label>
-            <input matInput [formControlName]="'title'" [placeholder]="'Saissisez un message'">
-            <!-- <input matInput [formControlName]="'subject'"> -->
+            <input matInput formControlName="title" placeholder="Saisissez le titre du message" required>
         </mat-form-field>
 
-        <div class="sm:col-span-3 mb-6">
-            <mat-label class="font-medium mb-2">{{ cloudTemplateMode ? "Média d'en-tête du modèle (si le modèle en a un)" : 'Choisir des fichiers (optionnel)' }}</mat-label>
-            <app-file-upload [isMultiple]="!cloudTemplateMode" [acceptedFileType]="attachmentAccept" [acceptedFile]="attachmentHint" [validateFiles]="validateAttachments" (uploadFileEvent)="setFiles($event)"></app-file-upload>
+        <!-- Pieces jointes -->
+        <div class="mb-6">
+            <div class="font-medium mb-2">{{ cloudTemplateMode ? "Média d'en-tête du modèle (si le modèle en a un)" : 'Fichiers (optionnel)' }}</div>
+            <app-file-upload
+                [isMultiple]="allowMultipleFiles"
+                [acceptedFileType]="attachmentAccept"
+                [acceptedFile]="attachmentHint"
+                [validateFiles]="validateAttachments"
+                (uploadFileEvent)="setFiles($event)"></app-file-upload>
         </div>
 
-        <ng-container *ngIf="!cloudTemplateMode">
-        <!-- Subject -->
-        <mat-form-field >
-            <mat-label>Choisi un template</mat-label>
-            <input matInput [formControlName]="'subject'" #matForm #autocompleteTrigger="matAutocompleteTrigger" [matAutocomplete]="auto" [placeholder]="'Selectionnez un message template'">
-            <!-- <input matInput [formControlName]="'subject'"> -->
-        </mat-form-field>
+        <!-- Erreur de canal : message impossible a envoyer en WhatsApp Business -->
+        <fuse-alert *ngIf="channelError" [appearance]="'outline'" [type]="'warning'" class="mb-6">
+            {{channelError}}
+        </fuse-alert>
 
-        <mat-autocomplete #auto="matAutocomplete">
-            <fuse-loading-bar *ngIf="(loadingMessageTemplate$ | async)"></fuse-loading-bar>
-            <mat-option (click)="selectMessageTemplate(msgTmp)" class="w-full" *ngFor="let msgTmp of messageTemplateFiltered; let i = index; trackBy: trackByFn" [value]="msgTmp.title">
-                <!-- Contact " -->
-                <div  class="flex items-center px-6 py-4 md:px-8 cursor-pointer border-b w-full"
-                    [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !(selectedMessageTemplate && selectedMessageTemplate._id==msgTmp._id),
-                                'bg-primary-50 dark:bg-hover': selectedMessageTemplate && selectedMessageTemplate._id==msgTmp._id}"
-                    >
-                    <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
-                        <ng-container>
-                            <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                                {{msgTmp.title.charAt(0)}}
-                            </div>
-                        </ng-container>
+        <ng-container *ngIf="showBody">
+            <!-- Choix d'un modele (pre-remplit le corps) -->
+            <mat-form-field>
+                <mat-label>Modèle de message (optionnel)</mat-label>
+                <input matInput formControlName="templateSearch" #templateSearch [matAutocomplete]="auto" placeholder="Rechercher un modèle">
+                <button *ngIf="selectedMessageTemplate" matSuffix mat-icon-button type="button" (click)="removeMessageTemplate($event)" aria-label="Retirer le modèle">
+                    <mat-icon [svgIcon]="'heroicons_outline:trash'" class="text-red-600 dark:text-red-400"></mat-icon>
+                </button>
+            </mat-form-field>
+
+            <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngIf="(loadingMessageTemplate$ | async)" [value]="''" disabled>Chargement des modèles...</mat-option>
+
+                <mat-option *ngFor="let template of messageTemplateFiltered; trackBy: trackByFn" [value]="template.title" (onSelectionChange)="$event.isUserInput && selectMessageTemplate(template)">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200 uppercase shrink-0">{{template.title.charAt(0)}}</span>
+                        <span class="font-medium truncate">{{template.title}}</span>
                     </div>
-                    <div class="w-10/12 min-w-0 ml-4">
-                        <div class="font-medium leading-5 truncate">{{msgTmp.title}}</div>
-                    </div>
-                    <!--  -->
-                    <div class="w-6 h-6 mr-3 cursor-pointer float-right" *ngIf="selectedMessageTemplate && selectedMessageTemplate._id==msgTmp._id" (click)="removeMessageTemplate(msgTmp,$event)">
-                        <mat-icon mat-button                            
-                            class="icon-size-6 text-red-600 dark:text-red-400"
-                            [svgIcon]="'heroicons_outline:trash'"
-                            [matTooltip]="'Rétirer le template'"></mat-icon>
-                    </div> 
+                </mat-option>
 
-                </div>
-            </mat-option>
-            
+                <mat-option *ngIf="!(loadingMessageTemplate$ | async) && messageTemplateFiltered.length === 0" [value]="''" disabled>
+                    Aucun modèle trouvé
+                </mat-option>
+            </mat-autocomplete>
 
-            <mat-option *ngIf="(loadingMessageTemplate$ | async)" [value]="''">
-                <div class="m-2">
-                   Chargement en cours...                                
-                </div>
-            </mat-option>
-
-            <mat-option *ngIf="!(loadingMessageTemplate$ | async) && messageTemplateFiltered.length==0" [value]="''">
-                <div class="p-3 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
-                    <img class="mx-auto" src="assets/images/sorry.svg" alt="Image Description" style="width: 4rem;">
-                        <p class="mb-0">Aucun contact trouvé</p>
-                </div>
-            </mat-option>
-        </mat-autocomplete>  
-        <!-- Body -->
-        <app-custom-quill-editor class="mt-2" [formControlName]="'body'"  (onContentWriteChanged)="loseFocus()"></app-custom-quill-editor>
+            <!-- Corps (texte libre apres eventuel pre-remplissage) -->
+            <app-custom-quill-editor class="mt-2" formControlName="body"></app-custom-quill-editor>
         </ng-container>
-        
-
     </form>
-    <!-- <ng-template #toLoading>
-        <div class="flex flex-col items-center mt-12">
-            <mat-progress-bar  [mode]="'indeterminate'"></mat-progress-bar>
-            <div class="text-lg font-medium ">Chargement des templates de messages...</div>            
-        </div>
-    </ng-template> -->
 </div>

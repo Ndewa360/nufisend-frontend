@@ -5,7 +5,8 @@ import { NgxsModule } from '@ngxs/store';
 import { ToastrService } from 'ngx-toastr';
 import { ContactState, GroupState, MessageTemplateState } from 'app/shared/store';
 import { PlanificationState } from 'app/shared/store/planifcation';
-import { classifyPlanifications, HomeComponent } from './home.component';
+import { classifyPlanifications } from 'app/shared/store/planifcation';
+import { HomeComponent } from './home.component';
 
 describe('classifyPlanifications', () => {
   it('counts an active, funded, non exhausted plan as in progress', () => {

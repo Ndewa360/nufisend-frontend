@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { MessageModel } from "./message.model";
 import { environment } from "environments/environment";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { ApiResultFormat } from "../global";
 
@@ -19,7 +19,7 @@ export class MessageService
     /**
      * Send Message
      */
-    sendMessage(message:MessageModel): Observable<ApiResultFormat<MessageModel>>
+    sendMessage(message:MessageModel, idempotencyKey:string): Observable<ApiResultFormat<MessageModel>>
     {
         const formData = new FormData();
         Object.entries(message || {}).forEach(([key, value]) => {
@@ -37,7 +37,9 @@ export class MessageService
                 formData.append(key, String(value));
             }
         });
-        return this._httpClient.post<ApiResultFormat<MessageModel>>(`${environment.apiUrl}/message/post`, formData)
+        // Le serveur refuse un envoi sans cle : un rejeu reseau ne cree pas un second envoi.
+        const headers = new HttpHeaders({ 'Idempotency-Key': idempotencyKey });
+        return this._httpClient.post<ApiResultFormat<MessageModel>>(`${environment.apiUrl}/message/post`, formData, { headers })
     }
     
 }

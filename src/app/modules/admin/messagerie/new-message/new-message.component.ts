@@ -6,6 +6,7 @@ import { ContactModel, ContactState, GlobalState, GroupModel, MessageAction, Mes
 import { UserProfileModel, UserProfileState } from 'app/shared/store/user-profile';
 import { Observable, Subject, combineLatest, firstValueFrom, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { buildSendPayload } from '../message-payload.builder';
 import { PrevisualisationMessageContactComponent } from '../components/previsualisation-message-contact/previsualisation-message-contact.component';
 import { Router } from '@angular/router';
 import { OrganizationService } from 'app/core/organization/organization.service';
@@ -28,7 +29,7 @@ export class NewMessageComponent implements OnInit{
   destinationContacts:ContactModel[] = []
   destinationGroups:GroupModel[]=[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title?:string}={}
+  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title?:string,error?:string}={}
   planificationObj:{hasPlanification:boolean, planif:MessagePlanification[]}={hasPlanification:false,planif:[]};
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
@@ -183,7 +184,7 @@ export class NewMessageComponent implements OnInit{
       this._changeDetectorRef.markForCheck();
     }
 
-    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title:string})
+    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title:string,error?:string})
     {
       this.messageToSend=message;
       this.hasAttachment=!!message?.files?.length;
@@ -202,113 +203,50 @@ export class NewMessageComponent implements OnInit{
         this._toastrService.error("Espace d'envoi en cours de chargement. Rechargez la page.", 'Envoi impossible');
         return;
       }
-      if (this.isCloud) {
-        this.sendCloudMessage();
-        return;
-      }
-      if (!this.isWhatsAppReady && !this.isWhatsAppSynced) {
-        this._toastrService.error("Synchronisez votre compte WhatsApp avant d'envoyer un message", 'WhatsApp non synchronisé');
-        this._router.navigate(['/sync_whatsapp']);
-        return;
-      }
-      if (!this.isWhatsAppReady) {
-        this._toastrService.error("La synchronisation WhatsApp n'est pas terminée. Veuillez patienter ou synchroniser votre compte.", 'WhatsApp indisponible');
-        this._router.navigate(['/sync_whatsapp']);
-        return;
-      }
-      const title = (this.messageToSend.title || '').trim();
-      if (!title) {
-        this._toastrService.error('Le titre du message est requis', 'Validation');
-        return;
-      }
-      if (!this.hasMessageContent()) {
-        this._toastrService.error('Ajoutez un texte, un template ou un fichier au message', 'Validation');
-        return;
-      }
-      if (this.destinationContacts.length === 0 && this.destinationGroups.length === 0) {
-        this._toastrService.error('Selectionnez au moins un destinataire', 'Validation');
-        return;
-      }
-      if (!this.messageSendToNow && !this.planificationObj.hasPlanification) {
-        this._toastrService.error('Definissez la planification du message', 'Validation');
-        return;
-      }
-      if (!this.costSufficient) {
-        this._toastrService.warning('Rechargez votre portefeuille pour couvrir le coût de cet envoi', 'Solde insuffisant');
-        return;
-      }
-
-      this.submitted=true;
-      let dataToSend:MessageModel={
-        type:MessageType.TEXT,
-        isSentToNow:this.messageSendToNow,
-        contactsID:this.destinationContacts.map((contact)=>contact._id),
-        title,
-        groupsID:this.destinationGroups.map((group)=>group._id)
-      }
-
-      if(!this.messageSendToNow && this.planificationObj.hasPlanification) dataToSend.planification=this.planificationObj.planif;
-      if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
-      else dataToSend.bodyText=this.messageToSend.message;
-      if(this.messageToSend.files?.length) dataToSend.bodyFile = this.messageToSend.files;
-      this._store.dispatch(new MessageAction.SendMessage(dataToSend));
-    }
-
-    /**
-     * Envoi d'un membre d'organisation : numero WhatsApp Business, modele
-     * approuve obligatoire pour un message programme.
-     */
-    private sendCloudMessage()
-    {
-      if (!this.cloudReady) {
+      if (!this.isCloud) {
+        if (!this.isWhatsAppReady && !this.isWhatsAppSynced) {
+          this._toastrService.error("Synchronisez votre compte WhatsApp avant d'envoyer un message", 'WhatsApp non synchronisé');
+          this._router.navigate(['/sync_whatsapp']);
+          return;
+        }
+        if (!this.isWhatsAppReady) {
+          this._toastrService.error("La synchronisation WhatsApp n'est pas terminée. Veuillez patienter ou synchroniser votre compte.", 'WhatsApp indisponible');
+          this._router.navigate(['/sync_whatsapp']);
+          return;
+        }
+      } else if (!this.cloudReady) {
         this._toastrService.error("L'organisation ne peut pas envoyer : vérifiez le numéro WhatsApp Business et la ligne de crédit", 'Envoi impossible');
         return;
       }
-      const title = (this.messageToSend.title || '').trim();
-      if (!title) {
-        this._toastrService.error('Le titre du message est requis', 'Validation');
-        return;
-      }
-      if (this.destinationContacts.length === 0 && this.destinationGroups.length === 0) {
-        this._toastrService.error('Selectionnez au moins un destinataire', 'Validation');
-        return;
-      }
-      const template = this.cloudSelection?.template || null;
-      if (!this.messageSendToNow && !template) {
-        this._toastrService.error('Un message programmé doit utiliser un modèle WhatsApp approuvé', 'Validation');
-        return;
-      }
-      if (template && !this.cloudSelection.complete) {
-        this._toastrService.error('Renseignez toutes les variables du modèle (et son média d\'en-tête)', 'Validation');
-        return;
-      }
-      if (!template && !this.hasMessageContent()) {
-        this._toastrService.error('Ajoutez un texte ou un fichier, ou choisissez un modèle', 'Validation');
-        return;
-      }
-      if (!this.messageSendToNow && !this.planificationObj.hasPlanification) {
-        this._toastrService.error('Definissez la planification du message', 'Validation');
-        return;
-      }
-      if (!this.costSufficient) {
-        this._toastrService.warning("Rechargez le portefeuille de l'organisation pour couvrir le coût de cet envoi", 'Solde insuffisant');
+
+      const result = buildSendPayload({
+        channel: this.isCloud ? 'cloud' : 'personal',
+        isSentToNow: this.messageSendToNow,
+        target: {
+          contactIds: this.destinationContacts.map((contact) => contact._id),
+          groupIds: this.destinationGroups.map((group) => group._id),
+        },
+        composition: {
+          title: this.messageToSend.title,
+          message: this.messageToSend.message ?? null,
+          files: this.messageToSend.files || [],
+          messageTemplateId: this.messageToSend.messageTemplate?._id ?? null,
+        },
+        cloudTemplate: this.cloudSelection?.template ?? null,
+        cloudTemplateComplete: !!this.cloudSelection?.complete,
+        planification: this.planificationObj.hasPlanification ? this.planificationObj.planif : null,
+        costSufficient: this.costSufficient,
+        composeError: this.messageToSend.error ?? null,
+      });
+
+      if (result.ok === false) {
+        const toast = result.error.level === 'warning' ? this._toastrService.warning : this._toastrService.error;
+        toast.call(this._toastrService, result.error.message, result.error.title);
         return;
       }
 
-      this.submitted=true;
-      const dataToSend:MessageModel={
-        type:MessageType.TEXT,
-        isSentToNow:this.messageSendToNow,
-        contactsID:this.destinationContacts.map((contact)=>contact._id),
-        title,
-        groupsID:this.destinationGroups.map((group)=>group._id)
-      }
-      if(!this.messageSendToNow) dataToSend.planification=this.planificationObj.planif;
-      if (template) dataToSend.template = template;
-      else if(this.messageToSend.messageTemplate) dataToSend.messageTemplateId=this.messageToSend.messageTemplate._id
-      else dataToSend.bodyText=this.messageToSend.message;
-      if(this.messageToSend.files?.length) dataToSend.bodyFile = this.messageToSend.files;
-      this._store.dispatch(new MessageAction.SendMessage(dataToSend));
+      this.submitted = true;
+      this._store.dispatch(new MessageAction.SendMessage(result.payload));
     }
 
     canPrevisualise(): boolean
