@@ -20,6 +20,10 @@ import { PrevisualisationMessageContactComponent } from './components/previsuali
 import { HomePlanningListComponent } from './components/home-planning-list/home-planning-list.component';
 import { MessageCostEstimateComponent } from './components/message-cost-estimate/message-cost-estimate.component';
 import { XafPipe } from 'app/shared/pipes/xaf.pipe';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { CampaignOverviewComponent } from './components/campaign-overview/campaign-overview.component';
+import { CampaignHistoryComponent } from './components/campaign-history/campaign-history.component';
+import { CampaignReportDialogComponent } from './components/campaign-report-dialog/campaign-report-dialog.component';
 
 
 @NgModule({
@@ -33,7 +37,10 @@ import { XafPipe } from 'app/shared/pipes/xaf.pipe';
     NewMessageForSingleContactComponent,
     PrevisualisationMessageContactComponent,
     HomePlanningListComponent,
-    MessageCostEstimateComponent
+    MessageCostEstimateComponent,
+    CampaignOverviewComponent,
+    CampaignHistoryComponent,
+    CampaignReportDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -46,6 +53,7 @@ import { XafPipe } from 'app/shared/pipes/xaf.pipe';
     RichTextEditorModule,
     XafPipe,
     CloudTemplatePickerComponent,
+    NgApexchartsModule,
   ],
   exports:[
     NewMessageForSingleContactComponent

@@ -3,6 +3,8 @@ import { Actions, Select, Store, ofActionCompleted } from '@ngxs/store';
 import { ContactModel, ContactState, GroupModel, GroupState, MessageStatus } from 'app/shared/store';
 import { PlanificationAction, PlanificationModel, PlanificationState } from 'app/shared/store/planifcation';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { MatDialog } from '@angular/material/dialog';
+import { CampaignReportDialogComponent, CampaignReportDialogData } from '../campaign-report-dialog/campaign-report-dialog.component';
 import { Observable, Subject, combineLatest, takeUntil } from 'rxjs';
 
 /** Ligne du tableau : une planification avec ses destinataires et son etat, calcules une seule fois. */
@@ -44,7 +46,20 @@ export class HomePlanningListComponent implements OnInit, OnDestroy {
     private _store: Store,
     private _ngxsAction: Actions,
     private _fuseConfirmationService: FuseConfirmationService,
+    private _matDialog: MatDialog,
   ) {}
+
+  /** Rapport du message porte par la planification (resultats de chaque occurrence). */
+  openReport(row: PlanningRow): void {
+    const messageId = (row.plan.message as any)?._id;
+    if (!messageId) return;
+    this._matDialog.open<CampaignReportDialogComponent, CampaignReportDialogData>(CampaignReportDialogComponent, {
+      data: { messageId: String(messageId) },
+      width: '720px',
+      maxWidth: '96vw',
+      autoFocus: false,
+    });
+  }
 
   ngOnInit(): void {
     combineLatest([this.planificationList$, this.contacts$, this.groups$])

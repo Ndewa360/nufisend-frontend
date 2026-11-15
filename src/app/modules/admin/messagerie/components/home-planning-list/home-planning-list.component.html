@@ -69,6 +69,8 @@
                                 (click)="toggle(row)">
                             {{row.plan.isActive ? 'Désactiver' : 'Activer'}}
                         </button>
+                        <button mat-stroked-button type="button" [disabled]="!row.plan.message?._id" (click)="openReport(row)"
+                                [attr.aria-label]="'Voir le rapport de ' + (row.plan.title || 'la planification')">Rapport</button>
                         <button mat-icon-button type="button" color="warn"
                                 [disabled]="busy.has(row.plan._id) || row.running"
                                 [attr.aria-label]="'Supprimer la planification ' + (row.plan.title || '')"

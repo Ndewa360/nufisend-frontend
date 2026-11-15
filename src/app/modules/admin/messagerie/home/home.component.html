@@ -4,7 +4,6 @@
     <div class="bg-card">
         <div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
             <div class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-8 sm:my-12">
-                <!-- Avatar and name -->
                 <div class="flex flex-auto items-center min-w-0">
                     <div class="flex-0 w-30 h-30 rounded-full overflow-hidden">
                         <img class="w-full h-full object-cover" src="assets/images/ui/img/Messagerie-instantanee.webp" alt="">
@@ -13,22 +12,16 @@
                         <h1 class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate">Campagnes</h1>
                         <div class="flex items-center">
                             <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:information-circle'"></mat-icon>
-                            <div class="ml-1.5 leading-6 truncate text-secondary">Envoyez ou planifiez vos campagnes pour une date ultérieure</div>
+                            <div class="ml-1.5 leading-6 truncate text-secondary">Envoyez, planifiez et suivez vos campagnes</div>
                         </div>
                     </div>
                 </div>
-                <!-- Actions -->
                 <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
                     <button (click)="newMessage()" [disabled]="!canSend" [matTooltip]="sendBlockedReason" mat-flat-button [color]="'primary'">
                         <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:mail'"></mat-icon>
                         <span class="ml-2">Nouvelle campagne</span>
                     </button>
                 </div>
-            </div>
-
-            <!-- Onglet de section -->
-            <div class="relative flex self-start pt-2 pb-1 pl-5 pr-4 overflow-hidden rounded-t-xl border border-b-0 bg-default">
-                <div class="font-medium leading-6 truncate">Campagnes WhatsApp</div>
             </div>
         </div>
     </div>
@@ -65,56 +58,55 @@
                 <span>Impossible de charger votre espace d'envoi. Rechargez la page pour pouvoir envoyer des messages.</span>
             </fuse-alert>
 
-            <!-- Erreur de chargement des planifications : distincte d'une liste vide -->
-            <fuse-alert *ngIf="loadError" class="mb-6" [type]="'warning'" [appearance]="'border'" [showIcon]="true">
+            <!-- Alertes de planifications : suspendues pour solde -->
+            <fuse-alert *ngIf="breakdown.suspended > 0" class="mb-6" [type]="'warning'" [appearance]="'border'" [showIcon]="true">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <span>Impossible de charger vos campagnes planifiées.</span>
-                    <button mat-button color="primary" type="button" (click)="retry()">Réessayer</button>
+                    <span>{{breakdown.suspended}} planification{{breakdown.suspended > 1 ? 's' : ''}} suspendue{{breakdown.suspended > 1 ? 's' : ''}} : solde insuffisant pour les envois.</span>
+                    <a mat-button color="primary" routerLink="/wallet">Recharger le portefeuille</a>
                 </div>
             </fuse-alert>
 
-            <!-- Indicateur de chargement : les sections restent affichées -->
-            <mat-progress-bar *ngIf="loading$ | async" class="mb-4" [mode]="'indeterminate'"></mat-progress-bar>
+            <mat-tab-group animationDuration="0ms" class="campaign-tabs" [(selectedIndex)]="selectedTab" (selectedIndexChange)="onTabChange($event)">
 
-            <!-- Compteurs -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full min-w-0">
-                <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Total</div>
-                    <div class="flex flex-col items-center mt-2">
-                        <div class="text-6xl font-bold tracking-tight leading-none text-blue-500">{{loadError ? '—' : total}}</div>
-                        <div class="text-lg font-medium text-blue-600 dark:text-blue-500">Planifications</div>
+                <!-- Apercu : activite de la periode, campagnes en cours -->
+                <mat-tab label="Aperçu">
+                    <div class="flex flex-col gap-8 pt-6">
+                        <app-active-campaigns></app-active-campaigns>
+                        <app-campaign-overview #overview></app-campaign-overview>
                     </div>
-                </div>
+                </mat-tab>
 
-                <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                    <div class="text-lg font-medium tracking-tight leading-6 truncate">En cours</div>
-                    <div class="flex flex-col items-center mt-2">
-                        <div class="text-6xl font-bold tracking-tight leading-none text-green-500">{{loadError ? '—' : breakdown.inProgress}}</div>
-                        <div class="text-lg font-medium text-green-600 dark:text-green-500">Envois à venir</div>
+                <!-- Campagnes : historique et rapports -->
+                <mat-tab label="Campagnes">
+                    <div class="pt-6">
+                        <app-campaign-history></app-campaign-history>
                     </div>
-                </div>
+                </mat-tab>
 
-                <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Suspendues</div>
-                    <div class="flex flex-col items-center mt-2">
-                        <div class="text-6xl font-bold tracking-tight leading-none text-red-500">{{loadError ? '—' : breakdown.suspended}}</div>
-                        <div class="text-lg font-medium text-red-600 dark:text-red-500">Solde insuffisant</div>
+                <!-- Planifications : programmes recurrents et leur etat -->
+                <mat-tab label="Planifications">
+                    <div class="flex flex-col gap-6 pt-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-card rounded-2xl shadow p-5">
+                                <div class="text-sm text-secondary">En cours d'envoi</div>
+                                <div class="text-3xl font-bold text-green-600">{{breakdown.inProgress}}</div>
+                                <div class="text-xs text-secondary">Actives, solde suffisant, non terminées</div>
+                            </div>
+                            <div class="bg-card rounded-2xl shadow p-5">
+                                <div class="text-sm text-secondary">Suspendues</div>
+                                <div class="text-3xl font-bold text-red-600">{{breakdown.suspended}}</div>
+                                <div class="text-xs text-secondary">Solde insuffisant</div>
+                            </div>
+                            <div class="bg-card rounded-2xl shadow p-5">
+                                <div class="text-sm text-secondary">Désactivées ou terminées</div>
+                                <div class="text-3xl font-bold text-amber-600">{{breakdown.inactive + breakdown.ended}}</div>
+                                <div class="text-xs text-secondary">Ne partiront plus</div>
+                            </div>
+                        </div>
+                        <app-home-planning-list></app-home-planning-list>
                     </div>
-                </div>
-
-                <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Désactivées</div>
-                    <div class="flex flex-col items-center mt-2">
-                        <div class="text-6xl font-bold tracking-tight leading-none text-amber-500">{{loadError ? '—' : breakdown.inactive}}</div>
-                        <div class="text-lg font-medium text-amber-600 dark:text-amber-500">Ne partiront pas</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 gap-8 w-full mt-8">
-                <app-active-campaigns></app-active-campaigns>
-                <app-home-planning-list></app-home-planning-list>
-            </div>
+                </mat-tab>
+            </mat-tab-group>
         </div>
     </div>
 </div>

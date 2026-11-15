@@ -1,0 +1,76 @@
+<div class="flex flex-col gap-6">
+
+    <!-- Periode -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="text-lg font-medium tracking-tight">Activité des {{period}} derniers jours</div>
+        <div class="inline-flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 overflow-hidden" role="group" aria-label="Période">
+            <button *ngFor="let option of periods" type="button" (click)="setPeriod(option)"
+                    [attr.aria-pressed]="option === period"
+                    [ngClass]="option === period ? 'bg-green-800 text-white' : 'bg-transparent'"
+                    class="px-3 py-1.5 text-sm font-semibold">
+                {{option}} j
+            </button>
+        </div>
+    </div>
+
+    <!-- Erreur -->
+    <div *ngIf="error" class="flex flex-col sm:flex-row sm:items-center gap-2 text-amber-700 dark:text-amber-400">
+        <span>Impossible de charger les statistiques.</span>
+        <button mat-stroked-button color="primary" type="button" (click)="load()">Réessayer</button>
+    </div>
+
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+    <ng-container *ngIf="stats && !error">
+        <!-- Indicateurs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="bg-card rounded-2xl shadow p-5">
+                <div class="text-sm text-secondary">Envois</div>
+                <div class="text-3xl font-bold text-blue-600">{{stats.totals.total}}</div>
+                <div class="text-xs text-secondary">{{stats.totals.messages}} campagne(s) ou occurrence(s)</div>
+            </div>
+            <div class="bg-card rounded-2xl shadow p-5">
+                <div class="text-sm text-secondary">Taux d'acceptation</div>
+                <div class="text-3xl font-bold text-emerald-600">{{stats.totals.acceptanceRate !== null ? stats.totals.acceptanceRate + ' %' : '—'}}</div>
+                <div class="text-xs text-secondary">Envoyés avec succès, avec ou sans accusé</div>
+            </div>
+            <div class="bg-card rounded-2xl shadow p-5">
+                <div class="text-sm text-secondary">Livraison confirmée</div>
+                <div class="text-3xl font-bold text-emerald-600">{{stats.totals.confirmationRate !== null ? stats.totals.confirmationRate + ' %' : '—'}}</div>
+                <div class="text-xs text-secondary">{{stats.totals.delivered}} livré(s) avec accusé</div>
+            </div>
+            <div class="bg-card rounded-2xl shadow p-5">
+                <div class="text-sm text-secondary">Échecs</div>
+                <div class="text-3xl font-bold text-red-600">{{stats.totals.failed}}</div>
+                <div class="text-xs text-secondary">{{stats.totals.failureRate !== null ? stats.totals.failureRate + ' % des destinataires' : '—'}}</div>
+            </div>
+            <div class="bg-card rounded-2xl shadow p-5">
+                <div class="text-sm text-secondary">Dépense</div>
+                <div class="text-3xl font-bold text-amber-600">{{stats.totals.cost | xaf}}</div>
+                <div class="text-xs text-secondary">Seuls les envois livrés sont facturés</div>
+            </div>
+        </div>
+
+        <!-- Activite par jour -->
+        <div *ngIf="hasActivity; else noActivity" class="bg-card rounded-2xl shadow p-5">
+            <apx-chart
+                [chart]="chartOptions.chart"
+                [colors]="chartOptions.colors"
+                [plotOptions]="chartOptions.plotOptions"
+                [dataLabels]="chartOptions.dataLabels"
+                [legend]="chartOptions.legend"
+                [xaxis]="chartOptions.xaxis"
+                [yaxis]="chartOptions.yaxis"
+                [grid]="chartOptions.grid"
+                [tooltip]="chartOptions.tooltip"
+                [series]="chartOptions.series"></apx-chart>
+            <p class="text-xs text-secondary mt-2">{{stats.notice}}</p>
+        </div>
+
+        <ng-template #noActivity>
+            <div class="bg-card rounded-2xl shadow p-8 text-center text-secondary">
+                Aucun envoi sur cette période. Lancez une campagne pour voir vos résultats ici.
+            </div>
+        </ng-template>
+    </ng-container>
+</div>
