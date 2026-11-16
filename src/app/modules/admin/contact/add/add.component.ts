@@ -84,6 +84,7 @@ export class AddComponent implements OnInit, OnDestroy {
         this.contactForm = this._formBuilder.group({
             // avatar      : [null],
             fullName       : ['', [Validators.required]],
+            firstName      : [''],
             emails         : this._formBuilder.array([]),
             phoneNumbers   : this._formBuilder.array([]),
             jobTitle       : [null],

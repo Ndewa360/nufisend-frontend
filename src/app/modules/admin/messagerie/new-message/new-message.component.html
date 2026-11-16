@@ -122,6 +122,7 @@
                                 <ng-container *ngIf="!messageSendToNow">Les messages programmés utilisent obligatoirement un modèle approuvé par Meta.</ng-container>
                             </div>
                             <app-cloud-template-picker
+                                [sampleRecipient]="sampleRecipient"
                                 [allowFreeText]="messageSendToNow"
                                 [hasAttachment]="hasAttachment"
                                 (selectionChange)="setCloudTemplate($event)"></app-cloud-template-picker>

@@ -39,7 +39,7 @@ export class CustomQuillEditorComponent implements ControlValueAccessor{
 
         ['link'],     
         
-        [{ 'templatevars': ['','senderFullName', 'senderEmail','receiverFullName','receiverEmail','dateToSend','plateform'] }], // my custom dropdown
+        [{ 'templatevars': ['','senderFullName', 'senderEmail','receiverFullName','receiverFirstName','receiverEmail','receiverCompany','receiverJobTitle','receiverOrganization','receiverAddress','dateToSend','plateform'] }], // my custom dropdown
     ],
       handlers: {
         "templatevars":(value) =>this.templateVars(value)

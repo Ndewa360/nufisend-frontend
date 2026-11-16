@@ -93,7 +93,16 @@
                     </mat-form-field>
                 </div>
 
-                <!-- Company -->
+                                <!-- Prénom -->
+                <div class="mt-8">
+                    <mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+                        <mat-label>Prénom</mat-label>
+                        <input matInput [formControlName]="'firstName'" [placeholder]="'Prénom'" [spellcheck]="false">
+                        <mat-hint>Utilisé par {{ '{{receiverFirstName}}' }} dans les messages</mat-hint>
+                    </mat-form-field>
+                </div>
+
+<!-- Company -->
                 <div class="mt-8">
                     <mat-form-field
                         class="w-full"

@@ -21,7 +21,29 @@ import { OrganizationService } from 'app/core/organization/organization.service'
   encapsulation  : ViewEncapsulation.None,
 })
 export class ListComponent implements OnInit, OnDestroy{
-  @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
+  matDrawer: MatDrawer;
+  private _drawerSubscribed = false;
+
+  /**
+   * Le tiroir est dans un *ngIf (modele WhatsApp Business : pas de tiroir), il
+   * n'existe donc pas encore dans ngOnInit. On s'abonne quand il apparait.
+   */
+  @ViewChild('matDrawer') set matDrawerRef(drawer: MatDrawer | undefined)
+  {
+      if (!drawer || this._drawerSubscribed) return;
+      this.matDrawer = drawer;
+      this._drawerSubscribed = true;
+      drawer.openedChange
+          .pipe(takeUntil(this._unsubscribeAll))
+          .subscribe((opened) => {
+              if (!opened)
+              {
+                  // Remove the selected messageTemplate when drawer closed
+                  this.selectedMessageTemplate = null;
+                  this._changeDetectorRef.markForCheck();
+              }
+          });
+  }
 
     @Select(MessageTemplateState.selectStateData) messageTemplates$: Observable<MessageTemplateModel[]>;
     @Select(MessageTemplateState.selectStateLoading) loading$:Observable<boolean>
@@ -99,18 +121,6 @@ export class ListComponent implements OnInit, OnDestroy{
         this.searchInputControl.valueChanges
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((query: string) => this._filterMessageTemplates(query));
-
-        // Subscribe to MatDrawer opened change
-        this.matDrawer.openedChange.subscribe((opened) => {
-            if ( !opened )
-            {
-                // Remove the selected messageTemplate when drawer closed
-                this.selectedMessageTemplate = null;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            }
-        });
 
        
     

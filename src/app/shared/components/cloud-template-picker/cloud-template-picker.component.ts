@@ -9,6 +9,7 @@ import {
     Output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MessageProcessing } from 'app/shared/utils/message-processing';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -31,6 +32,38 @@ export interface TemplateSelection
     preview: string;
     /** Vrai si toutes les variables et le media d'en-tete requis sont renseignes. */
     complete: boolean;
+}
+
+/** Destinataire pris pour l'apercu des variables (memes champs que le contact). */
+export interface SampleRecipient {
+    fullName?: string;
+    firstName?: string;
+    email?: string;
+    company?: string;
+    jobTitle?: string;
+    organization?: string;
+    address?: string;
+}
+
+const SAMPLE_RECIPIENT: SampleRecipient = { fullName: 'Awa Diop', firstName: 'Awa', email: 'awa@exemple.com', company: 'ACME', jobTitle: 'Responsable achats' };
+
+/** Valeurs de variables pour l'apercu, a partir du destinataire d'exemple. */
+function sampleValues(sample: SampleRecipient): Record<string, unknown>
+{
+    const first = sample.firstName || (sample.fullName || '').trim().split(/\s+/)[0] || '';
+    return {
+        receiverFullName: sample.fullName,
+        receiverFirstName: first,
+        receiverEmail: sample.email,
+        receiverCompany: sample.company,
+        receiverJobTitle: sample.jobTitle,
+        receiverOrganization: sample.organization,
+        receiverAddress: sample.address,
+        senderFullName: 'Vous',
+        senderEmail: '',
+        dateToSend: new Date().toLocaleDateString('fr-FR'),
+        plateform: 'NufiSend',
+    };
 }
 
 const MEDIA_HEADERS = ['IMAGE', 'VIDEO', 'DOCUMENT'];
@@ -73,7 +106,9 @@ const MEDIA_HEADERS = ['IMAGE', 'VIDEO', 'DOCUMENT'];
                         </mat-form-field>
                     </div>
                     <div *ngIf="variables.length" class="text-xs text-secondary mt-1">
-                        Personnalisation : {{ '{{receiverFullName}}' }} (nom du destinataire), {{ '{{senderFullName}}' }} (votre nom).
+                        Personnalisation par destinataire : {{ '{{receiverFirstName|ami}}' }} (prénom, avec valeur de repli),
+                        {{ '{{receiverFullName}}' }}, {{ '{{receiverCompany}}' }}, {{ '{{receiverJobTitle}}' }}, {{ '{{senderFullName}}' }}.
+                        Aperçu avec {{ previewRecipientName }}.
                     </div>
                     <mat-form-field *ngIf="needsHeaderMedia" class="w-full mt-3" appearance="outline" subscriptSizing="dynamic">
                         <mat-label>Lien public du média d'en-tête ({{ selected.headerFormat | lowercase }})</mat-label>
@@ -105,6 +140,9 @@ export class CloudTemplatePickerComponent implements OnInit
     variables: string[] = [];
     headerMediaUrl = '';
     urlVariableValue = '';
+
+    /** Destinataire utilise pour l'apercu (le premier destinataire ou le contact courant). */
+    @Input() sampleRecipient: SampleRecipient | null = null;
 
     readonly categoryLabels = TEMPLATE_CATEGORY_LABELS;
 
@@ -144,9 +182,21 @@ export class CloudTemplatePickerComponent implements OnInit
         return !!buttons?.buttons?.some((button: any) => button.type === 'URL' && /\{\{\s*1\s*\}\}/.test(button.url || ''));
     }
 
+    get previewRecipientName(): string
+    {
+        return this.sample.fullName || 'un destinataire';
+    }
+
+    private get sample(): SampleRecipient
+    {
+        return this.sampleRecipient || SAMPLE_RECIPIENT;
+    }
+
     get previewText(): string
     {
-        return templateBody(this.selected).replace(/\{\{\s*(\d+)\s*\}\}/g, (match, index) => this.variables[Number(index) - 1] || match);
+        // 1. {{n}} : valeurs saisies. 2. variables NufiSend : valeurs du destinataire d'exemple.
+        const withValues = templateBody(this.selected).replace(/\{\{\s*(\d+)\s*\}\}/g, (match, index) => this.variables[Number(index) - 1] || match);
+        return MessageProcessing.renderVariables(withValues, sampleValues(this.sample));
     }
 
     keyOf(template: WhatsappTemplate): string

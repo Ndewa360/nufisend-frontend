@@ -87,7 +87,7 @@ export class PrevisualisationMessageContactComponent implements OnInit, OnDestro
   getCustomMessage()
   {
 
-    this.message=MessageProcessing.getPersonalizedMessage(this.initMessage,this.selectedContact,this.sender,this.dateToSend)
+    this.message=MessageProcessing.getPersonalizedMessage(this.initMessage,this.selectedContact,this.sender,this.dateToSend,true)
   }
 
 

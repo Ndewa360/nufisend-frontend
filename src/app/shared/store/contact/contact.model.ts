@@ -1,6 +1,7 @@
 export interface ContactModel {
     _id?:string;
     fullName?:string;
+    firstName?:string;
     emails?:{email?:string,label?:string}[];
     phoneNumbers?:{country?:string,phoneNumber?:string,label?:string}[];    
     skype?:string;

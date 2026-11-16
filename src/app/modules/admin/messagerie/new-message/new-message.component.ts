@@ -40,6 +40,8 @@ export class NewMessageComponent implements OnInit{
   isWhatsAppReady:boolean=false;
   /** Destinataires uniques (contacts + membres des groupes) pour l'estimation du cout. */
   recipientsCount:number=0;
+  /** Destinataire d'exemple pour l'apercu des variables (premier contact choisi). */
+  sampleRecipient: ContactModel | null = null;
   hasAttachment:boolean=false;
   costSufficient:boolean=true;
   /** Adhesion : undefined = non chargee, null = compte personnel, objet = membre (envoi Cloud). */
@@ -119,6 +121,7 @@ export class NewMessageComponent implements OnInit{
     getDestinationMessageData(data)
     {
       this.destinationContacts=[...data.contacts];
+      this.sampleRecipient = this.destinationContacts[0] || null;
       this.destinationGroups=[...data.groups]
       const recipientIds = new Set<string>(this.destinationContacts.map((contact)=>String(contact._id)));
       for (const group of this.destinationGroups)

@@ -32,7 +32,7 @@ export class ContactComponent {
   userProfile:UserProfileModel=null;
   percent=0;
 
-  @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
+  @ViewChild('matDrawer') matDrawer: MatDrawer;
 
     contacts: WhatsappContactModel[];
     contactsFiltered:WhatsappContactModel[]=[]
