@@ -11,6 +11,7 @@ import { Subject, Observable, combineLatest, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { buildSendPayload } from '../../message-payload.builder';
 import { ComposedMessage } from '../rediger-message-direct/rediger-message-direct.component';
+import { WindowPhone, whatsappPhoneOf } from '../cloud-window-hint/cloud-window-hint.component';
 
 /**
  * Message immediat a un contact unique (depuis la liste des contacts).
@@ -48,7 +49,11 @@ export class NewMessageForSingleContactComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) data: { contact: ContactModel }
   ) {
     this.destinationContact = data.contact;
+    this.cloudWindowPhones = whatsappPhoneOf(data.contact) ? [whatsappPhoneOf(data.contact)] : [];
   }
+
+  /** Numero du contact, pour verifier la fenetre de 24 h (texte libre). */
+  cloudWindowPhones: WindowPhone[] = [];
 
   // -----------------------------------------------------------------------------------------------------
   // @ Canal (source unique : messaging-channel.ts)

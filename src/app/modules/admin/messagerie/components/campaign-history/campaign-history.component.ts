@@ -5,6 +5,8 @@ import { Actions, ofActionSuccessful } from '@ngxs/store';
 import { EMPTY, Observable, Subject, Subscription, catchError, expand, map, reduce, takeUntil } from 'rxjs';
 import { CampaignChannel, CampaignHistoryItem, CampaignKind, CampaignStatsService, HistoryParams, MessageAction, Paginated } from 'app/shared/store/message';
 import { CsvColumn, downloadCsv, toCsv } from 'app/shared/utils/csv-export';
+import { campaignRefresh } from 'app/shared/utils/campaign-refresh';
+import { Socket } from 'ngx-socket-io';
 import { CampaignReportDialogComponent, CampaignReportDialogData } from '../campaign-report-dialog/campaign-report-dialog.component';
 
 /** Periodes du filtre (jours) ; 0 = toutes. */
@@ -67,6 +69,7 @@ export class CampaignHistoryComponent implements OnInit, OnDestroy {
     private _dialog: MatDialog,
     private _actions: Actions,
     private _cdr: ChangeDetectorRef,
+    private _socket: Socket,
   ) {}
 
   ngOnInit(): void {
@@ -78,6 +81,10 @@ export class CampaignHistoryComponent implements OnInit, OnDestroy {
         this.page = 1;
         this.load();
       });
+    // Statuts mis a jour pendant l'envoi (evenements temps reel, puis periodiquement).
+    campaignRefresh(this._socket, 8000)
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe(() => this.load());
   }
 
   ngOnDestroy(): void {

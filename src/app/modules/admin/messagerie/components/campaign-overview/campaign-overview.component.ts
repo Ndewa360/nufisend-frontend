@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { ApexOptions } from 'ng-apexcharts';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { CampaignStats, CampaignStatsService } from 'app/shared/store/message';
+import { campaignRefresh } from 'app/shared/utils/campaign-refresh';
+import { Socket } from 'ngx-socket-io';
 
 /** Periodes proposees : nombre de jours se terminant aujourd'hui. */
 export const OVERVIEW_PERIODS = [7, 30, 90] as const;
@@ -27,7 +29,7 @@ export class CampaignOverviewComponent implements OnInit, OnDestroy {
   private _request: Subscription;
   private _unsubscribeAll = new Subject<void>();
 
-  constructor(private _statistics: CampaignStatsService, private _cdr: ChangeDetectorRef) {
+  constructor(private _statistics: CampaignStatsService, private _cdr: ChangeDetectorRef, private _socket: Socket) {
     this._prepareChart();
   }
 
@@ -37,6 +39,10 @@ export class CampaignOverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.load();
+    // Chiffres mis a jour pendant et apres l'envoi.
+    campaignRefresh(this._socket, 20000)
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe(() => this.load());
   }
 
   ngOnDestroy(): void {

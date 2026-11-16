@@ -126,6 +126,7 @@
                                 [allowFreeText]="messageSendToNow"
                                 [hasAttachment]="hasAttachment"
                                 (selectionChange)="setCloudTemplate($event)"></app-cloud-template-picker>
+                            <app-cloud-window-hint *ngIf="isCloud && messageSendToNow && !usesCloudTemplate" [phones]="cloudWindowPhones"></app-cloud-window-hint>
                         </div>
                         <app-rediger-message-direct [cloudTemplateMode]="usesCloudTemplate" [cloudMode]="isCloud" (sendMessageData)="setMessage($event)"></app-rediger-message-direct>
                         <app-message-cost-estimate

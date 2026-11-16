@@ -1,4 +1,5 @@
 import { ActiveCampaignsComponent } from './components/active-campaigns/active-campaigns.component';
+import { CloudWindowHintComponent } from './components/cloud-window-hint/cloud-window-hint.component';
 import { NgModule } from '@angular/core';
 import { CloudTemplatePickerComponent } from 'app/shared/components/cloud-template-picker/cloud-template-picker.component';
 import { CommonModule } from '@angular/common';
@@ -53,6 +54,7 @@ import { CampaignReportDialogComponent } from './components/campaign-report-dial
     RichTextEditorModule,
     XafPipe,
     CloudTemplatePickerComponent,
+    CloudWindowHintComponent,
     NgApexchartsModule,
   ],
   exports:[

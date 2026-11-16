@@ -46,6 +46,7 @@
                     [allowFreeText]="true"
                     [hasAttachment]="!!messageToSend.files?.length"
                     (selectionChange)="setCloudTemplate($event)"></app-cloud-template-picker>
+                <app-cloud-window-hint *ngIf="isCloud && !usesCloudTemplate" [phones]="cloudWindowPhones"></app-cloud-window-hint>
             </div>
             <app-rediger-message-direct
                 [cloudTemplateMode]="usesCloudTemplate"

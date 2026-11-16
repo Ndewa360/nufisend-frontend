@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { OrganizationService } from 'app/core/organization/organization.service';
 import { Membership } from 'app/core/organization/organization.types';
 import { isChannelReady, isOrganizationCloudReady, resolveMessagingChannel } from 'app/core/organization/messaging-channel';
+import { WindowPhone, whatsappPhoneOf } from '../components/cloud-window-hint/cloud-window-hint.component';
 import { TemplateSelection } from 'app/shared/components/cloud-template-picker/cloud-template-picker.component';
 
 @Component({
@@ -42,6 +43,8 @@ export class NewMessageComponent implements OnInit{
   recipientsCount:number=0;
   /** Destinataire d'exemple pour l'apercu des variables (premier contact choisi). */
   sampleRecipient: ContactModel | null = null;
+  /** Numeros des destinataires, pour verifier la fenetre de 24 h (texte libre). */
+  cloudWindowPhones: WindowPhone[] = [];
   hasAttachment:boolean=false;
   costSufficient:boolean=true;
   /** Adhesion : undefined = non chargee, null = compte personnel, objet = membre (envoi Cloud). */
@@ -122,6 +125,12 @@ export class NewMessageComponent implements OnInit{
     {
       this.destinationContacts=[...data.contacts];
       this.sampleRecipient = this.destinationContacts[0] || null;
+      this.cloudWindowPhones = [
+        ...this.destinationContacts,
+        ...this.destinationGroups.flatMap((group: any) => (group.contacts || []).filter((contact: any) => typeof contact === 'object')),
+      ]
+        .map((contact) => whatsappPhoneOf(contact))
+        .filter((phone): phone is WindowPhone => !!phone);
       this.destinationGroups=[...data.groups]
       const recipientIds = new Set<string>(this.destinationContacts.map((contact)=>String(contact._id)));
       for (const group of this.destinationGroups)

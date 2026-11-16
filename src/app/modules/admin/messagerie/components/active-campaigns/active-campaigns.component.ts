@@ -5,6 +5,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { Actions, ofActionSuccessful } from '@ngxs/store';
+import { Subject, Subscription, takeUntil } from 'rxjs';
+import { MessageAction } from 'app/shared/store/message';
+import { campaignRefresh } from 'app/shared/utils/campaign-refresh';
 import { environment } from 'environments/environment';
 import { Socket } from 'ngx-socket-io';
 import { ToastrService } from 'ngx-toastr';
@@ -93,8 +97,9 @@ export class ActiveCampaignsComponent implements OnInit, OnDestroy
     campaigns: ActiveCampaign[] = [];
     busy = new Set<string>();
     private readonly _url = `${environment.apiUrl}/message`;
-    private readonly _refresh = () => this.load();
     private readonly _onProgress = (event: any) => this.applyProgress(event);
+    private readonly _unsubscribeAll = new Subject<void>();
+    private _onProgressSocket: any = null;
 
     constructor(
         private _http: HttpClient,
@@ -102,6 +107,7 @@ export class ActiveCampaignsComponent implements OnInit, OnDestroy
         private _toastr: ToastrService,
         private _confirmation: FuseConfirmationService,
         private _cdr: ChangeDetectorRef,
+        private _actions: Actions,
     )
     {
     }
@@ -109,14 +115,23 @@ export class ActiveCampaignsComponent implements OnInit, OnDestroy
     ngOnInit(): void
     {
         this.load();
-        (this._socket.ioSocket as any)?.on('message-progress', this._onProgress);
-        (this._socket.ioSocket as any)?.on('message-status', this._refresh);
+        // Avancement immediat (message-progress), puis rechargement a chaque evenement et periodiquement.
+        this._onProgressSocket = this._socket.ioSocket as any;
+        this._onProgressSocket?.on('message-progress', this._onProgress);
+        campaignRefresh(this._socket, 4000)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => this.load());
+        // Un envoi qui vient d'etre lance apparait tout de suite.
+        this._actions
+            .pipe(takeUntil(this._unsubscribeAll), ofActionSuccessful(MessageAction.SendMessage))
+            .subscribe(() => this.load());
     }
 
     ngOnDestroy(): void
     {
-        (this._socket.ioSocket as any)?.off('message-progress', this._onProgress);
-        (this._socket.ioSocket as any)?.off('message-status', this._refresh);
+        this._onProgressSocket?.off('message-progress', this._onProgress);
+        this._unsubscribeAll.next();
+        this._unsubscribeAll.complete();
     }
 
     trackById(_: number, campaign: ActiveCampaign): string
