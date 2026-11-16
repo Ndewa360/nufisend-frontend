@@ -569,8 +569,59 @@
             </div>
         </section>
 
-        <!-- Pricing -->
-        <section id="pricing" class="scroll-mt-24 bg-white py-20 sm:py-24">
+        <!-- Pricing : abonnement par numero (mode tech_provider) -->
+        <section *ngIf="isTechProvider" id="pricing" class="scroll-mt-24 bg-white py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-2xl text-center" data-reveal>
+                    <span class="nufi-eyebrow">Tarifs</span>
+                    <h2 class="mt-4 text-[2rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-nufi-900 sm:text-[2.6rem]">
+                        Un abonnement simple par numéro WhatsApp.
+                    </h2>
+                    <p class="mt-4 text-[16px] leading-7 text-slate-500">
+                        Pas de commission sur vos messages : vous payez un montant fixe par mois et par numéro raccordé.
+                    </p>
+                </div>
+
+                <div class="mx-auto mt-14 grid max-w-4xl items-stretch gap-5 md:grid-cols-2">
+                    <article class="nufi-card flex flex-col rounded-3xl border border-nufi-200 bg-white p-8" data-reveal>
+                        <div class="text-[10px] font-bold uppercase tracking-[0.14em] text-nufi-600">Abonnement NufiSend</div>
+                        <div class="mt-1 text-[14px] font-bold text-nufi-900">Par numéro raccordé</div>
+                        <div class="mt-6 flex items-end gap-1 whitespace-nowrap">
+                            <span class="text-[2.6rem] font-extrabold leading-none tracking-[-0.04em] text-nufi-900">{{ platformFeeLabel }}</span>
+                            <span class="pb-1 text-[13px] font-semibold text-slate-500">FCFA / numéro / mois</span>
+                        </div>
+                        <ul class="mt-6 flex flex-1 flex-col gap-3 text-[13px] leading-5 text-slate-600">
+                            <li class="flex gap-2"><span class="text-nufi-600">&#10003;</span> Envois, programmation et modèles de messages</li>
+                            <li class="flex gap-2"><span class="text-nufi-600">&#10003;</span> Boîte de réception partagée avec votre équipe</li>
+                            <li class="flex gap-2"><span class="text-nufi-600">&#10003;</span> Annuaire partagé : contacts, groupes et modèles</li>
+                            <li class="flex gap-2"><span class="text-nufi-600">&#10003;</span> Aucune commission par message NufiSend</li>
+                        </ul>
+                        <a routerLink="/auth/sign-up" class="mt-8 inline-flex items-center justify-center rounded-full bg-nufi-600 px-5 py-3 text-[14px] font-bold text-white transition hover:bg-nufi-700">
+                            Commencer
+                        </a>
+                    </article>
+
+                    <article class="nufi-card flex flex-col rounded-3xl border border-slate-200 bg-white p-8" data-reveal>
+                        <div class="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Frais de messagerie</div>
+                        <div class="mt-1 text-[14px] font-bold text-nufi-900">Payés directement à Meta</div>
+                        <p class="mt-6 text-[14px] leading-6 text-slate-500">
+                            Chaque message livré est facturé par WhatsApp (Meta) à votre compte, au tarif officiel de Meta. Ce tarif varie selon le pays du destinataire et la catégorie du message (marketing, utilitaire, service). NufiSend ne prend aucune marge dessus.
+                        </p>
+                        <p class="mt-4 text-[12px] leading-5 text-slate-400">
+                            Le moyen de paiement se configure directement sur votre compte WhatsApp Business chez Meta.
+                        </p>
+                    </article>
+                </div>
+
+                <p class="mt-8 text-center text-[12px] text-slate-400">
+                    Une question sur les tarifs ?
+                    <a href="mailto:contact@ndewa-360.com" class="font-semibold text-nufi-700 hover:underline">écrivez-nous.</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- Pricing : grille par message (mode solution_partner, conservee pour la bascule) -->
+        <section *ngIf="!isTechProvider" id="pricing" class="scroll-mt-24 bg-white py-20 sm:py-24">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl text-center" data-reveal>
                     <span class="nufi-eyebrow">Tarifs</span>
@@ -834,7 +885,7 @@
                             </button>
                             <div [id]="'faq-panel-' + i" class="nufi-faq-body" [class.is-open]="openFaq === i">
                                 <div>
-                                    <p class="px-5 pb-5 text-[14px] leading-6 text-slate-500 sm:px-6 sm:pb-6">{{ item.answer }}</p>
+                                    <p class="px-5 pb-5 text-[14px] leading-6 text-slate-500 sm:px-6 sm:pb-6">{{ answerOf(item) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -869,7 +920,8 @@
                         </a>
                     </div>
                     <p class="mt-5 text-[12px] text-slate-400">
-                        Campagnes dès 9 000 FCFA (500 messages), sans abonnement · Paiement Mobile Money
+                        <ng-container *ngIf="isTechProvider; else cloudNoteSp">Abonnement dès {{ platformFeeLabel }} FCFA par numéro et par mois · Paiement Mobile Money</ng-container>
+                        <ng-template #cloudNoteSp>Campagnes dès 9 000 FCFA (500 messages), sans abonnement · Paiement Mobile Money</ng-template>
                     </p>
                 </div>
             </div>

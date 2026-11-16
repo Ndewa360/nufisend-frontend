@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from 'environments/environment';
 import { FinanceApiService } from '../finance-api.service';
 
 /** Tarification et parametres financiers de la plateforme. */
@@ -49,6 +51,22 @@ import { FinanceApiService } from '../finance-api.service';
                     <mat-form-field><mat-label>Utility (FCFA)</mat-label><input matInput type="number" min="0" step="0.5" formControlName="cloudUtility"></mat-form-field>
                     <mat-form-field><mat-label>Authentification (FCFA)</mat-label><input matInput type="number" min="0" step="0.5" formControlName="cloudAuthentication"></mat-form-field>
                     <mat-form-field><mat-label>Service (FCFA)</mat-label><input matInput type="number" min="0" step="0.5" formControlName="cloudService"></mat-form-field>
+                </div>
+            </div>
+
+            <div class="bg-card rounded-2xl shadow p-6">
+                <div class="text-lg font-semibold">Mode Meta et abonnement par numéro</div>
+                <div class="text-sm text-secondary">
+                    Mode actuel de la plateforme : <strong>{{ metaModeLabel }}</strong>.
+                    Il se règle par la variable META_PARTNER_MODE (redémarrage requis), car il doit correspondre au statut accordé par Meta.
+                </div>
+                <div class="text-sm text-secondary mt-2">
+                    <strong>tech_provider</strong> : abonnement mensuel par numéro raccordé, prélevé sur le portefeuille de l'organisation ; le client paie Meta directement pour ses messages.
+                    <strong>solution_partner</strong> : grille par message ci-dessous et ligne de crédit NufiSend ; pas d'abonnement.
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <mat-form-field><mat-label>Abonnement par numéro (FCFA / mois, tech_provider)</mat-label><input matInput type="number" min="0" step="1" formControlName="platformFeePerNumber"></mat-form-field>
+                    <mat-form-field><mat-label>Part plateforme par message (FCFA, tech_provider, 0 = aucune)</mat-label><input matInput type="number" min="0" step="1" formControlName="techProviderFee"></mat-form-field>
                 </div>
             </div>
 
@@ -148,6 +166,8 @@ export class FinanceSettingsComponent implements OnInit
         cloudAuthentication    : [6, [Validators.required, Validators.min(0)]],
         cloudService           : [1, [Validators.required, Validators.min(0)]],
         usdToXafRate           : [600, [Validators.required, Validators.min(0)]],
+        platformFeePerNumber   : [5000, [Validators.required, Validators.min(0)]],
+        techProviderFee        : [0, [Validators.required, Validators.min(0)]],
         metaMarketingUsd       : [0, [Validators.required, Validators.min(0)]],
         metaUtilityUsd         : [0, [Validators.required, Validators.min(0)]],
         metaAuthenticationUsd  : [0, [Validators.required, Validators.min(0)]],
@@ -169,11 +189,15 @@ export class FinanceSettingsComponent implements OnInit
         vatRate                : [0, [Validators.min(0), Validators.max(100)]],
     });
 
+    /** Mode Meta lu depuis l'API publique (affichage seulement). */
+    metaModeLabel = '...';
+
     constructor(
         private _api: FinanceApiService,
         private _fb: FormBuilder,
         private _snack: MatSnackBar,
         private _cdr: ChangeDetectorRef,
+        private _http: HttpClient,
     ) {}
 
     get tiers(): FormArray
@@ -215,6 +239,16 @@ export class FinanceSettingsComponent implements OnInit
 
     ngOnInit(): void
     {
+        this._http.get<any>(`${environment.apiUrl}/billing/pricing`).subscribe({
+            next : (response) => {
+                this.metaModeLabel = response?.data?.mode ?? 'inconnu';
+                this._cdr.markForCheck();
+            },
+            error: () => {
+                this.metaModeLabel = 'inconnu';
+                this._cdr.markForCheck();
+            },
+        });
         this._api.settings().subscribe((settings) => {
             this.tiers.clear();
             (settings.tiers || []).forEach((tier) => this.addTier(tier.minRecipients, tier.discountPercent));

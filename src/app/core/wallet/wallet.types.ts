@@ -24,6 +24,10 @@ export interface WalletSummary {
     canTopup?: boolean;
     /** Tarifs WhatsApp Business par categorie (organisations). */
     cloudPrices?: Record<string, number> | null;
+    /** Mode Meta de la plateforme. */
+    metaMode?: 'tech_provider' | 'solution_partner';
+    /** Abonnement mensuel par numero (tech_provider, organisations). */
+    platformFeePerNumber?: number | null;
     /** Membre d'organisation : son solde personnel (recharge avant l'adhesion). */
     personalWallet?: { available: number; reserved: number } | null;
 }

@@ -6,7 +6,9 @@ import {
     ViewEncapsulation
 } from '@angular/core';
 import { ViewportScroller } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Meta, Title } from '@angular/platform-browser';
+import { environment } from 'environments/environment';
 
 /** Hauteur de la barre de navigation fixe (h-20) plus une marge. */
 const NAVBAR_OFFSET_PX = 88;
@@ -17,6 +19,18 @@ interface FaqItem
     answer: string;
 }
 
+/** Mode Meta de la plateforme (renvoye par GET /billing/pricing). */
+export type LandingPricingMode = 'tech_provider' | 'solution_partner';
+
+/** Tarifs publics renvoyes par l'API. */
+interface PublicPricing
+{
+    mode: LandingPricingMode;
+    techProvider: { platformFeePerNumber: number };
+}
+
+const PRICE_QUESTION = 'Quel est le prix des offres ?';
+
 @Component({
     selector     : 'landing-home',
     templateUrl  : './home.component.html',
@@ -26,6 +40,13 @@ interface FaqItem
 export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
 {
     openFaq = 0;
+
+    /**
+     * Par defaut, la grille par message (solution_partner) reste affichee : c'est
+     * le comportement historique, et il n'y a pas de regression si l'API ne repond pas.
+     */
+    pricingMode: LandingPricingMode = 'solution_partner';
+    platformFeePerNumber: number | null = null;
 
     readonly faqItems: FaqItem[] = [
         {
@@ -66,9 +87,32 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
     constructor(
         private _title: Title,
         private _meta: Meta,
-        private _viewportScroller: ViewportScroller
+        private _viewportScroller: ViewportScroller,
+        private _http: HttpClient
     )
     {
+    }
+
+    /** Vrai en mode Tech Provider : abonnement par numero (tarifs publics de l'API). */
+    get isTechProvider(): boolean
+    {
+        return this.pricingMode === 'tech_provider' && this.platformFeePerNumber !== null;
+    }
+
+    /** Montant formate en FCFA, separateur de milliers espace (ex. 5 000). */
+    get platformFeeLabel(): string
+    {
+        return this.formatFcfa(this.platformFeePerNumber ?? 0);
+    }
+
+    /** Reponse FAQ sur les prix, selon le mode Meta courant. */
+    answerOf(item: FaqItem): string
+    {
+        if ( item.question !== PRICE_QUESTION || !this.isTechProvider )
+        {
+            return item.answer;
+        }
+        return `NufiSend fonctionne par abonnement mensuel : ${this.platformFeeLabel} FCFA par numéro WhatsApp raccordé, prélevés sur votre portefeuille NufiSend. Vos messages ne sont pas facturés par NufiSend. Les frais de messagerie WhatsApp sont payés directement à Meta, au tarif officiel de Meta. La connexion par QR code de votre WhatsApp personnel reste disponible, facturée 10 FCFA par message livré, sans abonnement.`;
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -77,6 +121,7 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
 
     ngOnInit(): void
     {
+        this.loadPricing();
         // Liens internes (#features...) : la section n'est pas masquee par la barre fixe.
         this._viewportScroller.setOffset([0, NAVBAR_OFFSET_PX]);
         this._title.setTitle('NufiSend \u2014 Communication WhatsApp simplifi\u00e9e');
@@ -88,32 +133,44 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
 
     ngAfterViewInit(): void
     {
+        if ( 'IntersectionObserver' in window )
+        {
+            this.revealObserver = new IntersectionObserver((entries) =>
+            {
+                entries.forEach((entry) =>
+                {
+                    if ( !entry.isIntersecting )
+                    {
+                        return;
+                    }
+
+                    entry.target.classList.add('is-visible');
+                    this.revealObserver?.unobserve(entry.target);
+                });
+            }, {
+                threshold : 0.12,
+                rootMargin: '0px 0px -48px 0px'
+            });
+        }
+
+        this.observeRevealElements();
+    }
+
+    /**
+     * Observe les elements `data-reveal` presents dans le DOM. Appele aussi apres
+     * le chargement des tarifs, car le bloc de pricing est rendu de facon asynchrone.
+     */
+    private observeRevealElements(): void
+    {
         const elements = Array.from(
-            document.querySelectorAll<HTMLElement>('.nufisend-landing [data-reveal]')
+            document.querySelectorAll<HTMLElement>('.nufisend-landing [data-reveal]:not(.is-visible)')
         );
 
-        if ( !('IntersectionObserver' in window) )
+        if ( !this.revealObserver )
         {
             elements.forEach((element) => element.classList.add('is-visible'));
             return;
         }
-
-        this.revealObserver = new IntersectionObserver((entries) =>
-        {
-            entries.forEach((entry) =>
-            {
-                if ( !entry.isIntersecting )
-                {
-                    return;
-                }
-
-                entry.target.classList.add('is-visible');
-                this.revealObserver?.unobserve(entry.target);
-            });
-        }, {
-            threshold : 0.12,
-            rootMargin: '0px 0px -48px 0px'
-        });
 
         elements.forEach((element) => this.revealObserver?.observe(element));
     }
@@ -131,5 +188,35 @@ export class LandingHomeComponent implements OnInit, AfterViewInit, OnDestroy
     toggleFaq(index: number): void
     {
         this.openFaq = this.openFaq === index ? -1 : index;
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Private methods
+    // -----------------------------------------------------------------------------------------------------
+
+    /** Charge le mode et les tarifs publics. En cas d'echec, la grille historique reste affichee. */
+    private loadPricing(): void
+    {
+        this._http.get<{ data: PublicPricing }>(`${environment.apiUrl}/billing/pricing`).subscribe({
+            next : (response) =>
+            {
+                const data = response?.data;
+                if ( !data )
+                {
+                    return;
+                }
+                this.pricingMode = data.mode === 'tech_provider' ? 'tech_provider' : 'solution_partner';
+                this.platformFeePerNumber = Number(data.techProvider?.platformFeePerNumber ?? 0);
+                // Le bloc rendu apres ce cycle doit etre observe pour s'afficher au defilement.
+                setTimeout(() => this.observeRevealElements());
+            },
+            error: () => undefined
+        });
+    }
+
+    /** Milliers separes par une espace (5000 -> "5 000"). */
+    private formatFcfa(value: number): string
+    {
+        return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     }
 }

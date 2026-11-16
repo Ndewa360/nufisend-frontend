@@ -60,6 +60,14 @@
                 <div class="mt-1 text-sm text-secondary">Utilisés avant votre solde</div>
             </div>
             <div *ngIf="isOrganization" class="bg-card rounded-2xl shadow p-6 xl:col-span-2">
+                <ng-container *ngIf="summary.metaMode === 'tech_provider'; else cloudPricesBlock">
+                    <div class="text-secondary font-medium">Abonnement WhatsApp</div>
+                    <div class="mt-2 text-sm text-secondary">
+                        Montant mensuel par numéro raccordé, prélevé sur ce portefeuille. Les messages sont facturés directement par Meta, au tarif officiel de Meta.
+                    </div>
+                    <div class="mt-2 flex justify-between"><span>Par numéro et par mois</span><span class="font-semibold">{{ (summary.platformFeePerNumber || 0) | xaf }}</span></div>
+                </ng-container>
+                <ng-template #cloudPricesBlock>
                 <div class="text-secondary font-medium">Tarif par message livré (WhatsApp Business)</div>
                 <div class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1">
                     <div class="flex justify-between"><span>Marketing</span><span class="font-semibold">{{ (summary.cloudPrices?.marketing || 0) | xaf }}</span></div>
@@ -67,6 +75,7 @@
                     <div class="flex justify-between"><span>Authentification</span><span class="font-semibold">{{ (summary.cloudPrices?.authentication || 0) | xaf }}</span></div>
                     <div class="flex justify-between"><span>Réponse (24 h)</span><span class="font-semibold">{{ (summary.cloudPrices?.service || 0) | xaf }}</span></div>
                 </div>
+                </ng-template>
             </div>
             <div *ngIf="!isOrganization" class="bg-card rounded-2xl shadow p-6">
                 <div class="text-secondary font-medium">Tarif par destinataire <span *ngIf="summary.prices.custom" class="text-primary">(négocié)</span></div>
