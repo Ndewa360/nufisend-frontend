@@ -25,6 +25,47 @@
             Seuls le propriétaire et les administrateurs de l'organisation peuvent recharger ce portefeuille.
         </fuse-alert>
 
+        <!-- Abonnement WhatsApp impayé : envois bloqués -->
+        <div *ngIf="isOrganization && summary?.platformFee?.unpaid" class="mt-6 rounded-2xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-5">
+            <div class="font-semibold text-red-800 dark:text-red-300">Abonnement WhatsApp impayé : les envois sont bloqués</div>
+            <div class="text-sm text-secondary mt-1">
+                Montant dû : <span class="font-semibold">{{ summary.platformFee.unpaidAmount | xaf }}</span>
+                pour {{ summary.platformFee.unpaidPeriod }}.
+                Rechargez le portefeuille de l'organisation, puis vérifiez le paiement. Si vous avez déjà payé, déclarez-le :
+                les envois reprennent jusqu'à la validation par NufiSend.
+            </div>
+            <div *ngIf="canTopup" class="flex flex-wrap gap-3 mt-4">
+                <button mat-flat-button color="primary" type="button" [disabled]="checkingFee" (click)="retryPlatformFee()">
+                    <mat-progress-spinner *ngIf="checkingFee; else checkLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                    <ng-template #checkLabel>Vérifier maintenant</ng-template>
+                </button>
+                <button mat-stroked-button color="primary" type="button" (click)="declareOpen = !declareOpen">J'ai déjà payé</button>
+            </div>
+            <form *ngIf="canTopup && declareOpen" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" (ngSubmit)="submitDeclaration()">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Référence du paiement</mat-label>
+                    <input matInput name="reference" required minlength="3" maxlength="100" [(ngModel)]="declareForm.reference" placeholder="ex. MTN-20261116-004512">
+                </mat-form-field>
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Précision (facultatif)</mat-label>
+                    <input matInput name="note" maxlength="500" [(ngModel)]="declareForm.note" placeholder="ex. virement bancaire">
+                </mat-form-field>
+                <div class="md:col-span-2 flex gap-3">
+                    <button mat-flat-button color="primary" type="submit" [disabled]="declaring || declareForm.reference.trim().length < 3">
+                        <mat-progress-spinner *ngIf="declaring; else declareLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                        <ng-template #declareLabel>Déclarer le paiement</ng-template>
+                    </button>
+                    <button mat-button type="button" (click)="declareOpen = false">Annuler</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Declaration en attente de validation -->
+        <fuse-alert *ngIf="isOrganization && summary?.platformFee?.pendingClaim" class="mt-6" type="info" appearance="border">
+            Paiement déclaré (référence {{ summary.platformFee.pendingClaim.reference }}, {{ summary.platformFee.pendingClaim.period }}).
+            Les envois sont autorisés pendant la vérification par NufiSend.
+        </fuse-alert>
+
         <!-- Solde personnel d'un membre (recharge faite avant l'adhesion) -->
         <div *ngIf="hasPersonalBalance" class="mt-6 rounded-2xl border border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800 p-5 flex flex-col md:flex-row md:items-center gap-4">
             <div class="flex-auto">

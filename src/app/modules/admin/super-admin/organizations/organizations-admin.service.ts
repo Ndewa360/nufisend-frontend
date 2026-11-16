@@ -82,6 +82,22 @@ export class OrganizationsAdminService
         return this._http.patch<ApiResponse<AdminOrganizationDetails>>(`${this._baseUrl}/${id}`, input).pipe(map((res) => res.data));
     }
 
+    /** Enregistre directement qu'un paiement de l'abonnement a ete recu. */
+    recordPlatformFeePayment(id: string, input: { reference: string; note?: string; period?: string }): Observable<unknown>
+    {
+        return this._http
+            .post<ApiResponse<unknown>>(`${this._baseUrl}/${id}/platform-fee/payments`, input)
+            .pipe(map((res) => res.data));
+    }
+
+    /** Valide ou rejette une declaration de paiement de l'abonnement WhatsApp. */
+    decidePlatformFeeClaim(id: string, claimId: string, decision: 'verified' | 'rejected'): Observable<unknown>
+    {
+        return this._http
+            .post<ApiResponse<unknown>>(`${this._baseUrl}/${id}/platform-fee/claims/${claimId}`, { decision })
+            .pipe(map((res) => res.data));
+    }
+
     whatsapp(id: string): Observable<OrganizationWhatsapp>
     {
         return this._http.get<ApiResponse<OrganizationWhatsapp>>(`${this._baseUrl}/${id}/whatsapp`).pipe(map((res) => res.data));

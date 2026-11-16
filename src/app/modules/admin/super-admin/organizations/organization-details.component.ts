@@ -2,7 +2,13 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { ActivatedRoute } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { readApiError } from 'app/core/organization/organization.service';
-import { ORG_ROLE_LABELS, OrganizationWhatsapp, PLAN_LABELS } from 'app/core/organization/organization.types';
+import {
+    ORG_ROLE_LABELS,
+    OrganizationPlatformFee,
+    OrganizationWhatsapp,
+    PLAN_LABELS,
+    PlatformFeeClaim,
+} from 'app/core/organization/organization.types';
 import { ToastrService } from 'ngx-toastr';
 import { AdminOrganizationDetails, OrganizationsAdminService } from './organizations-admin.service';
 
@@ -36,6 +42,65 @@ import { AdminOrganizationDetails, OrganizationsAdminService } from './organizat
                     Offre {{ planLabels[d.organization.plan] || d.organization.plan }} ·
                     {{ d.maxMembers > 0 ? (d.maxMembers + ' membres max') : 'membres illimités' }} ·
                     facturation des campagnes au volume
+                </div>
+
+                <!-- Abonnement WhatsApp : declarations de paiement -->
+                <div *ngIf="d.organization.platformFee as fee" class="bg-card rounded-2xl shadow p-6 mt-6">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="text-lg font-semibold">Abonnement WhatsApp</div>
+                        <button *ngIf="!paymentOpen" mat-stroked-button color="primary" type="button" (click)="openPayment(fee)">
+                            Enregistrer un paiement
+                        </button>
+                    </div>
+                    <div class="text-sm mt-2" [ngClass]="fee.unpaidSince ? 'text-red-700 dark:text-red-400' : 'text-secondary'">
+                        <ng-container *ngIf="fee.unpaidSince; else paidBlock">
+                            Impayé : {{ fee.unpaidAmount | number:'1.0-0':'fr-FR' }} FCFA dus pour {{ fee.unpaidPeriod }}. Envois bloqués.
+                        </ng-container>
+                        <ng-template #paidBlock>Dernier mois réglé : {{ fee.period || 'aucun' }}</ng-template>
+                    </div>
+                    <form *ngIf="paymentOpen" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 border rounded-xl p-4" (ngSubmit)="submitPayment()">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>Mois réglé (AAAA-MM)</mat-label>
+                            <input matInput name="period" required pattern="\d{4}-\d{2}" [(ngModel)]="payment.period">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>Référence du paiement</mat-label>
+                            <input matInput name="reference" required minlength="3" maxlength="100" [(ngModel)]="payment.reference">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>Précision (facultatif)</mat-label>
+                            <input matInput name="note" maxlength="500" [(ngModel)]="payment.note">
+                        </mat-form-field>
+                        <div class="md:col-span-3 text-xs text-secondary">
+                            Le mois doit être le mois impayé ({{ fee.unpaidPeriod || 'aucun actuellement' }}) ou le mois en cours. Le paiement est enregistré comme validé.
+                        </div>
+                        <div class="md:col-span-3 flex gap-3">
+                            <button mat-flat-button color="primary" type="submit" [disabled]="recording || payment.reference.trim().length < 3 || !payment.period">
+                                <mat-progress-spinner *ngIf="recording; else recordLabel" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+                                <ng-template #recordLabel>Enregistrer</ng-template>
+                            </button>
+                            <button mat-button type="button" (click)="paymentOpen = false">Annuler</button>
+                        </div>
+                    </form>
+                    <div *ngIf="!(fee.claims?.length)" class="text-sm text-secondary mt-4">Aucune déclaration de paiement.</div>
+                    <div *ngFor="let claim of claimsOf(fee)" class="flex flex-wrap items-center gap-3 mt-4 border rounded-xl p-4">
+                        <div class="flex-auto min-w-0">
+                            <div class="font-semibold">
+                                Référence {{ claim.reference }} · {{ claim.period }}
+                                <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+                                      [ngClass]="claim.status === 'pending' ? 'bg-amber-100 text-amber-800' : claim.status === 'verified' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                                    {{ claim.status === 'pending' ? 'En attente' : claim.status === 'verified' ? 'Validé' : 'Rejeté' }}
+                                </span>
+                            </div>
+                            <div class="text-sm text-secondary">
+                                Déclaré le {{ claim.declaredAt | date:'dd/MM/yyyy HH:mm' }}<span *ngIf="claim.note"> · {{ claim.note }}</span>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="claim.status === 'pending'">
+                            <button mat-stroked-button color="warn" type="button" (click)="decideClaim(claim, 'rejected')">Rejeter</button>
+                            <button mat-flat-button color="primary" type="button" (click)="decideClaim(claim, 'verified')">Valider</button>
+                        </ng-container>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
@@ -185,6 +250,71 @@ export class OrganizationDetailsComponent implements OnInit
         const c = this.connection;
         return /^\d{5,25}$/.test(c.wabaId.trim()) && /^\d{5,25}$/.test(c.phoneNumberId.trim())
             && c.accessToken.trim().length >= 20 && (!c.register || /^\d{6}$/.test(c.pin.trim()));
+    }
+
+    paymentOpen = false;
+    recording = false;
+    payment = { reference: '', note: '', period: '' };
+
+    /** Ouvre le formulaire, pre-rempli avec le mois a regler. */
+    openPayment(fee: OrganizationPlatformFee): void
+    {
+        const now = new Date();
+        const current = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        this.payment = { reference: '', note: '', period: fee.unpaidSince && fee.unpaidPeriod ? fee.unpaidPeriod : current };
+        this.paymentOpen = true;
+    }
+
+    submitPayment(): void
+    {
+        const reference = this.payment.reference.trim();
+        if (reference.length < 3 || !this.payment.period) return;
+        this.recording = true;
+        this._cdr.markForCheck();
+        this._admin.recordPlatformFeePayment(this.id, {
+            reference,
+            note  : this.payment.note.trim() || undefined,
+            period: this.payment.period,
+        }).subscribe({
+            next : () => {
+                this.recording = false;
+                this.paymentOpen = false;
+                this._toastr.success('Paiement enregistré', 'Abonnement WhatsApp');
+                this.load();
+            },
+            error: (error) => {
+                this.recording = false;
+                this._toastr.error(readApiError(error), 'Abonnement WhatsApp');
+                this._cdr.markForCheck();
+            },
+        });
+    }
+
+    /** Declarations les plus recentes d'abord. */
+    claimsOf(fee: OrganizationPlatformFee): PlatformFeeClaim[]
+    {
+        return [...(fee.claims || [])].sort((a, b) => (b.declaredAt || '').localeCompare(a.declaredAt || ''));
+    }
+
+    decideClaim(claim: PlatformFeeClaim, decision: 'verified' | 'rejected'): void
+    {
+        const verified = decision === 'verified';
+        this._confirmation.open({
+            title  : verified ? 'Valider le paiement' : 'Rejeter la déclaration',
+            message: verified
+                ? `Confirmez que le paiement ${claim.reference} a bien été reçu. Les envois restent autorisés pour ${claim.period}.`
+                : `Le paiement ${claim.reference} n'a pas été retrouvé. L'abonnement redevient dû et sera prélevé sur le portefeuille.`,
+            actions: { confirm: { label: verified ? 'Valider' : 'Rejeter', color: verified ? 'primary' : 'warn' }, cancel: { label: 'Annuler' } },
+        }).afterClosed().subscribe((result) => {
+            if (result !== 'confirmed') return;
+            this._admin.decidePlatformFeeClaim(this.id, claim._id, decision).subscribe({
+                next : () => {
+                    this._toastr.success(verified ? 'Paiement validé' : 'Déclaration rejetée', 'Abonnement WhatsApp');
+                    this.load();
+                },
+                error: (error) => this._toastr.error(readApiError(error), 'Abonnement WhatsApp'),
+            });
+        });
     }
 
     load(): void

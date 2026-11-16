@@ -42,6 +42,11 @@ export class WalletComponent implements OnInit, OnDestroy
     reservations: WalletHold[] = [];
     transferring = false;
 
+    checkingFee = false;
+    declareOpen = false;
+    declaring = false;
+    declareForm = { reference: '', note: '' };
+
     readonly pageSize = 15;
     private readonly _destroy$ = new Subject<void>();
 
@@ -190,6 +195,62 @@ export class WalletComponent implements OnInit, OnDestroy
                 },
             });
         });
+    }
+
+    /** Relance le prelevement de l'abonnement WhatsApp (verification immediate). */
+    retryPlatformFee(): void
+    {
+        this.checkingFee = true;
+        this._cdr.markForCheck();
+        this._walletService.retryPlatformFee().subscribe({
+            next : (res) => {
+                this.checkingFee = false;
+                const messages: Record<string, string> = {
+                    charged: 'Abonnement prélevé : les envois sont rétablis.',
+                    paid   : 'Abonnement déjà réglé pour ce mois.',
+                    free   : 'Abonnement gratuit : les envois sont rétablis.',
+                    unpaid : 'Solde insuffisant : rechargez le portefeuille puis réessayez.',
+                    skipped: "Aucun abonnement à prélever (numéro non raccordé ou mode sans abonnement).",
+                };
+                const type = res?.outcome === 'unpaid' || res?.outcome === 'skipped' ? 'warning' : 'success';
+                this._toastr[type](messages[res?.outcome] || 'Vérification effectuée', 'Abonnement WhatsApp');
+                this.reloadAll();
+            },
+            error: (err) => {
+                this.checkingFee = false;
+                this._toastr.error(this.errorMessage(err, 'Vérification impossible'), 'Abonnement WhatsApp');
+                this._cdr.markForCheck();
+            },
+        });
+    }
+
+    /** Declaration « deja paye » : debloque les envois en attente de validation par NufiSend. */
+    submitDeclaration(): void
+    {
+        const reference = this.declareForm.reference.trim();
+        if (reference.length < 3) return;
+        this.declaring = true;
+        this._cdr.markForCheck();
+        this._walletService.declarePlatformFeePayment(reference, this.declareForm.note.trim()).subscribe({
+            next : () => {
+                this.declaring = false;
+                this.declareOpen = false;
+                this.declareForm = { reference: '', note: '' };
+                this._toastr.success('Paiement déclaré. Les envois reprennent en attendant la validation de NufiSend.', 'Abonnement WhatsApp');
+                this.reloadAll();
+            },
+            error: (err) => {
+                this.declaring = false;
+                this._toastr.error(this.errorMessage(err, 'Déclaration impossible'), 'Abonnement WhatsApp');
+                this._cdr.markForCheck();
+            },
+        });
+    }
+
+    private errorMessage(err: any, fallback: string): string
+    {
+        const message = err?.error?.message;
+        return Array.isArray(message) ? message.join(' ') : message || fallback;
     }
 
     get canTopup(): boolean

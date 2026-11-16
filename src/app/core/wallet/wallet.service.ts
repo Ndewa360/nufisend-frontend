@@ -55,6 +55,22 @@ export class WalletService
         );
     }
 
+    /** Relance le prelevement de l'abonnement WhatsApp de l'organisation. */
+    retryPlatformFee(): Observable<{ outcome: string; status: unknown }>
+    {
+        return this._http
+            .post<ApiResponse<{ outcome: string; status: unknown }>>(`${environment.apiUrl}/organizations/me/platform-fee/retry`, {})
+            .pipe(map((res) => res.data));
+    }
+
+    /** Declare que l'abonnement a deja ete paye (en attente de validation). */
+    declarePlatformFeePayment(reference: string, note?: string): Observable<unknown>
+    {
+        return this._http
+            .post<ApiResponse<unknown>>(`${environment.apiUrl}/organizations/me/platform-fee/declare-payment`, { reference, note: note || undefined })
+            .pipe(map((res) => res.data));
+    }
+
     transactions(page = 1, limit = 20, type?: string): Observable<Paginated<LedgerEntry>>
     {
         let params = new HttpParams().set('page', page).set('limit', limit);

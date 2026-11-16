@@ -33,7 +33,31 @@ export interface Organization
     maxMembers?: number | null;
     suspensionReason?: string;
     whatsapp?: OrganizationWhatsapp;
+    platformFee?: OrganizationPlatformFee;
     createdAt?: string;
+}
+
+/** Declaration « deja paye » d'un responsable, validee ou non par NufiSend. */
+export interface PlatformFeeClaim
+{
+    _id: string;
+    period: string;
+    reference: string;
+    note: string;
+    declaredAt: string;
+    status: 'pending' | 'verified' | 'rejected';
+    decidedAt?: string | null;
+}
+
+/** Abonnement WhatsApp par numero (mode tech_provider). */
+export interface OrganizationPlatformFee
+{
+    period: string | null;
+    unpaidSince: string | null;
+    unpaidAmount: number;
+    unpaidPeriod: string | null;
+    lastError: string | null;
+    claims: PlatformFeeClaim[];
 }
 
 /** Organisation de l'utilisateur connecte et son role. */

@@ -30,6 +30,20 @@ export interface WalletSummary {
     platformFeePerNumber?: number | null;
     /** Membre d'organisation : son solde personnel (recharge avant l'adhesion). */
     personalWallet?: { available: number; reserved: number } | null;
+    /** Abonnement par numero de l'organisation (tech_provider). */
+    platformFee?: WalletPlatformFee | null;
+}
+
+export interface WalletPlatformFee
+{
+    period: string;
+    amount: number;
+    paid: boolean;
+    unpaid: boolean;
+    unpaidPeriod: string | null;
+    unpaidAmount: number;
+    unpaidSince: string | null;
+    pendingClaim: { reference: string; period: string; declaredAt: string } | null;
 }
 
 export interface LedgerEntry {
