@@ -14,10 +14,11 @@ import { Conversation, InboxMessage, Membership } from 'app/core/organization/or
 import { TemplateSelection } from 'app/shared/components/cloud-template-picker/cloud-template-picker.component';
 import { Socket } from 'ngx-socket-io';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, debounceTime, takeUntil } from 'rxjs';
+import { Subject, debounceTime, interval, takeUntil } from 'rxjs';
 
 const STATUS_ICONS: Record<string, string> = {
     pending  : 'heroicons_outline:clock',
+    queued   : 'heroicons_outline:clock',
     sent     : 'heroicons_outline:check',
     delivered: 'heroicons_outline:check-circle',
     read     : 'heroicons_solid:check-circle',
@@ -81,6 +82,8 @@ export class InboxComponent implements OnInit, OnDestroy
             this._cdr.markForCheck();
         });
         this._search$.pipe(debounceTime(300), takeUntil(this._unsubscribeAll)).subscribe(() => this.loadConversations());
+        // Filet de securite : statuts d'envoi suivis meme si le temps reel est coupe.
+        interval(10_000).pipe(takeUntil(this._unsubscribeAll)).subscribe(() => this._syncPendingStatuses());
         const socket = this._socket.ioSocket as any;
         socket?.on('inbox-message', this._onMessage);
         socket?.on('inbox-status', this._onStatus);
@@ -222,8 +225,9 @@ export class InboxComponent implements OnInit, OnDestroy
             next : () => {
                 this.sending = false;
                 this.replyText = '';
-                // Le message apparait des que le worker l'a envoye (evenement temps reel).
-                this._toastr.info('Réponse en cours d’envoi', 'Boîte de réception', { timeOut: 2000 });
+                // La reponse est enregistree (en attente) : son statut suit en direct (en attente, envoye, livre, lu, echec).
+                this._toastr.info('Réponse enregistrée, envoi en cours', 'Boîte de réception', { timeOut: 2000 });
+                this._refreshThread(conversationId);
                 this._cdr.markForCheck();
             },
             error: (error) => {
@@ -265,13 +269,15 @@ export class InboxComponent implements OnInit, OnDestroy
     {
         const conversation: Conversation = event?.conversation;
         if (!conversation?._id) return;
+        // Seul un message du client ouvre la fenetre de 24 h et rend la conversation non lue.
+        const incoming = event?.message?.direction === 'in';
         const index = this.conversations.findIndex((c) => c._id === conversation._id);
         const previous = index >= 0 ? this.conversations[index] : null;
         const merged: Conversation = {
             ...(previous || {}),
             ...conversation,
             contact  : previous?.contact ?? conversation.contact ?? null,
-            windowOpen: true,
+            windowOpen: incoming ? true : (previous?.windowOpen ?? conversation.windowOpen ?? false),
         };
         if (index >= 0) this.conversations.splice(index, 1);
         else {
@@ -286,7 +292,7 @@ export class InboxComponent implements OnInit, OnDestroy
                 this.messages = [...this.messages, event.message];
                 this._scrollToBottom();
             }
-            this._markRead();
+            if (incoming) this._markRead();
         }
         this._cdr.markForCheck();
     }
@@ -295,8 +301,11 @@ export class InboxComponent implements OnInit, OnDestroy
     {
         if (this.active?._id !== event?.conversationId) return;
         const message = this.messages.find((m) => m._id === event.messageId);
+        if (event.status === 'failed')
+            this._toastr.error(event.error || 'Le message n’a pas pu être envoyé', 'Réponse non envoyée', { timeOut: 8000 });
         if (message) {
             message.status = event.status;
+            if (event.error) message.error = event.error;
             this.messages = [...this.messages];
             this._cdr.markForCheck();
             return;
@@ -304,6 +313,38 @@ export class InboxComponent implements OnInit, OnDestroy
         // Message sortant pas encore affiche (reponse envoyee par le worker) : rechargement.
         this._organizationService.conversationMessages(this.active._id).subscribe({
             next : (result) => {
+                this.messages = result.messages;
+                this._cdr.markForCheck();
+                this._scrollToBottom();
+            },
+            error: () => undefined,
+        });
+    }
+
+    /** Met a jour les statuts des messages en attente ou envoyes (sans faire defiler le fil). */
+    private _syncPendingStatuses(): void
+    {
+        const active = this.active;
+        const pending = this.messages.some((m) => m.direction === 'out' && (m.status === 'queued' || m.status === 'sent'));
+        if (!active || !pending) return;
+        this._organizationService.conversationMessages(active._id).subscribe({
+            next : (result) => {
+                if (this.active?._id !== active._id) return;
+                const grew = result.messages.length > this.messages.length;
+                this.messages = result.messages;
+                if (grew) this._scrollToBottom();
+                this._cdr.markForCheck();
+            },
+            error: () => undefined,
+        });
+    }
+
+    /** Recharge le fil de la conversation (apres une reponse). */
+    private _refreshThread(conversationId: string): void
+    {
+        this._organizationService.conversationMessages(conversationId).subscribe({
+            next : (result) => {
+                if (this.active?._id !== conversationId) return;
                 this.messages = result.messages;
                 this._cdr.markForCheck();
                 this._scrollToBottom();

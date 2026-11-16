@@ -114,6 +114,9 @@
                                               [svgIcon]="statusIcons[message.status] || statusIcons.sent"
                                               [matTooltip]="message.error || message.status"></mat-icon>
                                 </div>
+                                <div *ngIf="message.direction === 'out' && message.status === 'failed'" class="mt-1 text-xs text-red-600">
+                                    Non envoyé : {{ message.error || 'erreur inconnue' }}
+                                </div>
                             </div>
                         </div>
                     </div>
