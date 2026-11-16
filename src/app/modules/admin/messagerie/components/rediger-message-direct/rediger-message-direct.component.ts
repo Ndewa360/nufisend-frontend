@@ -12,7 +12,6 @@ export interface ComposedMessage {
   messageTemplate: MessageTemplateModel | null;
   message: string | null;
   files: File[];
-  title: string;
   /** Combinaison refusée par le canal (ex. texte + audio en Cloud). Bloque l'envoi. */
   error?: string;
 }
@@ -67,7 +66,6 @@ export class RedigerMessageDirectComponent implements OnInit, AfterViewInit, OnD
     this.composeForm = this._formBuilder.group({
       templateSearch: [''],
       body: [''],
-      title: ['', [Validators.required]],
     });
 
     this._store.dispatch(new MessageTemplateAction.FetchAllMessageTemplate());
@@ -77,10 +75,6 @@ export class RedigerMessageDirectComponent implements OnInit, AfterViewInit, OnD
         this.messageTemplateAll = [...(list || [])];
         this._applyTemplateFilter(this.composeForm.controls.templateSearch.value);
       });
-
-    this.composeForm.controls.title.valueChanges
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe(() => this._emit());
 
     // Le corps est un champ d'edition : chaque modification est transmise (pas seulement au blur).
     this.composeForm.controls.body.valueChanges
@@ -167,7 +161,6 @@ export class RedigerMessageDirectComponent implements OnInit, AfterViewInit, OnD
       messageTemplate: null,
       message: text ? this.composeForm.controls.body.value : null,
       files: [...this.selectedFiles],
-      title: (this.composeForm.controls.title.value || '').trim(),
       error: error || undefined,
     });
     this._changeDetectorRef.markForCheck();

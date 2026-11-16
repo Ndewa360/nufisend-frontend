@@ -10,7 +10,6 @@ export interface SendTarget {
 }
 
 export interface SendComposition {
-    title: string;
     /** Corps rédigé (HTML de l'éditeur), null si vide. */
     message: string | null;
     files: File[];
@@ -55,12 +54,10 @@ export function buildSendPayload(input: SendInput): SendBuildResult
 {
     const { channel, isSentToNow, target, composition } = input;
     const isCloud = channel === 'cloud';
-    const title = (composition.title || '').trim();
     const text = htmlToWhatsappText(composition.message);
     const files = composition.files || [];
     const hasTemplate = isCloud && !!input.cloudTemplate;
 
-    if (!title) return fail('error', 'Validation', 'Le titre du message est requis.');
     if (target.contactIds.length === 0 && target.groupIds.length === 0) {
         return fail('error', 'Validation', 'Sélectionnez au moins un destinataire.');
     }
@@ -101,7 +98,6 @@ export function buildSendPayload(input: SendInput): SendBuildResult
         isSentToNow,
         contactsID: [...target.contactIds],
         groupsID: [...target.groupIds],
-        title,
     };
 
     if (!isSentToNow) payload.planification = input.planification as MessageModel['planification'];

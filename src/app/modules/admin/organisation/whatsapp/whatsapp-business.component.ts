@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { OrganizationService, readApiError } from 'app/core/organization/organization.service';
 import {
     Membership,
     OrganizationWhatsapp,
     TEMPLATE_CATEGORY_LABELS,
+    TEMPLATE_STATUS,
     WhatsappConnectionMode,
     WhatsappTemplate,
     templateBody,
@@ -18,15 +20,6 @@ declare global
     interface Window { FB?: any; fbAsyncInit?: () => void }
 }
 
-const TEMPLATE_STATUS: Record<string, { label: string; tone: string }> = {
-    APPROVED : { label: 'Approuvé', tone: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' },
-    PENDING  : { label: 'En revue chez Meta', tone: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200' },
-    REJECTED : { label: 'Refusé', tone: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' },
-    PAUSED   : { label: 'En pause', tone: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' },
-    DISABLED : { label: 'Désactivé', tone: 'bg-gray-200 text-gray-700' },
-    IN_APPEAL: { label: 'En appel', tone: 'bg-blue-100 text-blue-800' },
-    DELETED  : { label: 'Supprimé', tone: 'bg-gray-200 text-gray-700' },
-};
 
 interface ButtonDraft
 {
@@ -96,6 +89,9 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
     private _unsubscribeAll = new Subject<void>();
     private _pollTimer: ReturnType<typeof setInterval> | null = null;
 
+    /** Modele en cours de modification (null : creation). */
+    editing: WhatsappTemplate | null = null;
+
     constructor(
         private _organizationService: OrganizationService,
         private _confirmation: FuseConfirmationService,
@@ -103,6 +99,8 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         private _zone: NgZone,
         private _cdr: ChangeDetectorRef,
         private _socket: Socket,
+        private _route: ActivatedRoute,
+        private _router: Router,
     )
     {
     }
@@ -118,6 +116,11 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(() => this.refreshTemplates(true));
         this.reload();
+        // Liens depuis « Modèles de message » : ?create=1 ou ?edit=<nom>&language=<langue>.
+        this._route.queryParamMap.pipe(takeUntil(this._unsubscribeAll)).subscribe((params) => {
+            if (params.get('create')) this.openCreate();
+            if (params.get('edit')) this._openEditByName(params.get('edit'), params.get('language'));
+        });
     }
 
     ngOnDestroy(): void
@@ -482,9 +485,62 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
 
     openCreate(): void
     {
+        this.editing = null;
         this.draft = this._emptyDraft();
         this.showCreate = true;
         this.showButtons = false;
+        this._clearQueryParams();
+    }
+
+    /** Ouvre le formulaire pre-rempli avec un modele soumis (structure reconstruite depuis ses composants). */
+    openEdit(template: WhatsappTemplate): void
+    {
+        const components: any[] = template.components || [];
+        const header = components.find((c) => c.type === 'HEADER');
+        const body = components.find((c) => c.type === 'BODY');
+        const footer = components.find((c) => c.type === 'FOOTER');
+        const buttons = components.find((c) => c.type === 'BUTTONS')?.buttons || [];
+        const draft = this._emptyDraft();
+        draft.name = template.name;
+        draft.language = template.language;
+        draft.category = String(template.category || 'MARKETING').toUpperCase();
+        draft.body = body?.text || '';
+        draft.bodyExamples = (body?.example?.body_text?.[0] as string[] | undefined) || [];
+        draft.headerFormat = header?.format ? String(header.format).toUpperCase() : 'NONE';
+        draft.headerText = header?.format === 'TEXT' ? header.text || '' : '';
+        // L'URL du media d'en-tete n'est pas relue chez Meta : a ressaisir si le modele en a un.
+        draft.headerMediaUrl = '';
+        draft.footer = footer?.text || '';
+        draft.buttons = buttons.map((button: any) => ({
+            type       : button.type,
+            text       : button.text || '',
+            url        : button.url || '',
+            urlExample : Array.isArray(button.example) ? button.example[0] || '' : '',
+            phoneNumber: button.phone_number || '',
+        }));
+        this.draft = draft;
+        this.editing = template;
+        this.showCreate = true;
+        this.showButtons = this.draft.buttons.length > 0;
+        this._cdr.markForCheck();
+    }
+
+    private _openEditByName(name: string, language: string | null): void
+    {
+        this._organizationService.templates().subscribe({
+            next : (templates) => {
+                const template = templates.find((t) => t.name === name && (!language || t.language === language));
+                if (template) this.openEdit(template);
+                this._clearQueryParams();
+            },
+            error: () => this._clearQueryParams(),
+        });
+    }
+
+    private _clearQueryParams(): void
+    {
+        if (this._route.snapshot.queryParamMap.keys.length)
+            this._router.navigate([], { relativeTo: this._route, queryParams: {}, replaceUrl: true });
     }
 
     syncExamples(): void
@@ -570,7 +626,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
             ...(button.type === 'PHONE_NUMBER' ? { phoneNumber: button.phoneNumber.trim() } : {}),
         }));
         this.creating = true;
-        this._organizationService.createTemplate({
+        const payload = {
             name          : this.draft.name.trim().toLowerCase(),
             language      : this.draft.language,
             category      : this.draft.category,
@@ -581,11 +637,22 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
             headerMediaUrl: this.draft.headerMediaUrl.trim() || undefined,
             footer        : this.draft.footer.trim() || undefined,
             buttons       : buttons.length ? buttons : undefined,
-        }).subscribe({
+        };
+        const wasEditing = !!this.editing;
+        const request = this.editing
+            ? this._organizationService.updateTemplate(this.editing.name, this.editing.language, payload)
+            : this._organizationService.createTemplate(payload);
+        request.subscribe({
             next : () => {
                 this.creating = false;
                 this.showCreate = false;
-                this._toastr.success('Modèle soumis à Meta : la validation prend de quelques minutes à 24 h. Le statut se met à jour automatiquement.', 'Modèle');
+                this.editing = null;
+                this._toastr.success(
+                    wasEditing
+                        ? 'Modèle modifié : Meta le remet en revue. Le statut se met à jour automatiquement.'
+                        : 'Modèle soumis à Meta : la validation prend de quelques minutes à 24 h. Le statut se met à jour automatiquement.',
+                    'Modèle',
+                );
                 this.refreshTemplates(true);
                 this._cdr.markForCheck();
             },

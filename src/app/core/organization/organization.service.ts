@@ -267,6 +267,18 @@ export class OrganizationService
             .pipe(data<WhatsappTemplate>());
     }
 
+    /** Modification d'un modele soumis : Meta le remet en revue (nom et langue inchanges). */
+    updateTemplate(name: string, language: string, input: Parameters<OrganizationService['createTemplate']>[0]): Observable<unknown>
+    {
+        return this._http
+            .patch<ApiResponse<unknown>>(
+                `${this._baseUrl}/me/whatsapp/templates/${encodeURIComponent(name)}`,
+                input,
+                { params: { language } },
+            )
+            .pipe(data<unknown>());
+    }
+
     deleteTemplate(name: string): Observable<unknown>
     {
         return this._http

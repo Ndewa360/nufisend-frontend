@@ -1,3 +1,5 @@
+<ng-container *ngIf="membershipLoaded">
+<ng-container *ngIf="!isCloud; else cloudTemplates">
 <div class="flex flex-col flex-auto min-w-0">
 
     <mat-drawer-container
@@ -194,3 +196,8 @@
     </mat-drawer-container>
 
 </div>
+</ng-container>
+<ng-template #cloudTemplates>
+    <app-cloud-message-templates></app-cloud-message-templates>
+</ng-template>
+</ng-container>

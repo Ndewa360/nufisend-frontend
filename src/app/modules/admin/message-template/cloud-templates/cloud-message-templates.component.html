@@ -1,0 +1,82 @@
+<div class="flex flex-col flex-auto min-w-0 p-6 md:p-8">
+
+    <!-- En-tete -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4">
+        <div>
+            <div class="text-4xl font-extrabold tracking-tight leading-none">Modèles de message</div>
+            <div class="mt-2 max-w-3xl text-secondary">
+                Ces modèles sont les modèles WhatsApp Business de votre organisation, approuvés par Meta. Ils sont les seuls utilisables hors de la fenêtre de 24 h et dans les campagnes.
+                La création, la modification et la suppression se font depuis Organisation &gt; WhatsApp.
+            </div>
+        </div>
+        <button mat-flat-button color="primary" type="button" (click)="create()">
+            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+            <span class="ml-2">Nouveau modèle</span>
+        </button>
+    </div>
+
+    <!-- Liste -->
+    <div class="mt-8 bg-card rounded-2xl shadow divide-y">
+        <div *ngIf="loading" class="p-8 text-center text-secondary">Chargement des modèles…</div>
+
+        <div *ngIf="!loading && templates.length === 0" class="p-8 text-center text-secondary">
+            Aucun modèle pour le moment. Créez votre premier modèle : Meta l'examine avant qu'il puisse être envoyé.
+        </div>
+
+        <ng-container *ngFor="let template of templates">
+            <div class="flex flex-col md:flex-row md:items-start gap-3 px-6 py-4">
+                <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="font-semibold">{{ template.name }}</span>
+                        <span class="text-sm text-secondary">{{ template.language }}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full"
+                              [ngClass]="statusOf(template).tone">{{ statusOf(template).label }}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                            {{ categoryLabels[(template.category || '').toLowerCase()] || template.category }}
+                        </span>
+                    </div>
+                    <div class="text-sm mt-2 text-secondary line-clamp-2 whitespace-pre-line">{{ bodyOf(template) }}</div>
+                    <div *ngIf="template.status === 'REJECTED' && template.rejectedReason" class="text-sm text-red-600 mt-1">
+                        Motif : {{ template.rejectedReason }}
+                    </div>
+
+                    <!-- Apercu complet -->
+                    <div *ngIf="expanded === keyOf(template)" class="mt-4 rounded-xl bg-gray-50 dark:bg-gray-800 p-4 text-sm space-y-3">
+                        <div *ngIf="headerOf(template)">
+                            <div class="text-xs font-semibold uppercase text-secondary">En-tête</div>
+                            <div>{{ headerOf(template) }}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-semibold uppercase text-secondary">Corps</div>
+                            <div class="whitespace-pre-line">{{ bodyOf(template) }}</div>
+                        </div>
+                        <div *ngIf="footerOf(template)">
+                            <div class="text-xs font-semibold uppercase text-secondary">Pied de page</div>
+                            <div>{{ footerOf(template) }}</div>
+                        </div>
+                        <div *ngIf="buttonsOf(template).length">
+                            <div class="text-xs font-semibold uppercase text-secondary">Boutons</div>
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                <span *ngFor="let button of buttonsOf(template)" class="px-2 py-1 rounded border text-xs">{{ button.text }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0">
+                    <button mat-button type="button" (click)="toggle(template)">
+                        {{ expanded === keyOf(template) ? 'Masquer' : 'Voir' }}
+                    </button>
+                    <button mat-button type="button" (click)="edit(template)"
+                            [disabled]="!canEdit(template)"
+                            [matTooltip]="canEdit(template) ? 'Modifier le modèle' : 'Ce modèle ne peut pas être modifié pour le moment (revue en cours ou désactivé)'">
+                        Modifier
+                    </button>
+                    <button mat-icon-button type="button" matTooltip="Supprimer" (click)="remove(template)">
+                        <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

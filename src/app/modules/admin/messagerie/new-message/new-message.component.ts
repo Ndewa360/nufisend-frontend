@@ -29,7 +29,7 @@ export class NewMessageComponent implements OnInit{
   destinationContacts:ContactModel[] = []
   destinationGroups:GroupModel[]=[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
-  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title?:string,error?:string}={}
+  messageToSend:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],error?:string}={}
   planificationObj:{hasPlanification:boolean, planif:MessagePlanification[]}={hasPlanification:false,planif:[]};
   submitted:boolean=false;
   @Select(MessageState.selectStateLoading) isSendingMessage:Observable<boolean>;
@@ -184,7 +184,7 @@ export class NewMessageComponent implements OnInit{
       this._changeDetectorRef.markForCheck();
     }
 
-    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],title:string,error?:string})
+    setMessage(message:{messageTemplate?:MessageTemplateModel,message?:string,files?:File[],error?:string})
     {
       this.messageToSend=message;
       this.hasAttachment=!!message?.files?.length;
@@ -227,7 +227,6 @@ export class NewMessageComponent implements OnInit{
           groupIds: this.destinationGroups.map((group) => group._id),
         },
         composition: {
-          title: this.messageToSend.title,
           message: this.messageToSend.message ?? null,
           files: this.messageToSend.files || [],
           messageTemplateId: this.messageToSend.messageTemplate?._id ?? null,

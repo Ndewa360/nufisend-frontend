@@ -38,7 +38,7 @@ export interface MessageModel
 {
     type:MessageType;
 
-    title:string;
+    title?:string;
 
     
     contactsID?:string[];

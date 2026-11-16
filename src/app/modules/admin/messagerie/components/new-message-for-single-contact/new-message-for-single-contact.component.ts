@@ -166,7 +166,6 @@ export class NewMessageForSingleContactComponent implements OnInit, OnDestroy {
       isSentToNow: true,
       target: { contactIds: this.destinationContact?._id ? [this.destinationContact._id] : [], groupIds: [] },
       composition: {
-        title: this.messageToSend.title,
         message: this.messageToSend.message ?? null,
         files: this.messageToSend.files || [],
         messageTemplateId: null,

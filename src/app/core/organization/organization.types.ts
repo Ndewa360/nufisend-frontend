@@ -131,6 +131,20 @@ export const TEMPLATE_CATEGORY_LABELS: Record<string, string> = {
     service       : 'Service (réponse)',
 };
 
+/** Libelles et couleurs des statuts d'un modele WhatsApp Business. */
+export const TEMPLATE_STATUS: Record<string, { label: string; tone: string }> = {
+    APPROVED : { label: 'Approuvé', tone: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' },
+    PENDING  : { label: 'En revue chez Meta', tone: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200' },
+    REJECTED : { label: 'Refusé', tone: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' },
+    PAUSED   : { label: 'En pause', tone: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' },
+    DISABLED : { label: 'Désactivé', tone: 'bg-gray-200 text-gray-700' },
+    IN_APPEAL: { label: 'En appel', tone: 'bg-blue-100 text-blue-800' },
+    DELETED  : { label: 'Supprimé', tone: 'bg-gray-200 text-gray-700' },
+};
+
+/** Statuts pour lesquels Meta accepte une modification. */
+export const TEMPLATE_EDITABLE_STATUSES = ['APPROVED', 'REJECTED', 'PAUSED'];
+
 export const templateBody = (template: WhatsappTemplate): string =>
     (template?.components || []).find((c) => c.type === 'BODY')?.text || '';
 

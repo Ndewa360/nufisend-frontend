@@ -11,6 +11,7 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { Select, Store } from '@ngxs/store';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ToastrService } from 'ngx-toastr';
+import { OrganizationService } from 'app/core/organization/organization.service';
 
 @Component({
   selector: 'app-messageTemplate-list',
@@ -35,6 +36,11 @@ export class ListComponent implements OnInit, OnDestroy{
     selectedMessageTemplate: MessageTemplateModel;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    /** Adhesion chargee (evite d'afficher la mauvaise vue pendant le chargement). */
+    membershipLoaded = false;
+    /** Membre d'une organisation : vue des modeles WhatsApp Business. */
+    isCloud = false;
+
     /**
      * Constructor
      */
@@ -47,7 +53,8 @@ export class ListComponent implements OnInit, OnDestroy{
         private _router: Router,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseConfirmationService: FuseConfirmationService,
-        private _toastrService:ToastrService
+        private _toastrService:ToastrService,
+        private _organizationService: OrganizationService
     )
     {
     }
@@ -61,6 +68,15 @@ export class ListComponent implements OnInit, OnDestroy{
      */
     ngOnInit(): void
     {
+        // Membre d'organisation : ses modeles sont les modeles WhatsApp Business (vue dediee).
+        this._organizationService.loadedMembership$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((membership) => {
+                this.membershipLoaded = true;
+                this.isCloud = !!membership;
+                this._changeDetectorRef.markForCheck();
+            });
+
         // Get the messageTemplates
         this._store.dispatch(new MessageTemplateAction.FetchAllMessageTemplate())
 

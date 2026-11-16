@@ -7,13 +7,15 @@ import { SharedModule } from 'app/shared/shared.module';
 import { AddComponent } from './add/add.component';
 import { RichTextEditorModule } from 'app/shared/modules/rich-text-editor.module';
 import { DetailComponent } from './detail/detail.component';
+import { CloudMessageTemplatesComponent } from './cloud-templates/cloud-message-templates.component';
 
 
 @NgModule({
   declarations: [
     ListComponent,
     AddComponent,
-    DetailComponent
+    DetailComponent,
+    CloudMessageTemplatesComponent
   ],
   imports: [
     CommonModule,
