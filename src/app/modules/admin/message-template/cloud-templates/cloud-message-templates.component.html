@@ -9,10 +9,25 @@
                 La création, la modification et la suppression se font depuis Organisation &gt; WhatsApp.
             </div>
         </div>
-        <button mat-flat-button color="primary" type="button" (click)="create()">
-            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
-            <span class="ml-2">Nouveau modèle</span>
-        </button>
+        <div class="flex items-center gap-3">
+            <button mat-stroked-button type="button" [disabled]="syncing" (click)="sync()">
+                <mat-icon svgIcon="heroicons_outline:refresh"></mat-icon>
+                <span class="ml-2">{{ syncing ? 'Synchronisation…' : 'Synchroniser avec Meta' }}</span>
+            </button>
+            <button mat-flat-button color="primary" type="button" (click)="create()">
+                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                <span class="ml-2">Nouveau modèle</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Etat de la synchronisation avec Meta -->
+    <div *ngIf="syncError" class="mt-6 rounded-2xl border border-red-200 bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-800 dark:text-red-300">
+        <strong>Modèles non synchronisés avec Meta.</strong> Liste affichée : copie enregistrée localement.
+        Raison : {{ syncError }}
+    </div>
+    <div *ngIf="!syncError && lastSyncAt" class="mt-4 text-xs text-secondary">
+        Lu chez Meta à {{ lastSyncAt | date:'HH:mm:ss' }}
     </div>
 
     <!-- Liste -->

@@ -28,6 +28,11 @@ export class CloudMessageTemplatesComponent implements OnInit, OnDestroy
 {
     templates: WhatsappTemplate[] = [];
     loading = true;
+    /** Synchronisation avec Meta en cours. */
+    syncing = false;
+    /** Erreur de la derniere synchronisation (les modeles affiches sont alors ceux de la base locale). */
+    syncError: string | null = null;
+    lastSyncAt: Date | null = null;
     expanded: string | null = null;
     readonly statusLabels = TEMPLATE_STATUS;
     readonly categoryLabels = TEMPLATE_CATEGORY_LABELS;
@@ -47,11 +52,34 @@ export class CloudMessageTemplatesComponent implements OnInit, OnDestroy
 
     ngOnInit(): void
     {
-        this.refresh();
+        // Les modeles sont lus chez Meta a l'ouverture (et non seulement la copie locale).
+        this.sync();
         // Approbation Meta : mise a jour sans rechargement.
         this._socket.fromEvent<any>('template-status')
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(() => this.refresh());
+            .subscribe(() => this.sync());
+    }
+
+    /** Lit les modeles chez Meta puis affiche le resultat. En cas d'echec, affiche l'erreur et la copie locale. */
+    sync(): void
+    {
+        this.syncing = true;
+        this._cdr.markForCheck();
+        this._organizationService.syncTemplates().subscribe({
+            next : (templates) => {
+                this.templates = templates || [];
+                this.syncError = null;
+                this.lastSyncAt = new Date();
+                this.loading = false;
+                this.syncing = false;
+                this._cdr.markForCheck();
+            },
+            error: (error) => {
+                this.syncError = readApiError(error);
+                this.syncing = false;
+                this.refresh();
+            },
+        });
     }
 
     ngOnDestroy(): void
