@@ -307,8 +307,8 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
                             this._cdr.markForCheck();
                             return;
                         }
-                        // Le numero choisi arrive par postMessage, parfois apres le code.
-                        setTimeout(() => this._finishSignup(code), 1500);
+                        // Le numero choisi arrive par postMessage : avant ou apres le code, selon Meta.
+                        this._awaitSignupSession(code);
                     }),
                     {
                         config_id                       : config.configId,
@@ -351,16 +351,31 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
         }
     }
 
+    /**
+     * Attend le message de fin de Meta (waba_id, et souvent phone_number_id) jusqu'a
+     * 10 s : Meta peut l'envoyer avant ou apres le code d'autorisation. Sans ce
+     * delai, la connexion etait tentee sans le numero choisi.
+     */
+    private _awaitSignupSession(code: string, startedAt = Date.now()): void
+    {
+        const ready = !!this._signupSession.wabaId;
+        if (ready || Date.now() - startedAt > 10_000) {
+            this._finishSignup(code);
+            return;
+        }
+        setTimeout(() => this._awaitSignupSession(code, startedAt), 300);
+    }
+
     private _finishSignup(code: string): void
     {
         const { wabaId, phoneNumberId } = this._signupSession;
-        const coexistence = this.signupMode === 'coexistence';
-        if (!wabaId || (!phoneNumberId && !coexistence)) {
+        if (!wabaId) {
             this.connecting = false;
             this._toastr.error("Les identifiants du compte Meta n'ont pas été reçus : recommencez la connexion.", 'WhatsApp Business');
             this._cdr.markForCheck();
             return;
         }
+        // Sans numero dans le message, le serveur verifie les numeros du compte et refuse de deviner.
         this._organizationService.connectEmbedded(code, wabaId, phoneNumberId ?? null, this.signupMode).subscribe({
             next : (whatsapp) => {
                 this.connecting = false;
