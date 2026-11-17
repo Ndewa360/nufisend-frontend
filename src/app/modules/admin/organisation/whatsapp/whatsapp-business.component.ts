@@ -650,7 +650,7 @@ export class OrganisationWhatsappComponent implements OnInit, OnDestroy
                 this._toastr.success(
                     wasEditing
                         ? 'Modèle modifié : Meta le remet en revue. Le statut se met à jour automatiquement.'
-                        : 'Modèle soumis à Meta : la validation prend de quelques minutes à 24 h. Le statut se met à jour automatiquement.',
+                        : 'Modèle soumis à Meta : la validation prend de quelques minutes à 24 h. Le statut et la catégorie se mettent à jour automatiquement.',
                     'Modèle',
                 );
                 this.refreshTemplates(true);

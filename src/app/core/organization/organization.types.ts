@@ -113,6 +113,8 @@ export interface WhatsappTemplate
     name: string;
     language: string;
     category: string;
+    /** Categorie choisie a la soumission (peut differer de category si Meta l'a changee). */
+    requestedCategory?: string | null;
     status: string;
     bodyVariables: number;
     headerFormat?: string | null;

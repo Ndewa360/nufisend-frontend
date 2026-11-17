@@ -212,6 +212,7 @@
                             <mat-option value="UTILITY">Utilitaire (commande, rendez-vous)</mat-option>
                             <mat-option value="AUTHENTICATION">Authentification (code)</mat-option>
                         </mat-select>
+                        <mat-hint>Meta décide de la catégorie finale selon le contenu. Un modèle Utilitaire contenant une promotion est classé Marketing.</mat-hint>
                     </mat-form-field>
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                         <mat-label>Langue</mat-label>
@@ -334,6 +335,11 @@
                             </span>
                             <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">
                                 {{ categoryLabels[(template.category || '').toLowerCase()] || template.category }}
+                            </span>
+                            <span *ngIf="template.requestedCategory && template.requestedCategory !== template.category"
+                                  class="px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+                                  matTooltip="Meta a reclassé ce modèle. Il est envoyé au tarif de la nouvelle catégorie : reformulez le texte pour le garder dans la catégorie choisie.">
+                                Choisi : {{ categoryLabels[(template.requestedCategory || '').toLowerCase()] || template.requestedCategory }} · classé par Meta
                             </span>
                         </div>
                         <div class="text-sm mt-2 whitespace-pre-line">{{ templateBody(template) }}</div>
